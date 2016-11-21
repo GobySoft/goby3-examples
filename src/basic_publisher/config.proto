@@ -1,0 +1,9 @@
+import "goby/common/protobuf/app3.proto";
+import "goby/middleware/protobuf/interprocess_config.proto";
+
+message BasicPublisherConfig
+{
+  optional goby.protobuf.App3Config app = 1;
+  optional goby.protobuf.InterProcessPortalConfig interprocess_portal = 2;  
+}
+        

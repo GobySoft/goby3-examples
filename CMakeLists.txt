@@ -50,4 +50,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${project_BIN_DIR} CACHE PATH
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${project_LIB_DIR} CACHE PATH 
   "Output directory for the static libraries (archives)" )
 
+include_directories(${project_INC_DIR})
+protobuf_include_dirs(${project_INC_DIR})
+
 add_subdirectory(src)
+
+## configure to build/include
+file(GLOB_RECURSE INCLUDE_FILES RELATIVE ${project_SRC_DIR} 
+  src/messages/*.proto
+  )
+foreach(I ${INCLUDE_FILES})
+  configure_file(${project_SRC_DIR}/${I} ${project_INC_DIR}/${I} @ONLY)
+endforeach()
+
