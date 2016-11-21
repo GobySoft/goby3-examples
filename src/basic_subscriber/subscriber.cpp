@@ -3,42 +3,36 @@
 #include "messages/nav.pb.h"
 #include "config.pb.h"
 
-using goby::glog;
-using namespace goby::common::logger;
-
 // optional "using" declaration (reduces verbiage)
 using Base = goby::SingleThreadApplication<BasicSubscriberConfig>;
 
 class BasicSubscriber : public Base
 {
 public:
-    BasicSubscriber() : Base(0.1 /*hertz*/)
+    // event driven subscriber doesn't need any loop() method (default constructor for Base)
+    BasicSubscriber() 
         {
-            auto nav_callback = [this](const NavigationReport& nav) { incoming_nav(nav); };
+            // C++11 lambda that turns this->incoming_nav into a basic function that will be called when we get subscribed mail
+            auto nav_callback = [this] (const NavigationReport& nav)
+                { this->incoming_nav(nav); };
+            // subscribe to a group for a given variable type and when we receive messages, call the nav_callback function
             portal().subscribe<nav_group, NavigationReport>(nav_callback);
         }
 
-    // virtual method in goby::SingleThreadApplication called at a given frequency
-    void loop() override
-        {
-        }
-
+    // called each time a NavigationReport on the Group "navigation" is received
     void incoming_nav(const NavigationReport& nav)
         {
             std::cout << "Rx: " << nav.DebugString() << std::flush;
-        }
-    
+        }    
     
 private:
-    // publish/subscribe group declaration (and definition, as a constexpr)
-    static constexpr goby::Group nav_group{"nav::report"};
+    // "navigation" must match the group name used by the publisher(s)
+    static constexpr goby::Group nav_group{"navigation"};
     
 };
 
-// publish/subscribe group "definition" (actual definition is in class body because this is a constexpr)
 constexpr goby::Group BasicSubscriber::nav_group;
 
 
 int main(int argc, char* argv[])
 { return goby::run<BasicSubscriber>(argc, argv); }
-
