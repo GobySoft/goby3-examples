@@ -25,7 +25,7 @@ include_directories("${DCCL_INCLUDE_DIR}")
 protobuf_include_dirs("${DCCL_INCLUDE_DIR}")
 
 find_package(GOBY REQUIRED)
-get_target_property(GOBY_INCLUDE_DIR goby_moos INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(GOBY_INCLUDE_DIR goby_middleware INTERFACE_INCLUDE_DIRECTORIES)
 
 message("Using Goby in ${GOBY_INCLUDE_DIR}")
 include_directories("${GOBY_INCLUDE_DIR}")
