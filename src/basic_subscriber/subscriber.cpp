@@ -1,6 +1,8 @@
 #include "goby/middleware/single-thread-application.h"
 
 #include "messages/nav.pb.h"
+#include "messages/groups.h"
+
 #include "config.pb.h"
 
 // optional "using" declaration (reduces verbiage)
@@ -24,15 +26,7 @@ public:
         {
             std::cout << "Rx: " << nav.DebugString() << std::flush;
         }    
-    
-private:
-    // "navigation" must match the group name used by the publisher(s)
-    static constexpr goby::Group nav_group{"navigation"};
-    
 };
-
-constexpr goby::Group BasicSubscriber::nav_group;
-
 
 int main(int argc, char* argv[])
 { return goby::run<BasicSubscriber>(argc, argv); }

@@ -1,6 +1,8 @@
 #include "goby/middleware/single-thread-application.h" // provides SingleThreadApplication
 
 #include "messages/nav.pb.h" // Protobuf, defines NavigationReport
+#include "messages/groups.h" // defines publish/subscribe groups
+
 #include "config.pb.h" // Protobuf, defines BasicPublisherConfig
 
 // optional "using" declaration (reduces verbiage)
@@ -25,17 +27,8 @@ public:
 
             std::cout << "Tx: " << nav.DebugString() << std::flush;
             portal().publish<nav_group>(nav);
-        }
-    
-    
-private:
-    // publish/subscribe group declaration (and definition, as a constexpr). "navigation" is an arbitrary string that names the group
-    static constexpr goby::Group nav_group{"navigation"};
-    
+        }    
 };
-
-// publish/subscribe group "definition" (actual definition is in class body because this is a constexpr)
-constexpr goby::Group BasicPublisher::nav_group;
 
 
 // reads command line parameters based on BasicPublisherConfig definition
