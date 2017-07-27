@@ -7,6 +7,7 @@
 
 // optional "using" declaration (reduces verbiage)
 using Base = goby::SingleThreadApplication<BasicSubscriberConfig>;
+using protobuf::NavigationReport;
 
 class BasicSubscriber : public Base
 {
@@ -18,7 +19,7 @@ public:
             auto nav_callback = [this] (const NavigationReport& nav)
                 { this->incoming_nav(nav); };
             // subscribe to a group for a given variable type and when we receive messages, call the nav_callback function
-            portal().subscribe<nav_group, NavigationReport>(nav_callback);
+            transporter().subscribe<groups::nav, NavigationReport>(nav_callback);
         }
 
     // called each time a NavigationReport on the Group "navigation" is received

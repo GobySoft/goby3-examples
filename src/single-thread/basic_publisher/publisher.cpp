@@ -7,6 +7,7 @@
 
 // optional "using" declaration (reduces verbiage)
 using Base = goby::SingleThreadApplication<BasicPublisherConfig>;
+using protobuf::NavigationReport;
 
 class BasicPublisher : public Base
 {
@@ -26,7 +27,7 @@ public:
             nav.set_z(-305 + std::rand() % 10);
 
             std::cout << "Tx: " << nav.DebugString() << std::flush;
-            portal().publish<nav_group>(nav);
+            transporter().publish<groups::nav>(nav);
         }    
 };
 
