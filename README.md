@@ -2,10 +2,34 @@
 Examples for the Goby3 middleware (https://github.com/GobySoft/goby3)
 
 ## Interthread
-Examples to be posted in the near future...
+A working example using a standard NMEA-0183 GPS is given in src/multi-thread/gps_driver.
+
+This example consists of two processes: ```gps_driver``` which has two threads: one thread blocks reading the serial port, while the other (the main thread) waits for control data published by another process. Based on the control data parameter, the main thread spawns or joins the reader thread. ```gps_controller``` is a simple application that writes the value from the configuration file, and then quits.
+
+To run, you will need a GPS connected and know the serial port:
+```
+gobyd
+```
+
+```
+cd build/bin
+./gps_driver --serial_port=/dev/ttyUSB0 --serial_baud=4800
+```
+
+Then you can disable GPS reading via
+```
+cd build/bin
+./gps_controller --read_gps=false
+```
+
+And re-enable it by 
+```
+./gps_controller --read_gps=true
+```
+
 
 ## Interprocess
-A basic single-thread interprocess publish/subscribe example is given in src/basic_publisher and src/basic_subscriber. To run using the default UNIX sockets use:
+A basic single-thread interprocess publish/subscribe example is given in src/single-thread/basic_publisher and src/single-thread/basic_subscriber. To run using the default UNIX sockets use:
 ```
 gobyd
 ```
