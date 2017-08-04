@@ -13,21 +13,26 @@ class BasicPublisher : public ThreadBase
 {
 public:
 BasicPublisher(const BasicMultithreadPubSubConfig& config, ThreadBase::Transporter* t)
-    : ThreadBase(config, t, 0.01 /*hertz*/)
+    : ThreadBase(config, t, 10 /*hertz*/)
         {
-            std::cout << "My configuration int is: " << cfg().my_value() << std::endl;
+            using goby::glog;
+            using namespace goby::common::logger;
+            glog.is(VERBOSE) && glog << "My configuration int is: " << cfg().my_value() << std::endl;
         }
 
     void loop() override
         {
+            using goby::glog;
+            using namespace goby::common::logger;
+
             protobuf::NavigationReport nav;
             nav.set_x(95 + std::rand() % 20);
             nav.set_y(195 + std::rand() % 20);
             nav.set_z(-305 + std::rand() % 10);
-
-            std::cout << "Tx: " << nav.DebugString() << std::flush;
-            // publish only on the interthread layer
-            // transporter().inner().publish<groups::nav>(nav);
+            
+            glog.is(VERBOSE) && glog << "Tx: " << nav.DebugString() << std::flush;
+            // publish only on the interthread layer (transporter().inner(), since transporter is an InterProcessForwarder)
+            transporter().inner().publish<groups::nav>(nav);
         }    
 };
 

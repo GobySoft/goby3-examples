@@ -11,6 +11,7 @@
 using AppBase = goby::MultiThreadApplication<BasicMultithreadPubSubConfig>;
 using ThreadBase = AppBase::ThreadBase;
 
+template<int subscriber_index>
 class BasicSubscriber : public ThreadBase
 {
 public:
@@ -21,20 +22,17 @@ public:
                 { this->incoming_nav(nav); };
 
             // subscribe only on the interthread layer
-            transporter().inner().subscribe<groups::nav, protobuf::NavigationReport>(nav_callback);
+            transporter().inner().template subscribe<groups::nav, protobuf::NavigationReport>(nav_callback);
         }
 
     // called each time a NavigationReport on the Group "navigation" is received
     void incoming_nav(const protobuf::NavigationReport& nav)
         {
-            std::cout << "Rx: " << nav.DebugString() << std::flush;
-        }
+            using goby::glog;
+            using namespace goby::common::logger;
 
-    void loop() override
-    {
-        goby::glog.is(goby::common::logger::VERBOSE) && goby::glog << goby::common::goby_time() << std::endl;
-    }
-    
+            glog.is(VERBOSE) && glog <<  "Rx: " << subscriber_index << ": " << nav.DebugString() << std::flush;
+        }
 };
 
 #endif

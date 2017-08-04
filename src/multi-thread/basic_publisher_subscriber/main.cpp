@@ -6,10 +6,14 @@ using AppBase = goby::MultiThreadApplication<BasicMultithreadPubSubConfig>;
 class BasicMultiThreadPubSub : public AppBase
 {
 public:
-    BasicMultiThreadPubSub()
+    BasicMultiThreadPubSub() :
+        AppBase()
+        
         {
+            // launch a publisher then two subscriber threads
             launch_thread<BasicPublisher>();
-            launch_thread<BasicSubscriber>();
+            launch_thread<BasicSubscriber<0>>();
+            launch_thread<BasicSubscriber<1>>();
         }
 };
 
