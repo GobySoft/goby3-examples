@@ -8,8 +8,7 @@
 
 #include "config.pb.h"
 
-using AppBase = goby::MultiThreadApplication<BasicMultithreadPubSubConfig>;
-using ThreadBase = AppBase::ThreadBase;
+using ThreadBase = goby::Thread<BasicMultithreadPubSubConfig, goby::InterProcessForwarder<goby::InterThreadTransporter>>;
 
 template<int subscriber_index>
 class BasicSubscriber : public ThreadBase

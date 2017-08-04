@@ -6,8 +6,7 @@
 #include "messages/groups.h"
 #include "config.pb.h" 
 
-using AppBase = goby::MultiThreadApplication<BasicMultithreadPubSubConfig>;
-using ThreadBase = AppBase::ThreadBase;
+using ThreadBase = goby::Thread<BasicMultithreadPubSubConfig, goby::InterProcessForwarder<goby::InterThreadTransporter>>;
 
 class BasicPublisher : public ThreadBase
 {
@@ -15,6 +14,7 @@ public:
 BasicPublisher(const BasicMultithreadPubSubConfig& config, ThreadBase::Transporter* t)
     : ThreadBase(config, t, 10 /*hertz*/)
         {
+            // goby::glog is thread safe in goby::MultiThreadApplication, std::cout is not
             using goby::glog;
             using namespace goby::common::logger;
             glog.is(VERBOSE) && glog << "My configuration int is: " << cfg().my_value() << std::endl;

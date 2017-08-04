@@ -46,9 +46,6 @@ public:
     
     void loop() override
         {
-            glog.is(VERBOSE) && glog << "Serial loop" << std::endl;
-
-            
             boost::asio::streambuf buffer;
             boost::asio::read_until(serial_port_, buffer, '\n');
             std::istream is(&buffer);
@@ -125,7 +122,7 @@ class GPSAnalyzeThread : public ThreadBase
 {
 public:
     GPSAnalyzeThread(const GPSDriverConfig& cfg, ThreadBase::Transporter* t)
-        : ThreadBase(cfg, t, 1)
+        : ThreadBase(cfg, t)
         {
             transporter().subscribe<groups::gps_data, GPSPosition>(
                 [](const GPSPosition& pos)
@@ -133,15 +130,7 @@ public:
                     glog.is(VERBOSE) && glog << "GPSAnalyzeThread: " << pos.ShortDebugString() << std::endl;
                 }
                 );
-        }
-
-
-    void loop() override
-        {
-            glog.is(VERBOSE) && glog << "Analyze loop" << std::endl;
-        }
-    
-    
+        }    
 };
     
 
@@ -149,7 +138,6 @@ class GPSDriver : public AppBase
 {
 public:
     GPSDriver()
-        : AppBase(0) // freq of 0 disable loop() virtual method. GPSDriver is event driven
         {
             transporter().subscribe<groups::gps_control, GPSCommand>(
                 [this] (const GPSCommand& cmd) { this->incoming_command(cmd); }
@@ -168,15 +156,7 @@ public:
                 join_thread<GPSSerialThread>();
         }
 
-    void loop() override
-        {
-            glog.is(VERBOSE) && glog << "Main loop" << std::endl;
-        }
-    
-    
 };
-
-    
 
 
 
