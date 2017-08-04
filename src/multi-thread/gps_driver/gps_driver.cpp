@@ -24,12 +24,12 @@ using goby::glog;
 class GPSSerialThread : public ThreadBase
 {
 public:
-    GPSSerialThread(const GPSDriverConfig& cfg, ThreadBase::Transporter* t)
-        : ThreadBase(t, ThreadBase::loop_max_frequency()), // max loop frequency since we're going to block on serial I/O inside of loop
-          serial_port_(io_, cfg.serial_port())
+    GPSSerialThread(const GPSDriverConfig& config, ThreadBase::Transporter* t)
+        : ThreadBase(config, t, ThreadBase::loop_max_frequency()), // max loop frequency since we're going to block on serial I/O inside of loop
+          serial_port_(io_, cfg().serial_port())
         {
             using boost::asio::serial_port_base;
-            serial_port_.set_option(serial_port_base::baud_rate(cfg.serial_baud()));
+            serial_port_.set_option(serial_port_base::baud_rate(cfg().serial_baud()));
             // no flow control
             serial_port_.set_option(serial_port_base::flow_control(serial_port_base::flow_control::none));
 
@@ -125,7 +125,7 @@ class GPSAnalyzeThread : public ThreadBase
 {
 public:
     GPSAnalyzeThread(const GPSDriverConfig& cfg, ThreadBase::Transporter* t)
-        : ThreadBase(t, 1)
+        : ThreadBase(cfg, t, 1)
         {
             transporter().subscribe<groups::gps_data, GPSPosition>(
                 [](const GPSPosition& pos)
