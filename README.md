@@ -35,7 +35,7 @@ cd build/bin
 ### GPS Driver
 A working example using a standard NMEA-0183 GPS is given in ```src/multi-thread/gps_driver```.
 
-This example consists of two processes: ```gps_driver``` which has two threads: one thread blocks reading the serial port, while the other (the main thread) waits for control data published by another process. Based on the control data parameter, the main thread spawns or joins the reader thread. ```gps_controller``` is a simple application that writes the value from the configuration file, and then quits.
+This example consists of two processes: ```gps_driver``` which has three threads: one thread blocks reading the serial port, one subscribes to the data read by the first thread and writes it to the screen (as a proxy for doing some data analysis on it), while the third (the main thread) waits for control data published by another process. Based on the control data parameter, the main thread spawns or joins the reader thread. ```gps_controller``` is a simple application that writes the value from the configuration file, and then quits.
 
 To run, you will need a GPS connected and know the serial port:
 ```
