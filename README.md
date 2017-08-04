@@ -44,7 +44,7 @@ gobyd
 
 ```
 cd build/bin
-./gps_driver --serial_port=/dev/ttyUSB0 --serial_baud=4800
+./gps_driver --serial_port=/dev/ttyUSB0 --serial_baud=4800 -v
 ```
 
 Then you can disable GPS reading via
