@@ -10,7 +10,6 @@
 
 using ThreadBase = goby::Thread<BasicMultithreadPubSubConfig, goby::InterProcessForwarder<goby::InterThreadTransporter>>;
 
-template<int subscriber_index>
 class BasicSubscriber : public ThreadBase
 {
 public:
@@ -30,7 +29,7 @@ public:
             using goby::glog;
             using namespace goby::common::logger;
 
-            glog.is(VERBOSE) && glog <<  "Rx: " << subscriber_index << ": " << nav.DebugString() << std::flush;
+            glog.is(VERBOSE) && glog <<  "Rx: " << ThreadBase::index() <<  ": " << nav.DebugString() << std::flush;
         }
 };
 

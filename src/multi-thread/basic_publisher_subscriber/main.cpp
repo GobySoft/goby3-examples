@@ -12,8 +12,8 @@ public:
         {
             // launch a publisher then two subscriber threads
             launch_thread<BasicPublisher>();
-            launch_thread<BasicSubscriber<0>>();
-            launch_thread<BasicSubscriber<1>>();
+            launch_thread<BasicSubscriber>(0);
+            launch_thread<BasicSubscriber>(1);
         }
 };
 
