@@ -5,10 +5,17 @@
 
 namespace groups
 {    
-    // extern is currently required by g++ but not clang++
+#ifdef __clang__
+    constexpr goby::Group nav{"navigation"};
+    constexpr goby::Group gps_data{"gps_data"};
+    constexpr goby::Group gps_control{"gps_control"};
+#else
+    // bug in gcc requires extern
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52036
     extern constexpr goby::Group nav{"navigation"};
     extern constexpr goby::Group gps_data{"gps_data"};
     extern constexpr goby::Group gps_control{"gps_control"};
+#endif
     
 }
 
