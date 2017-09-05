@@ -15,7 +15,7 @@ using protobuf::GPSCommand;
 using protobuf::GPSPosition;
 
 using AppBase = goby::MultiThreadApplication<GPSDriverConfig>;
-using ThreadBase = AppBase::ThreadBase;
+using ThreadBase = goby::SimpleThread<GPSDriverConfig>;
 namespace si = boost::units::si;
 
 using namespace goby::common::logger;
@@ -24,8 +24,8 @@ using goby::glog;
 class GPSSerialThread : public ThreadBase
 {
 public:
-    GPSSerialThread(const GPSDriverConfig& config, ThreadBase::Transporter* t)
-        : ThreadBase(config, t, ThreadBase::loop_max_frequency()), // max loop frequency since we're going to block on serial I/O inside of loop
+    GPSSerialThread(const GPSDriverConfig& config)
+        : ThreadBase(config, ThreadBase::loop_max_frequency()), // max loop frequency since we're going to block on serial I/O inside of loop
           serial_port_(io_, cfg().serial_port())
         {
             using boost::asio::serial_port_base;
@@ -73,7 +73,7 @@ public:
                     gps.set_latitude(nmea_geo_to_decimal(nmea.as<double>(LAT), nmea.as<char>(LAT_HEMI)));
                     gps.set_longitude(nmea_geo_to_decimal(nmea.as<double>(LON), nmea.as<char>(LON_HEMI)));
                 
-                    transporter().publish<groups::gps_data>(gps);
+                    interprocess().publish<groups::gps_data>(gps);
                 }
                 
             }
@@ -121,10 +121,10 @@ private:
 class GPSAnalyzeThread : public ThreadBase
 {
 public:
-    GPSAnalyzeThread(const GPSDriverConfig& cfg, ThreadBase::Transporter* t)
-        : ThreadBase(cfg, t)
+    GPSAnalyzeThread(const GPSDriverConfig& cfg)
+        : ThreadBase(cfg)
         {
-            transporter().subscribe<groups::gps_data, GPSPosition>(
+            interprocess().subscribe<groups::gps_data, GPSPosition>(
                 [](const GPSPosition& pos)
                 {
                     glog.is(VERBOSE) && glog << "GPSAnalyzeThread: " << pos.ShortDebugString() << std::endl;
@@ -139,7 +139,7 @@ class GPSDriver : public AppBase
 public:
     GPSDriver()
         {
-            transporter().subscribe<groups::gps_control, GPSCommand>(
+            interprocess().subscribe<groups::gps_control, GPSCommand>(
                 [this] (const GPSCommand& cmd) { this->incoming_command(cmd); }
                 );
 

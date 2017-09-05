@@ -8,19 +8,19 @@
 
 #include "config.pb.h"
 
-using ThreadBase = goby::Thread<BasicMultithreadPubSubConfig, goby::InterProcessForwarder<goby::InterThreadTransporter>>;
+using ThreadBase = goby::SimpleThread<BasicMultithreadPubSubConfig>;
 
 class BasicSubscriber : public ThreadBase
 {
 public:
-    BasicSubscriber(const BasicMultithreadPubSubConfig& config, ThreadBase::Transporter* t)
-        : ThreadBase(config, t)
+BasicSubscriber(const BasicMultithreadPubSubConfig& config, int index)
+    : ThreadBase(config, 0, index)
         {
             auto nav_callback = [this] (const protobuf::NavigationReport& nav)
                 { this->incoming_nav(nav); };
 
             // subscribe only on the interthread layer
-            transporter().inner().template subscribe<groups::nav, protobuf::NavigationReport>(nav_callback);
+            interthread().subscribe<groups::nav, protobuf::NavigationReport>(nav_callback);
         }
 
     // called each time a NavigationReport on the Group "navigation" is received
