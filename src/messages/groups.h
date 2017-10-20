@@ -1,7 +1,7 @@
 #ifndef GOBY3EXAMPLES_GROUPS_H
 #define GOBY3EXAMPLES_GROUPS_H
 
-#include "goby/middleware/serialize_parse.h"
+#include "goby/middleware/group.h"
 
 namespace groups
 {    
