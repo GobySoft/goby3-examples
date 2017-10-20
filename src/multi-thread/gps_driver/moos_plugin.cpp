@@ -52,7 +52,7 @@ private:
     void goby_to_moos(const GPSPosition& pos)
         {
             Base::moos_comms().Notify("GPS_LATITUDE", pos.latitude());
-            Base::moos_comms().Notify("GPS_LATITUDE", pos.longitude());
+            Base::moos_comms().Notify("GPS_LONGITUDE", pos.longitude());
         }
 };
 
