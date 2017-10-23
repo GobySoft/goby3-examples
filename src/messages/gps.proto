@@ -5,18 +5,9 @@ package protobuf;
 
 message GPSPosition
 {
-    option (dccl.msg) = { codec_version: 3
-                          id: 124
-                          max_bytes: 32 };
-
-    required double time = 1 [(dccl.field) = { min: 0 max: 86400 precision: 0 }];
-
-    // assume Woods Hole harbor is at lat: 41.524991°, -70.676540°
-    // 111,320 meters per degree of latitude. We want to operate in a 100km radius, but we'll use a full degree to be safe
-    required double latitude = 2 [(dccl.field) = { min: 40.524991 max: 42.524991 precision: 6 }];
-
-    // at 42.524991 latitude, longitude lines are closer so that 1.356 degrees is about 111 km. 
-    required double longitude = 3 [(dccl.field) = { min: -72.03254 max: -69.32054 precision: 6} ];
+    required double time = 1;
+    required double latitude = 2;
+    required double longitude = 3;
 }
 
 message GPSCommand
