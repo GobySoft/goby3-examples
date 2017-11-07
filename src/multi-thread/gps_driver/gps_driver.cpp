@@ -154,13 +154,9 @@ public:
             try
             {
                 if(cmd.read_gps())
-                {
                     launch_thread<GPSSerialThread>();
-                }
                 else
-                {
                     join_thread<GPSSerialThread>();
-                }
             }
             catch(goby::Exception& e)
             {
