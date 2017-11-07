@@ -125,7 +125,7 @@ public:
     GPSAnalyzeThread(const GPSDriverConfig& cfg)
         : ThreadBase(cfg)
         {
-            interprocess().subscribe<groups::gps_data, GPSPosition>(
+            interthread().subscribe<groups::gps_data, GPSPosition>(
                 [](const GPSPosition& pos)
                 {
                     glog.is(VERBOSE) && glog << "GPSAnalyzeThread: " << pos.ShortDebugString() << std::endl;
