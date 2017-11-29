@@ -1,7 +1,7 @@
 #include "publisher.h"
 #include "subscriber.h"
 
-using AppBase = goby::MultiThreadApplication<BasicMultithreadPubSubConfig>;
+using AppBase = goby::MultiThreadStandaloneApplication<BasicMultithreadPubSubConfig>;
 
 class BasicMultiThreadPubSub : public AppBase
 {
