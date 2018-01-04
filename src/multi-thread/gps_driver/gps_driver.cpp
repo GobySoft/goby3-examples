@@ -46,9 +46,8 @@ public:
     
     void loop() override
         {
-            boost::asio::streambuf buffer;
-            boost::asio::read_until(serial_port_, buffer, '\n');
-            std::istream is(&buffer);
+            boost::asio::read_until(serial_port_, buffer_, '\n');
+            std::istream is(&buffer_);
             std::string line;
             std::getline(is, line);            
             glog.is(VERBOSE) && glog << "GPSSerialThread: " << line << std::endl;
@@ -116,6 +115,8 @@ public:
 private:
     boost::asio::io_service io_;
     boost::asio::serial_port serial_port_;
+    boost::asio::streambuf buffer_;
+
 };
 
 class GPSAnalyzeThread : public ThreadBase
@@ -124,7 +125,7 @@ public:
     GPSAnalyzeThread(const GPSDriverConfig& cfg)
         : ThreadBase(cfg)
         {
-            interprocess().subscribe<groups::gps_data, GPSPosition>(
+            interthread().subscribe<groups::gps_data, GPSPosition>(
                 [](const GPSPosition& pos)
                 {
                     glog.is(VERBOSE) && glog << "GPSAnalyzeThread: " << pos.ShortDebugString() << std::endl;
@@ -150,10 +151,17 @@ public:
     void incoming_command(const GPSCommand& cmd)
         {
             glog.is(VERBOSE) && glog << "GPSDriver (main thread): incoming command: " << cmd.ShortDebugString() << std::endl;
-            if(cmd.read_gps())
-                launch_thread<GPSSerialThread>();
-            else
-                join_thread<GPSSerialThread>();
+            try
+            {
+                if(cmd.read_gps())
+                    launch_thread<GPSSerialThread>();
+                else
+                    join_thread<GPSSerialThread>();
+            }
+            catch(goby::Exception& e)
+            {
+                glog.is(VERBOSE) && glog << "Did not process command. Reason: " << e.what() << std::endl;
+            }
         }
 
 };
