@@ -6,7 +6,7 @@ message BasicMultithreadPubSubConfig
     // required parameters for ApplicationBase3 class
     optional goby.protobuf.App3Config app = 1;
     // required parameters for connecting to 'gobyd'
-    optional goby.protobuf.InterProcessPortalConfig interprocess_portal = 2;
+    optional goby.protobuf.InterProcessPortalConfig interprocess = 2;
 
     optional int32 my_value = 3;
 }
