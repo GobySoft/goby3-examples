@@ -12,7 +12,7 @@ public:
         {
             protobuf::GPSCommand cmd;
             cmd.set_read_gps(cfg().read_gps());
-            transporter().publish<groups::gps_control>(cmd);
+            interprocess().publish<groups::gps_control>(cmd);
             quit();
         }
 };

@@ -32,7 +32,7 @@ private:
 		ctrl_.set_desired_state(protobuf::ON);
 	    
 	    std::cout << "Tx: " << ctrl_.DebugString() << std::flush;
-            transporter().publish<groups::state_control>(ctrl_);
+            interprocess().publish<groups::state_control>(ctrl_);
         }
 private:
     protobuf::StateControl ctrl_;

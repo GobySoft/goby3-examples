@@ -27,7 +27,7 @@ public:
             nav.set_z(-305 + std::rand() % 10);
 
             std::cout << "Tx: " << nav.DebugString() << std::flush;
-            transporter().publish<groups::nav>(nav);
+            interprocess().publish<groups::nav>(nav);
         }    
 };
 
