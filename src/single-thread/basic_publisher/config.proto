@@ -3,11 +3,11 @@ import "goby/middleware/protobuf/interprocess_config.proto";
 
 message BasicPublisherConfig
 {
-  // required parameters for ApplicationBase3 class
-  optional goby.protobuf.App3Config app = 1;
-  // required parameters for connecting to 'gobyd'
-  optional goby.protobuf.InterProcessPortalConfig interprocess = 2;
+    // required parameters for ApplicationBase3 class
+    optional goby.protobuf.App3Config app = 1;
+    // required parameters for connecting to 'gobyd'
+    optional goby.protobuf.InterProcessPortalConfig interprocess = 2;
 
-  // any specific parameters for your application
-  optional int32 my_value = 3;
+    // any specific parameters for your application
+    optional int32 my_value = 3;
 }

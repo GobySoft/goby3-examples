@@ -2,16 +2,16 @@ package protobuf;
 
 enum State
 {
-  ON = 1;
-  OFF = 2;
+    ON = 1;
+    OFF = 2;
 }
 
 message StateControl
 {
-   required State desired_state = 1;
+    required State desired_state = 1;
 }
 
 message StateReport
 {
-   required State current_state = 1;
+    required State current_state = 1;
 }
