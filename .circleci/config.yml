@@ -1,3 +1,7 @@
+environment-template-common: &environment-template-common
+  CC="/usr/bin/clang"
+  CXX="/usr/bin/clang++"
+
 environment-template-stretch: &environment-template-stretch
   DISTRO_RELEASE_CODENAME: "stretch"
   DISTRO_RELEASE_VERSION: "debian9"
@@ -61,14 +65,17 @@ jobs:
     <<: *job-template-amd64
     docker: *docker-base-stretch
     environment:
+      <<: *environment-template-common
       <<: *environment-template-stretch    
   amd64-xenial-build:
     <<: *job-template-amd64
     docker: *docker-base-xenial
     environment:
+      <<: *environment-template-common
       <<: *environment-template-xenial
   amd64-bionic-build:
     <<: *job-template-amd64
     docker: *docker-base-bionic
     environment:
+      <<: *environment-template-common
       <<: *environment-template-bionic    
