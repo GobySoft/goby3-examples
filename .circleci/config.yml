@@ -1,6 +1,6 @@
 environment-template-common: &environment-template-common
-  CC="/usr/bin/clang"
-  CXX="/usr/bin/clang++"
+  CC: "/usr/bin/clang"
+  CXX: "/usr/bin/clang++"
 
 environment-template-stretch: &environment-template-stretch
   DISTRO_RELEASE_CODENAME: "stretch"
