@@ -10,7 +10,7 @@ class BasicPublisher : public goby::SimpleThread<BasicMultithreadPubSubConfig>
 {
   public:
     BasicPublisher(const BasicMultithreadPubSubConfig& config)
-        : goby::SimpleThread<BasicMultithreadPubSubConfig>(config, 10 /*hertz*/)
+        : goby::SimpleThread<BasicMultithreadPubSubConfig>(config, 1 /*hertz*/)
     {
         // goby::glog is thread safe in goby::MultiThreadApplication, std::cout is not
         goby::glog.is_verbose() && goby::glog << "My configuration int is: " << cfg().my_value()
