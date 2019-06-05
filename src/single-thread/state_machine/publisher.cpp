@@ -1,11 +1,11 @@
-#include "goby/middleware/single-thread-application.h"
+#include "goby/zeromq/single-thread-application.h"
 
 #include "messages/groups.h"
 #include "messages/state.pb.h"
 
 #include "config.pb.h"
 
-using Base = goby::SingleThreadApplication<StateMachineCtrlConfig>;
+using Base = goby::zeromq::SingleThreadApplication<StateMachineCtrlConfig>;
 
 class StateMachineCtrl : public Base
 {

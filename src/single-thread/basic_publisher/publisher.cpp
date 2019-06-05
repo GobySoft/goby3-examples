@@ -1,4 +1,4 @@
-#include "goby/middleware/single-thread-application.h" // provides SingleThreadApplication
+#include "goby/zeromq/single-thread-application.h" // provides SingleThreadApplication
 
 #include "messages/groups.h" // defines publish/subscribe groups
 #include "messages/nav.pb.h" // Protobuf, defines NavigationReport
@@ -6,7 +6,7 @@
 #include "config.pb.h" // Protobuf, defines BasicPublisherConfig
 
 // optional "using" declaration (reduces verbiage)
-using Base = goby::SingleThreadApplication<BasicPublisherConfig>;
+using Base = goby::zeromq::SingleThreadApplication<BasicPublisherConfig>;
 using protobuf::NavigationReport;
 
 class BasicPublisher : public Base
@@ -18,7 +18,7 @@ class BasicPublisher : public Base
         std::cout << "My configuration int is: " << cfg().my_value() << std::endl;
     }
 
-    // virtual method in goby::SingleThreadApplication called at the frequency given to Base(freq)
+    // virtual method in goby::zeromq::SingleThreadApplication called at the frequency given to Base(freq)
     void loop() override
     {
         NavigationReport nav;

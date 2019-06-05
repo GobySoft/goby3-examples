@@ -1,12 +1,12 @@
 import "goby/middleware/protobuf/app_config.proto";
-import "goby/middleware/protobuf/interprocess_config.proto";
+import "goby/zeromq/protobuf/interprocess_config.proto";
 
 message GPSDriverConfig
 {
     // required parameters for ApplicationBase3 class
     optional goby.protobuf.AppConfig app = 1;
     // required parameters for connecting to 'gobyd'
-    optional goby.protobuf.InterProcessPortalConfig interprocess = 2;
+    optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
 
     required string serial_port = 3;
     optional int32 serial_baud = 4 [default = 4800];
@@ -15,7 +15,7 @@ message GPSDriverConfig
 message GPSControllerConfig
 {
     optional goby.protobuf.AppConfig app = 1;
-    optional goby.protobuf.InterProcessPortalConfig interprocess = 2;
+    optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
 
     required bool read_gps = 10;
 }

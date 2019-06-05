@@ -4,7 +4,7 @@
 
 #include <boost/asio.hpp>
 
-#include "goby/middleware/multi-thread-application.h"
+#include "goby/zeromq/multi-thread-application.h"
 #include "goby/util/linebasedcomms/nmea_sentence.h"
 
 #include "config.pb.h"
@@ -14,7 +14,7 @@
 using protobuf::GPSCommand;
 using protobuf::GPSPosition;
 
-using AppBase = goby::MultiThreadApplication<GPSDriverConfig>;
+using AppBase = goby::zeromq::MultiThreadApplication<GPSDriverConfig>;
 using ThreadBase = goby::SimpleThread<GPSDriverConfig>;
 namespace si = boost::units::si;
 

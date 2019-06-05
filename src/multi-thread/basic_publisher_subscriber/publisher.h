@@ -2,7 +2,7 @@
 #define MULTITHREAD_PUBLISHER_H
 
 #include "config.pb.h"
-#include "goby/middleware/multi-thread-application.h"
+#include "goby/zeromq/multi-thread-application.h"
 #include "messages/groups.h"
 #include "messages/nav.pb.h"
 
@@ -12,7 +12,7 @@ class BasicPublisher : public goby::SimpleThread<BasicMultithreadPubSubConfig>
     BasicPublisher(const BasicMultithreadPubSubConfig& config)
         : goby::SimpleThread<BasicMultithreadPubSubConfig>(config, 1 /*hertz*/)
     {
-        // goby::glog is thread safe in goby::MultiThreadApplication, std::cout is not
+        // goby::glog is thread safe in goby::zeromq::MultiThreadApplication, std::cout is not
         goby::glog.is_verbose() && goby::glog << "My configuration int is: " << cfg().my_value()
                                               << std::endl;
     }

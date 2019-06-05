@@ -1,4 +1,4 @@
-#include "goby/middleware/single-thread-application.h"
+#include "goby/zeromq/single-thread-application.h"
 
 #include "messages/groups.h"
 #include "messages/nav.pb.h"
@@ -6,7 +6,7 @@
 #include "config.pb.h"
 
 // optional "using" declaration (reduces verbiage)
-using Base = goby::SingleThreadApplication<BasicSubscriberConfig>;
+using Base = goby::zeromq::SingleThreadApplication<BasicSubscriberConfig>;
 using protobuf::NavigationReport;
 
 class BasicSubscriber : public Base

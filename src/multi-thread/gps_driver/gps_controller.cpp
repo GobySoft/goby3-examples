@@ -1,11 +1,11 @@
-#include "goby/middleware/single-thread-application.h"
+#include "goby/zeromq/single-thread-application.h"
 
 #include "messages/gps.pb.h"
 #include "messages/groups.h"
 
 #include "config.pb.h"
 
-class GPSController : public goby::SingleThreadApplication<GPSControllerConfig>
+class GPSController : public goby::zeromq::SingleThreadApplication<GPSControllerConfig>
 {
   public:
     GPSController()
