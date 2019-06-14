@@ -22,13 +22,17 @@ class BasicSubscriber : public ThreadBase
 
         // subscribe only on the interthread layer
         interthread().subscribe<groups::nav, protobuf::NavigationReport>(nav_callback);
+        goby::glog.add_group("subscriber" + std::to_string(ThreadBase::index()),
+                             goby::util::Colors::green);
     }
 
     // called each time a NavigationReport on the Group "navigation" is received
     void incoming_nav(const protobuf::NavigationReport& nav)
     {
-        goby::glog.is_verbose() && goby::glog << "Rx: " << ThreadBase::index() << ": "
-                                              << nav.DebugString() << std::flush;
+        using namespace goby::util::tcolor;
+        goby::glog.is_verbose() &&
+            goby::glog << group("subscriber" + std::to_string(ThreadBase::index())) << green
+                       << "Rx: " << nocolor << nav.DebugString() << std::flush;
     }
 };
 

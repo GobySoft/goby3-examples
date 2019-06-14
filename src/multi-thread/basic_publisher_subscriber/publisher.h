@@ -15,6 +15,8 @@ class BasicPublisher : public goby::middleware::SimpleThread<BasicMultithreadPub
         // goby::glog is thread safe in goby::zeromq::MultiThreadApplication, std::cout is not
         goby::glog.is_verbose() && goby::glog << "My configuration int is: " << cfg().my_value()
                                               << std::endl;
+
+        goby::glog.add_group("publisher", goby::util::Colors::blue);
     }
 
     void loop() override
@@ -24,7 +26,11 @@ class BasicPublisher : public goby::middleware::SimpleThread<BasicMultithreadPub
         nav.set_y(195 + std::rand() % 20);
         nav.set_z(-305 + std::rand() % 10);
 
-        goby::glog.is_verbose() && goby::glog << "Tx: " << nav.DebugString() << std::flush;
+        using goby::util::tcolor::blue;
+        using goby::util::tcolor::nocolor;
+
+        goby::glog.is_verbose() && goby::glog << group("publisher") << blue << "Tx: " << nocolor
+                                              << nav.DebugString() << std::flush;
         interthread().publish<groups::nav>(nav);
     }
 };

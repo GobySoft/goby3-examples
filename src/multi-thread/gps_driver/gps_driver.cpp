@@ -4,8 +4,8 @@
 
 #include <boost/asio.hpp>
 
-#include "goby/zeromq/multi-thread-application.h"
 #include "goby/util/linebasedcomms/nmea_sentence.h"
+#include "goby/zeromq/multi-thread-application.h"
 
 #include "config.pb.h"
 #include "messages/gps.pb.h"
@@ -126,7 +126,8 @@ class GPSAnalyzeThread : public ThreadBase
     GPSAnalyzeThread(const GPSDriverConfig& cfg) : ThreadBase(cfg)
     {
         interthread().subscribe<groups::gps_data, GPSPosition>([](const GPSPosition& pos) {
-                glog.is_verbose() && glog << "GPSAnalyzeThread: " << pos.ShortDebugString() << std::endl;
+            glog.is_verbose() && glog << "GPSAnalyzeThread: " << pos.ShortDebugString()
+                                      << std::endl;
         });
     }
 };
@@ -146,7 +147,7 @@ class GPSDriver : public AppBase
     void incoming_command(const GPSCommand& cmd)
     {
         glog.is_verbose() && glog << "GPSDriver (main thread): incoming command: "
-                                 << cmd.ShortDebugString() << std::endl;
+                                  << cmd.ShortDebugString() << std::endl;
         try
         {
             if (cmd.read_gps())
