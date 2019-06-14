@@ -1,6 +1,9 @@
 environment-template-common: &environment-template-common
   CC: "/usr/bin/clang"
   CXX: "/usr/bin/clang++"
+  DEBIAN_FRONTEND: noninteractive
+  DEBIAN_PRIORITY: "critical"
+  DEBCONF_NOWARNINGS: "yes"
 
 environment-template-stretch: &environment-template-stretch
   DISTRO_RELEASE_CODENAME: "stretch"
