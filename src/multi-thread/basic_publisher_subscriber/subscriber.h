@@ -1,14 +1,14 @@
 #ifndef MULTITHREAD_SUBSCRIBER_H
 #define MULTITHREAD_SUBSCRIBER_H
 
-#include "goby/middleware/single-thread-application.h"
+#include "goby/zeromq/single-thread-application.h"
 
 #include "messages/groups.h"
 #include "messages/nav.pb.h"
 
 #include "config.pb.h"
 
-using ThreadBase = goby::SimpleThread<BasicMultithreadPubSubConfig>;
+using ThreadBase = goby::middleware::SimpleThread<BasicMultithreadPubSubConfig>;
 
 class BasicSubscriber : public ThreadBase
 {
@@ -22,13 +22,17 @@ class BasicSubscriber : public ThreadBase
 
         // subscribe only on the interthread layer
         interthread().subscribe<groups::nav, protobuf::NavigationReport>(nav_callback);
+        goby::glog.add_group("subscriber" + std::to_string(ThreadBase::index()),
+                             goby::util::Colors::green);
     }
 
     // called each time a NavigationReport on the Group "navigation" is received
     void incoming_nav(const protobuf::NavigationReport& nav)
     {
-        goby::glog.is_verbose() && goby::glog << "Rx: " << ThreadBase::index() << ": "
-                                              << nav.DebugString() << std::flush;
+        using namespace goby::util::tcolor;
+        goby::glog.is_verbose() &&
+            goby::glog << group("subscriber" + std::to_string(ThreadBase::index())) << green
+                       << "Rx: " << nocolor << nav.DebugString() << std::flush;
     }
 };
 

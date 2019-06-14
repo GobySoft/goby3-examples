@@ -1,18 +1,11 @@
+cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 project(goby3-examples C CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules/")
 
-cmake_minimum_required(VERSION 2.8.0 FATAL_ERROR)
-# This policy determines whether or not to follow symlinks encountered during a FILE GLOB_RECURSE cal
-cmake_policy(SET CMP0009 NEW)
-
 # require C++14
-if(CMAKE_VERSION VERSION_LESS 3.1)
-  add_definitions(-std=c++14)
-else()
-  set(CMAKE_CXX_STANDARD 14)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(ProtobufLocal REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
@@ -24,10 +17,8 @@ message("Using DCCL in ${DCCL_INCLUDE_DIR}")
 include_directories("${DCCL_INCLUDE_DIR}")
 protobuf_include_dirs("${DCCL_INCLUDE_DIR}")
 
-find_package(GOBY 3 REQUIRED)
-get_target_property(GOBY_INCLUDE_DIR goby_middleware INTERFACE_INCLUDE_DIRECTORIES)
+find_package(GOBY 3.0 COMPONENTS zeromq)
 
-message("Using Goby in ${GOBY_INCLUDE_DIR}")
 include_directories("${GOBY_INCLUDE_DIR}")
 protobuf_include_dirs("${GOBY_INCLUDE_DIR}")
 

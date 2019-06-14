@@ -1,4 +1,4 @@
-#include "goby/middleware/single-thread-application.h"
+#include "goby/zeromq/single-thread-application.h"
 
 #include "machine.h"
 
@@ -9,8 +9,9 @@
 
 using protobuf::NavigationReport;
 
-class StateMachineApp : public goby::SingleThreadApplication<StateMachineAppConfig,
-                                                             statechart::Machine<StateMachineApp> >
+class StateMachineApp
+    : public goby::zeromq::SingleThreadApplication<StateMachineAppConfig,
+                                                   statechart::Machine<StateMachineApp> >
 {
   public:
     StateMachineApp()

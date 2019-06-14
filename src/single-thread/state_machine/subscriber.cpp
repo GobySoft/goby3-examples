@@ -1,4 +1,4 @@
-#include "goby/middleware/single-thread-application.h"
+#include "goby/zeromq/single-thread-application.h"
 
 #include "machine.h"
 
@@ -7,7 +7,7 @@
 
 #include "config.pb.h"
 
-class StateMachineApp : public goby::SingleThreadApplication<StateMachineAppConfig>
+class StateMachineApp : public goby::zeromq::SingleThreadApplication<StateMachineAppConfig>
 {
   public:
     StateMachineApp()
