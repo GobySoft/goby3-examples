@@ -8,7 +8,7 @@
 
 #include "config.pb.h"
 
-using ThreadBase = goby::SimpleThread<BasicMultithreadPubSubConfig>;
+using ThreadBase = goby::middleware::SimpleThread<BasicMultithreadPubSubConfig>;
 
 class BasicSubscriber : public ThreadBase
 {

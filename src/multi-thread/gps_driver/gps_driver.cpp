@@ -15,10 +15,9 @@ using protobuf::GPSCommand;
 using protobuf::GPSPosition;
 
 using AppBase = goby::zeromq::MultiThreadApplication<GPSDriverConfig>;
-using ThreadBase = goby::SimpleThread<GPSDriverConfig>;
+using ThreadBase = goby::middleware::SimpleThread<GPSDriverConfig>;
 namespace si = boost::units::si;
 
-using namespace goby::common::logger;
 using goby::glog;
 
 class GPSSerialThread : public ThreadBase
@@ -51,7 +50,7 @@ class GPSSerialThread : public ThreadBase
         std::istream is(&buffer_);
         std::string line;
         std::getline(is, line);
-        glog.is(VERBOSE) && glog << "GPSSerialThread: " << line << std::endl;
+        glog.is_verbose() && glog << "GPSSerialThread: " << line << std::endl;
 
         try
         {
@@ -83,7 +82,7 @@ class GPSSerialThread : public ThreadBase
         }
         catch (goby::util::bad_nmea_sentence& e)
         {
-            glog.is(WARN) && glog << "Invalid NMEA sentence: " << e.what() << std::endl;
+            glog.is_warn() && glog << "Invalid NMEA sentence: " << e.what() << std::endl;
         }
     }
 
@@ -127,7 +126,7 @@ class GPSAnalyzeThread : public ThreadBase
     GPSAnalyzeThread(const GPSDriverConfig& cfg) : ThreadBase(cfg)
     {
         interthread().subscribe<groups::gps_data, GPSPosition>([](const GPSPosition& pos) {
-            glog.is(VERBOSE) && glog << "GPSAnalyzeThread: " << pos.ShortDebugString() << std::endl;
+                glog.is_verbose() && glog << "GPSAnalyzeThread: " << pos.ShortDebugString() << std::endl;
         });
     }
 };
@@ -146,7 +145,7 @@ class GPSDriver : public AppBase
 
     void incoming_command(const GPSCommand& cmd)
     {
-        glog.is(VERBOSE) && glog << "GPSDriver (main thread): incoming command: "
+        glog.is_verbose() && glog << "GPSDriver (main thread): incoming command: "
                                  << cmd.ShortDebugString() << std::endl;
         try
         {
@@ -157,8 +156,8 @@ class GPSDriver : public AppBase
         }
         catch (goby::Exception& e)
         {
-            glog.is(VERBOSE) && glog << "Did not process command. Reason: " << e.what()
-                                     << std::endl;
+            glog.is_verbose() && glog << "Did not process command. Reason: " << e.what()
+                                      << std::endl;
         }
     }
 };

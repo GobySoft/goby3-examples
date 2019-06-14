@@ -3,12 +3,12 @@ import "goby/zeromq/protobuf/interprocess_config.proto";
 
 message StateMachineAppConfig
 {
-    optional goby.protobuf.AppConfig app = 1;
+    optional goby.middleware.protobuf.AppConfig app = 1;
     optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
 }
 
 message StateMachineCtrlConfig
 {
-    optional goby.protobuf.AppConfig app = 1;
+    optional goby.middleware.protobuf.AppConfig app = 1;
     optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
 }

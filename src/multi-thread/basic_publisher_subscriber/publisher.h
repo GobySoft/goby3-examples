@@ -6,11 +6,11 @@
 #include "messages/groups.h"
 #include "messages/nav.pb.h"
 
-class BasicPublisher : public goby::SimpleThread<BasicMultithreadPubSubConfig>
+class BasicPublisher : public goby::middleware::SimpleThread<BasicMultithreadPubSubConfig>
 {
   public:
     BasicPublisher(const BasicMultithreadPubSubConfig& config)
-        : goby::SimpleThread<BasicMultithreadPubSubConfig>(config, 1 /*hertz*/)
+        : goby::middleware::SimpleThread<BasicMultithreadPubSubConfig>(config, 1 /*hertz*/)
     {
         // goby::glog is thread safe in goby::zeromq::MultiThreadApplication, std::cout is not
         goby::glog.is_verbose() && goby::glog << "My configuration int is: " << cfg().my_value()
