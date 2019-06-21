@@ -1,0 +1,4 @@
+#! goby_launch -x
+gobyd
+goby3_example_state_machine_subscriber
+goby3_example_state_machine_publisher

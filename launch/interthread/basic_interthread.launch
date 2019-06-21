@@ -1,0 +1,3 @@
+#! goby_launch -x
+goby3_example_basic_interthread -vv -n
+
