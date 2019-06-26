@@ -16,7 +16,12 @@ class BasicSubscriber : public Base
         auto nav_callback = [this](const NavigationReport& nav) {
             std::cout << "Rx: " << nav.DebugString() << std::flush;
         };
-        intervehicle().subscribe<groups::nav, NavigationReport>(nav_callback);
+
+        goby::middleware::protobuf::TransporterConfig nav_subscriber_cfg;
+        nav_subscriber_cfg.mutable_intervehicle()->add_publisher_id(1);
+        nav_subscriber_cfg.mutable_intervehicle()->add_publisher_id(11);
+        
+        intervehicle().subscribe<groups::nav, NavigationReport>(nav_callback, {nav_subscriber_cfg});
     }
 };
 
