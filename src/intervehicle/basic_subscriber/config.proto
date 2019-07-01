@@ -1,8 +1,10 @@
 import "goby/middleware/protobuf/app_config.proto";
 import "goby/zeromq/protobuf/interprocess_config.proto";
+import "goby/middleware/protobuf/transporter_config.proto";
 
 message BasicSubscriberConfig
 {
     optional goby.middleware.protobuf.AppConfig app = 1;
     optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
+    required goby.middleware.protobuf.TransporterConfig nav_subscriber_cfg = 3;
 }
