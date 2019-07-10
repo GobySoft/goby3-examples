@@ -1,7 +1,13 @@
 import "goby/common/protobuf/app3.proto";
 import "goby/middleware/protobuf/interprocess_config.proto";
 
-message BasicSubscriberConfig
+message StateMachineAppConfig
+{
+    optional goby.protobuf.App3Config app = 1;
+    optional goby.protobuf.InterProcessPortalConfig interprocess = 2;
+}
+
+message StateMachineCtrlConfig
 {
     optional goby.protobuf.App3Config app = 1;
     optional goby.protobuf.InterProcessPortalConfig interprocess = 2;

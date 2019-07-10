@@ -1,6 +1,7 @@
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${project_INC_DIR}/messages
   nav.proto
   gps.proto
+  state.proto
   )
 
 add_library(example_messages SHARED ${PROTO_SRCS} ${PROTO_HDRS})

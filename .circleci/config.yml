@@ -1,0 +1,81 @@
+environment-template-common: &environment-template-common
+  CC: "/usr/bin/clang"
+  CXX: "/usr/bin/clang++"
+
+environment-template-stretch: &environment-template-stretch
+  DISTRO_RELEASE_CODENAME: "stretch"
+  DISTRO_RELEASE_VERSION: "debian9"
+
+environment-template-xenial: &environment-template-xenial
+  DISTRO_RELEASE_CODENAME: "xenial"
+  DISTRO_RELEASE_VERSION: "ubuntu16.04"
+  
+environment-template-bionic: &environment-template-bionic
+  DISTRO_RELEASE_CODENAME: "bionic"
+  DISTRO_RELEASE_VERSION: "ubuntu18.04"
+  
+docker-base-stretch: &docker-base-stretch
+  - image: gobysoft/goby3-debian-build-base:9.1
+docker-base-xenial: &docker-base-xenial
+  - image: gobysoft/goby3-ubuntu-build-base:16.04.1
+docker-base-bionic: &docker-base-bionic
+  - image: gobysoft/goby3-ubuntu-build-base:18.04.1
+
+## Pre-declare job templates
+job-template-amd64: &job-template-amd64
+  working_directory: /root/goby3-examples
+  steps:
+    - checkout
+    - run:
+        name: Add continuous build package sources.list 
+        command: |
+          echo "deb http://packages.gobysoft.org/ubuntu/continuous/ ${DISTRO_RELEASE_CODENAME}/" >> /etc/apt/sources.list.d/gobysoft_continuous.list 
+    - run: &run-update-apt
+        name: Update apt packages and install goby3 headers
+        command: apt-get update && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev
+    - run:
+        name: Build examples
+        command: |
+          mkdir -p build && cd build && cmake .. && cmake --build . -- -j4
+        
+version: 2
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - amd64-stretch-build
+      - amd64-xenial-build
+      - amd64-bionic-build
+      
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 7 * * *"
+          filters:
+            branches:
+              only:
+                - /.*/
+    jobs:
+      - amd64-stretch-build
+      - amd64-xenial-build
+      - amd64-bionic-build
+            
+jobs:
+  amd64-stretch-build:
+    <<: *job-template-amd64
+    docker: *docker-base-stretch
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-stretch    
+  amd64-xenial-build:
+    <<: *job-template-amd64
+    docker: *docker-base-xenial
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-xenial
+  amd64-bionic-build:
+    <<: *job-template-amd64
+    docker: *docker-base-bionic
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-bionic    
