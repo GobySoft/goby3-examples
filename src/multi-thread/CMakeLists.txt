@@ -1,2 +1,0 @@
-add_subdirectory(gps_driver)
-add_subdirectory(basic_publisher_subscriber)

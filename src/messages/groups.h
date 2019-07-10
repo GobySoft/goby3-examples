@@ -5,22 +5,13 @@
 
 namespace groups
 {
-#ifndef __clang__
-#ifdef __GNUC__
-#if __GNUC__ < 7 || __GNUC_MINOR__ < 2
-// bug in gcc < 7.2 requires extern
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52036
-#error Must use Clang or GCC > 7.2 to compile goby3-examples
-#endif
-#endif
-#endif
+constexpr goby::middleware::Group nav{"navigation", goby::middleware::Group::broadcast_group};
 
-constexpr goby::Group nav{"navigation"};
-constexpr goby::Group gps_data{"gps_data"};
-constexpr goby::Group gps_control{"gps_control"};
-constexpr goby::Group state_control{"state_control"};
-constexpr goby::Group state_report{"state_report"};
-constexpr goby::Group string_msg{"string_msg"};
+constexpr goby::middleware::Group gps_data{"gps_data"};
+constexpr goby::middleware::Group gps_control{"gps_control"};
+constexpr goby::middleware::Group state_control{"state_control"};
+constexpr goby::middleware::Group state_report{"state_report"};
+constexpr goby::middleware::Group string_msg{"string_msg"};
 
 } // namespace groups
 
