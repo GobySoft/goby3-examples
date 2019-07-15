@@ -1,3 +1,2 @@
 add_subdirectory(basic_publisher)
 add_subdirectory(basic_subscriber)
-add_subdirectory(state_machine)
