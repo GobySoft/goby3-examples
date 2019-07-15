@@ -38,7 +38,7 @@ message("Using DCCL in ${DCCL_INCLUDE_DIR}")
 include_directories("${DCCL_INCLUDE_DIR}")
 protobuf_include_dirs("${DCCL_INCLUDE_DIR}")
 
-find_package(GOBY 3.0 COMPONENTS zeromq)
+find_package(GOBY 3.0 REQUIRED zeromq)
 
 include_directories("${GOBY_INCLUDE_DIR}")
 protobuf_include_dirs("${GOBY_INCLUDE_DIR}")

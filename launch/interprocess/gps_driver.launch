@@ -1,0 +1,7 @@
+#! goby_launch -x
+gobyd
+goby3_example_gps_driver --serial_port /dev/ttyUSB0 --serial_baud 4800 -vvv
+
+## Uncomment this section for MOOS plugin demonstration
+# [kill=SIGTERM] MOOSDB
+# GOBY_MOOS_GATEWAY_PLUGINS=`pwd`/../../build/lib/libgps_moos_plugin.so goby_moos_gateway -vvv
