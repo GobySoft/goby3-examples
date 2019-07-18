@@ -1,4 +1,4 @@
-#include "goby/zeromq/single-thread-application.h"
+#include "goby/zeromq/application/single_thread.h"
 
 #include "machine.h"
 

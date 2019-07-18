@@ -5,7 +5,8 @@
 #include <boost/asio.hpp>
 
 #include "goby/util/linebasedcomms/nmea_sentence.h"
-#include "goby/zeromq/multi-thread-application.h"
+#include "goby/middleware/marshalling/protobuf.h"
+#include "goby/zeromq/application/multi_thread.h"
 
 #include "config.pb.h"
 #include "messages/gps.pb.h"
