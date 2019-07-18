@@ -1,6 +1,6 @@
 #! goby_launch -x
 gobyd
-goby3_example_gps_driver --serial 'port: "/dev/ttyUSB0"' -vvvv
+goby3_example_gps_driver --serial 'port: "/dev/ttyUSB0"' -vvv
 
 ## Uncomment this section for MOOS plugin demonstration
 # [kill=SIGTERM] MOOSDB
