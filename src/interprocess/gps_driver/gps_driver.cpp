@@ -4,8 +4,11 @@
 
 #include <boost/asio.hpp>
 
-#include "goby/util/linebasedcomms/nmea_sentence.h"
+#include "goby/middleware/marshalling/dccl.h"
 #include "goby/middleware/marshalling/protobuf.h"
+
+#include "goby/middleware/io/serial_line_based.h"
+#include "goby/util/linebasedcomms/nmea_sentence.h"
 #include "goby/zeromq/application/multi_thread.h"
 
 #include "config.pb.h"
@@ -21,37 +24,22 @@ namespace si = boost::units::si;
 
 using goby::glog;
 
-class GPSSerialThread : public ThreadBase
+class GPSParseThread : public ThreadBase
 {
   public:
-    GPSSerialThread(const GPSDriverConfig& config)
-        : ThreadBase(
-              config,
-              ThreadBase::
-                  loop_max_frequency()), // max loop frequency since we're going to block on serial I/O inside of loop
-          serial_port_(io_, cfg().serial_port())
+    GPSParseThread(const GPSDriverConfig& cfg) : ThreadBase(cfg)
     {
-        using boost::asio::serial_port_base;
-        serial_port_.set_option(serial_port_base::baud_rate(cfg().serial_baud()));
-        // no flow control
-        serial_port_.set_option(
-            serial_port_base::flow_control(serial_port_base::flow_control::none));
-
-        // 8N1
-        serial_port_.set_option(serial_port_base::character_size(8));
-        serial_port_.set_option(serial_port_base::parity(serial_port_base::parity::none));
-        serial_port_.set_option(serial_port_base::stop_bits(serial_port_base::stop_bits::one));
+        // subscribe to data from the serial port
+        interthread().subscribe<groups::gps_raw_in, goby::middleware::protobuf::IOData>(
+            [this](std::shared_ptr<const goby::middleware::protobuf::IOData> io_msg) {
+                parse_line(io_msg->data());
+            });
     }
+    ~GPSParseThread() {}
 
-    ~GPSSerialThread() { serial_port_.close(); }
-
-    void loop() override
+    void parse_line(const std::string& line)
     {
-        boost::asio::read_until(serial_port_, buffer_, '\n');
-        std::istream is(&buffer_);
-        std::string line;
-        std::getline(is, line);
-        glog.is_verbose() && glog << "GPSSerialThread: " << line << std::endl;
+        glog.is_verbose() && glog << "GPSParseThread: " << line << std::endl;
 
         try
         {
@@ -87,6 +75,7 @@ class GPSSerialThread : public ThreadBase
         }
     }
 
+  private:
     // given a time in "NMEA form", returns the value as seconds since the start of the day
     // NMEA form is HHMMSS.SSSS where "H" is hours, "M" is minutes, "S" is seconds or fractional seconds
     double nmea_time_to_seconds(double nmea_time)
@@ -114,11 +103,6 @@ class GPSSerialThread : public ThreadBase
 
         return sign * (deg_int + deg_frac);
     }
-
-  private:
-    boost::asio::io_service io_;
-    boost::asio::serial_port serial_port_;
-    boost::asio::streambuf buffer_;
 };
 
 class GPSAnalyzeThread : public ThreadBase
@@ -136,13 +120,17 @@ class GPSAnalyzeThread : public ThreadBase
 class GPSDriver : public AppBase
 {
   public:
+    using SerialThread =
+        goby::middleware::io::SerialThreadLineBased<groups::gps_raw_in, groups::gps_raw_out>;
+
     GPSDriver()
     {
         interprocess().subscribe<groups::gps_control, GPSCommand>(
             [this](const GPSCommand& cmd) { this->incoming_command(cmd); });
 
+        launch_thread<SerialThread>(cfg().serial());
+        launch_thread<GPSParseThread>();
         launch_thread<GPSAnalyzeThread>();
-        launch_thread<GPSSerialThread>();
     }
 
     void incoming_command(const GPSCommand& cmd)
@@ -152,9 +140,9 @@ class GPSDriver : public AppBase
         try
         {
             if (cmd.read_gps())
-                launch_thread<GPSSerialThread>();
+                launch_thread<SerialThread>(cfg().serial());
             else
-                join_thread<GPSSerialThread>();
+                join_thread<SerialThread>();
         }
         catch (goby::Exception& e)
         {
@@ -164,4 +152,24 @@ class GPSDriver : public AppBase
     }
 };
 
-int main(int argc, char* argv[]) { return goby::run<GPSDriver>(argc, argv); }
+// Use a custom configurator to modify the configuration after default protobuf parser to set default serial parameters for a GPS.
+class GPSDriverConfigurator
+    : public goby::middleware::ProtobufConfigurator<GPSDriverConfig>
+{
+  public:
+    GPSDriverConfigurator(int argc, char* argv[])
+        : goby::middleware::ProtobufConfigurator<GPSDriverConfig>(argc, argv)
+    {
+        GPSDriverConfig& cfg = mutable_cfg();
+        goby::middleware::protobuf::SerialConfig& serial_cfg = *cfg.mutable_serial();
+
+        // set default baud
+        if (!serial_cfg.has_baud())
+            serial_cfg.set_baud(4800);
+        // set default end of line
+        if (!serial_cfg.has_end_of_line())
+            serial_cfg.set_end_of_line("\r\n");
+    }
+};
+
+int main(int argc, char* argv[]) { return goby::run<GPSDriver>(GPSDriverConfigurator(argc, argv)); }

@@ -1,3 +1,4 @@
+import "goby/middleware/protobuf/serial_config.proto";
 import "goby/middleware/protobuf/app_config.proto";
 import "goby/zeromq/protobuf/interprocess_config.proto";
 
@@ -8,8 +9,7 @@ message GPSDriverConfig
     // required parameters for connecting to 'gobyd'
     optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
 
-    required string serial_port = 3;
-    optional int32 serial_baud = 4 [default = 4800];
+    required goby.middleware.protobuf.SerialConfig serial = 10;
 }
 
 message GPSControllerConfig
