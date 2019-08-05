@@ -1,7 +1,7 @@
 #ifndef MULTITHREAD_SUBSCRIBER_H
 #define MULTITHREAD_SUBSCRIBER_H
 
-#include "goby/zeromq/single-thread-application.h"
+#include "goby/zeromq/application/single_thread.h"
 
 #include "messages/groups.h"
 #include "messages/nav.pb.h"

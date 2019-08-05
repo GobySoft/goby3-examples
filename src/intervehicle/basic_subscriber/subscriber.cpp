@@ -1,5 +1,6 @@
+#include "goby/middleware/marshalling/dccl.h"
 #include "goby/middleware/protobuf/intervehicle.pb.h"
-#include "goby/zeromq/single-thread-application.h"
+#include "goby/zeromq/application/single_thread.h"
 
 #include "messages/groups.h"
 #include "messages/nav_dccl.pb.h"

@@ -1,4 +1,5 @@
-#include "goby/zeromq/single-thread-application.h"
+#include "goby/middleware/marshalling/protobuf.h"
+#include "goby/zeromq/application/single_thread.h"
 
 #include "messages/groups.h"
 #include "messages/nav.pb.h"

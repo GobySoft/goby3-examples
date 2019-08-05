@@ -9,3 +9,9 @@ target_link_libraries(goby3_example_basic_interthread
   goby
   goby_zeromq
   goby3_example_messages)
+
+
+if(export_goby_interfaces)
+  goby_export_interface(goby3_example_basic_interthread ${project_SHARE_DIR}/interfaces YML_OUT)
+  add_custom_target(goby3_example_basic_interthread_interface ALL DEPENDS ${YML_OUT})
+endif()
