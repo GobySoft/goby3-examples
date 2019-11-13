@@ -10,3 +10,5 @@ add_subdirectory(interthread)
 add_subdirectory(interprocess)
 add_subdirectory(intervehicle)
 
+add_subdirectory(components)
+
