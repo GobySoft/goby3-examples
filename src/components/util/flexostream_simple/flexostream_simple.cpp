@@ -21,6 +21,7 @@
 
 #include "goby/util/debug_logger.h"
 #include <boost/asio/deadline_timer.hpp> // for deadline_timer
+#include <boost/asio/io_service.hpp>
 #include <fstream>
 
 using goby::util::Colors;
