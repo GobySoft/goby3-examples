@@ -1,0 +1,1 @@
+add_subdirectory(amac_simple)

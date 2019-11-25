@@ -9,6 +9,10 @@ environment-template-stretch: &environment-template-stretch
   DISTRO_RELEASE_CODENAME: "stretch"
   DISTRO_RELEASE_VERSION: "debian9"
 
+environment-template-buster: &environment-template-buster
+  DISTRO_RELEASE_CODENAME: "buster"
+  DISTRO_RELEASE_VERSION: "debian10"
+  
 environment-template-xenial: &environment-template-xenial
   DISTRO_RELEASE_CODENAME: "xenial"
   DISTRO_RELEASE_VERSION: "ubuntu16.04"
@@ -19,6 +23,8 @@ environment-template-bionic: &environment-template-bionic
   
 docker-base-stretch: &docker-base-stretch
   - image: gobysoft/goby3-debian-build-base:9.1
+docker-base-buster: &docker-base-buster
+  - image: gobysoft/goby3-debian-build-base:10.1
 docker-base-xenial: &docker-base-xenial
   - image: gobysoft/goby3-ubuntu-build-base:16.04.1
 docker-base-bionic: &docker-base-bionic
@@ -47,6 +53,7 @@ workflows:
   commit:
     jobs:
       - amd64-stretch-build
+      - amd64-buster-build
       - amd64-xenial-build
       - amd64-bionic-build
       
@@ -60,6 +67,7 @@ workflows:
                 - /.*/
     jobs:
       - amd64-stretch-build
+      - amd64-buster-build
       - amd64-xenial-build
       - amd64-bionic-build
             
@@ -70,6 +78,12 @@ jobs:
     environment:
       <<: *environment-template-common
       <<: *environment-template-stretch    
+  amd64-buster-build:
+    <<: *job-template-amd64
+    docker: *docker-base-buster
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-buster    
   amd64-xenial-build:
     <<: *job-template-amd64
     docker: *docker-base-xenial
