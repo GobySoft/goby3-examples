@@ -1,1 +1,2 @@
 add_subdirectory(flexostream_simple)
+add_subdirectory(can_example)
