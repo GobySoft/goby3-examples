@@ -19,6 +19,8 @@
 
 #include "goby/middleware/group.h"
 
+using goby::glog;
+
 constexpr goby::middleware::Group can_in{"can_in"};
 constexpr goby::middleware::Group can_out{"can_out"};
 
@@ -31,10 +33,13 @@ class CanDataHandleThread : public ThreadBase
     CanDataHandleThread(const CanExampleConfig& cfg) : ThreadBase(cfg)
     {
         interthread().subscribe<can_in, can_frame>([this](const can_frame& rec_frame) {
-            std::cout << "Data_rec: " << std::hex << rec_frame.can_id << "  ";
-            for (int i = 0; i < rec_frame.can_dlc; i++)
-            { std::cout << std::hex << int(rec_frame.data[i]) << " "; }
-            std::cout << std::dec << std::endl;
+            if (glog.is_verbose())
+            {
+                glog << "Data_rec: " << std::hex << rec_frame.can_id << "  ";
+                for (int i = 0; i < rec_frame.can_dlc; i++)
+                { glog << std::hex << int(rec_frame.data[i]) << " "; }
+                glog << std::dec << std::endl;
+            }
         });
     }
 
