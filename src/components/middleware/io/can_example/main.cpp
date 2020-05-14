@@ -67,7 +67,8 @@ class CanConfigurator : public goby::middleware::ProtobufConfigurator<CanExample
         CanExampleConfig& cfg = mutable_cfg();
 
         auto* can_config = cfg.mutable_can_config();
-        can_config->set_interface("vcan0");
+        if(!cfg.can_config().has_interface())
+            can_config->set_interface("vcan0");
 
         auto* filter = can_config->add_filter();
         filter->set_can_id(0x1b4);
