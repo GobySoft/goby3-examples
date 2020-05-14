@@ -1,6 +1,7 @@
 option(build_moos "Build MOOS related examples" OFF)
 
 if(build_moos)
+  find_package(MOOS 10 REQUIRED)
   find_package(GOBY 3.0 REQUIRED moos)
 endif()
 

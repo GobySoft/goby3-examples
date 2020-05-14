@@ -24,5 +24,4 @@ if(export_goby_interfaces)
     ${DRIVER_YML_OUT}
     ${CONTROLLER_YML_OUT})
 
-  add_custom_command(TARGET gps_deployment_interface_viz POST_BUILD COMMAND evince ARGS ${PDF_OUT}&)
 endif()
