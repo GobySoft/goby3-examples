@@ -5,3 +5,4 @@ if(build_moos)
 endif()
 
 add_subdirectory(util)
+add_subdirectory(middleware)
