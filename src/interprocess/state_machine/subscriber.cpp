@@ -24,13 +24,13 @@ class StateMachineApp : public goby::zeromq::SingleThreadApplication<StateMachin
             });
     }
 
-    void initialize()
+    void initialize() override
     {
         machine_.reset(new statechart::Machine<StateMachineApp>(*this));
         machine_->initiate();
     }
 
-    void finalize()
+    void finalize() override
     {
         machine_->terminate();
         machine_.reset();
