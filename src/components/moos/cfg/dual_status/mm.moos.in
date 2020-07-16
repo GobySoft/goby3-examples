@@ -53,39 +53,26 @@ ProcessConfig = pAcommsHandler
     }
     modem_id: _MODEM_ID_
 #if _DRIVER_ == 1 
-    driver_type: DRIVER_UDP
     driver_cfg {
-        [UDPDriverConfig.local] { 
-#if _MODEM_ID_ == 1
-            port: 34356
-#else
-            port: 34355 
-#endif
+        driver_type: DRIVER_UDP_MULTICAST
+        [goby.acomms.udp_multicast.protobuf.config] {        
+          multicast_address: "239.142.0.1"
+          multicast_port: 50021
+          max_frame_size: 1024
         }
-        [UDPDriverConfig.remote] { 
-            ip: "127.0.0.1" 
-#if _MODEM_ID_ == 1
-            port: 34355
-#else
-            port: 34356
-#endif
-        }
-        [UDPDriverConfig.max_frame_size]: 1024
     }
 #elif _DRIVER_ == 2
-    driver_type: DRIVER_WHOI_MICROMODEM
     driver_cfg {
-//       connection_type: CONNECTION_SERIAL
-         connection_type: CONNECTION_TCP_AS_CLIENT
-         tcp_server: "unicornsim.mit.edu"
+         driver_type: DRIVER_WHOI_MICROMODEM
+         connection_type: CONNECTION_SERIAL
 #if _MODEM_ID_ == 1
-//        serial_port: "/dev/ttyUSB0"
-         tcp_port: 54000
+        serial_port: "/dev/ttyUSB0"
 #else
-//        serial_port: "/dev/ttyUSB1"
-         tcp_port: 54001
+        serial_port: "/dev/ttyUSB1"
 #endif
-        [micromodem.protobuf.Config.reset_nvram]: true
+        [goby.acomms.micromodem.protobuf.config] {
+            reset_nvram: true
+        }
     }        
 #else
 #error Invalid driver
@@ -146,7 +133,7 @@ ProcessConfig = pAcommsHandler
     }
 
 
-    load_shared_library: "../../gobyexample_protobuf/libgobyexample_protobuf.so"    
+    load_shared_library: "../../../../../build/lib/libgobyexample_protobuf.so"    
 }
 
 ProcessConfig = uXMS
