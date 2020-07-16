@@ -8,8 +8,8 @@
 
 #include "goby/middleware/marshalling/protobuf.h"
 
+#include "goby/middleware/io/tcp_client_line_based.h"
 #include "goby/middleware/io/tcp_server.h"
-//#include "goby/middleware/io/tcp_client.h"
 #include "goby/util/linebasedcomms/nmea_sentence.h"
 #include "goby/zeromq/application/multi_thread.h"
 
@@ -49,21 +49,20 @@ class TCPConfigurator : public goby::middleware::ProtobufConfigurator<TCPExample
             tcp_server.set_bind_port(tcp_server_port);
         }
 
-        // if (!cfg.has_tcp_client1_config())
-        // {
-        //     // set up the second and third tcp thread as a point-to-point with the first
-        //     auto& tcp_client1 = *cfg.mutable_tcp_client1_config();
-        //     // dynamically assign
-        //     tcp_client1.set_bind_port(0);
-        //     tcp_client1.set_remote_address(tcp_server_addr);
-        //     tcp_client1.set_remote_port(tcp_server_port);
-        // }
+        if (!cfg.has_tcp_client1_config())
+        {
+            // set up the second and third tcp thread as a point-to-point with the first
+            auto& tcp_client1 = *cfg.mutable_tcp_client1_config();
+            // dynamically assign
+            tcp_client1.set_remote_address(tcp_server_addr);
+            tcp_client1.set_remote_port(tcp_server_port);
+        }
 
-        // if (!cfg.has_tcp_client2_config())
-        // {
-        //     // same config as client1
-        //     *cfg.mutable_tcp_client2_config() = cfg.tcp_client1_config();
-        // }
+        if (!cfg.has_tcp_client2_config())
+        {
+            // same config as client1
+            *cfg.mutable_tcp_client2_config() = cfg.tcp_client1_config();
+        }
     }
 };
 
@@ -87,7 +86,7 @@ class TCPExample : public AppBase
                                           << std::endl;
                 // respond to request
                 goby::middleware::protobuf::IOData tcp_data_out;
-                tcp_data_out.set_data("Response");
+                tcp_data_out.set_data("Response\n");
                 *tcp_data_out.mutable_tcp_dest() = tcp_data_in.tcp_src();
                 interthread().publish<tcp_server_out>(tcp_data_out);
             });
@@ -118,14 +117,14 @@ class TCPExample : public AppBase
         // launch the TCP threads
         using TCPServerThread =
             goby::middleware::io::TCPServerThread<tcp_server_in, tcp_server_out>;
-        // using TCPClient1Thread =
-        //     goby::middleware::io::TCPClientThread<tcp_client1_in, tcp_client1_out>;
-        // using TCPClient2Thread =
-        //     goby::middleware::io::TCPClientThread<tcp_client2_in, tcp_client2_out>;
+        using TCPClient1Thread =
+            goby::middleware::io::TCPClientThreadLineBased<tcp_client1_in, tcp_client1_out>;
+        using TCPClient2Thread =
+            goby::middleware::io::TCPClientThreadLineBased<tcp_client2_in, tcp_client2_out>;
 
         launch_thread<TCPServerThread>(cfg().tcp_server_config());
-        // launch_thread<TCPClient1Thread>(cfg().tcp_client1_config());
-        // launch_thread<TCPClient2Thread>(cfg().tcp_client2_config());
+        launch_thread<TCPClient1Thread>(cfg().tcp_client1_config());
+        launch_thread<TCPClient2Thread>(cfg().tcp_client2_config());
     }
 
   private:
@@ -138,7 +137,7 @@ void TCPExample::loop()
 {
     // transmit messages from both TCP clients
     goby::middleware::protobuf::IOData tcp_data;
-    tcp_data.set_data("Request");
+    tcp_data.set_data("Request\n");
     // no tcp_dest required in IOData message because we're using TCPPointToPointThread with a pre-configured destination for all messages
 
     interthread().publish<tcp_client1_out>(tcp_data);
