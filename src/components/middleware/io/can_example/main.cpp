@@ -9,7 +9,7 @@
 #include "goby/middleware/marshalling/dccl.h"
 #include "goby/middleware/marshalling/protobuf.h"
 
-#include "goby/middleware/io/can_interface.h"
+#include "goby/middleware/io/can.h"
 #include "goby/util/linebasedcomms/nmea_sentence.h"
 #include "goby/zeromq/application/multi_thread.h"
 

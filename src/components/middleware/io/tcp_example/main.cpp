@@ -8,8 +8,8 @@
 
 #include "goby/middleware/marshalling/protobuf.h"
 
-#include "goby/middleware/io/tcp_client_line_based.h"
-#include "goby/middleware/io/tcp_server.h"
+#include "goby/middleware/io/line_based/tcp_client.h"
+#include "goby/middleware/io/line_based/tcp_server.h"
 #include "goby/util/linebasedcomms/nmea_sentence.h"
 #include "goby/zeromq/application/multi_thread.h"
 
@@ -116,7 +116,7 @@ class TCPExample : public AppBase
 
         // launch the TCP threads
         using TCPServerThread =
-            goby::middleware::io::TCPServerThread<tcp_server_in, tcp_server_out>;
+            goby::middleware::io::TCPServerThreadLineBased<tcp_server_in, tcp_server_out>;
         using TCPClient1Thread =
             goby::middleware::io::TCPClientThreadLineBased<tcp_client1_in, tcp_client1_out>;
         using TCPClient2Thread =
