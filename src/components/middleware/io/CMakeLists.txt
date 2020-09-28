@@ -1,1 +1,3 @@
 add_subdirectory(can_example)
+add_subdirectory(udp_example)
+add_subdirectory(tcp_example)

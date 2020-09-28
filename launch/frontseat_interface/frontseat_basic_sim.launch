@@ -1,0 +1,16 @@
+#!/usr/bin/env goby_launch
+
+# start the simulator
+[kill=SIGTERM] goby_basic_frontseat_simulator 54321
+
+# start the Goby processes
+gobyd config/gobyd.pb.cfg
+goby_frontseat_interface_basic_simulator config/frontseat.pb.cfg
+goby_liaison config/liaison.pb.cfg
+
+# start the MOOS-IvP alpha mission
+[kill=SIGTERM] MOOSDB config/alpha.moos
+[kill=SIGTERM] pHelmIvP config/alpha.moos
+[kill=SIGTERM] pMarineViewer config/alpha.moos
+[kill=SIGTERM] uProcessWatch config/alpha.moos
+[kill=SIGTERM] pNodeReporter config/alpha.moos
