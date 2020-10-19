@@ -1,0 +1,7 @@
+deployment: gps_deployment
+platforms:
+  - name: auv0
+    interfaces:
+     - goby3_example_gps_controller_interface.yml
+     - goby3_example_gps_driver_interface.yml
+     

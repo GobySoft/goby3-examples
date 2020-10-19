@@ -69,9 +69,21 @@ option(export_goby_interfaces OFF "Build Goby Publish/Subscribe interface files 
 
 if(export_goby_interfaces)
   include(GobyClangTool)
+  set(YML_OUT_DIR ${project_SHARE_DIR}/interfaces)
 endif()
-  
+
 add_subdirectory(src)
+
+if(export_goby_interfaces)
+  generate_interfaces_figure(launch/interprocess/gps_driver_deployment.yml ${YML_OUT_DIR} gps_driver_interfaces.pdf "")  
+  generate_interfaces_figure(launch/interprocess/basic_publisher_subscriber_deployment.yml ${YML_OUT_DIR} basic_interprocess_interfaces.pdf "")
+  generate_interfaces_figure(launch/interprocess/state_machine_deployment.yml ${YML_OUT_DIR} state_machine_interfaces.pdf "")
+  generate_interfaces_figure(launch/interthread/basic_interthread_deployment.yml ${YML_OUT_DIR} basic_interthread_interfaces.pdf "")
+  generate_interfaces_figure(launch/intervehicle/basic/basic_intervehicle_deployment.yml ${YML_OUT_DIR} basic_intervehicle_interfaces.pdf "")
+  
+endif()
+
+
 
 ## configure to build/include
 file(GLOB_RECURSE INCLUDE_FILES RELATIVE ${project_SRC_DIR} 
@@ -81,4 +93,3 @@ file(GLOB_RECURSE INCLUDE_FILES RELATIVE ${project_SRC_DIR}
 foreach(I ${INCLUDE_FILES})
   configure_file(${project_SRC_DIR}/${I} ${project_INC_DIR}/${I} @ONLY)
 endforeach()
-

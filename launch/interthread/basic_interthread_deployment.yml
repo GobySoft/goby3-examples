@@ -1,0 +1,5 @@
+deployment: basic_interthread
+platforms:
+  - name: vehicle1
+    interfaces:
+     - goby3_example_basic_interthread_interface.yml

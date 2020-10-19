@@ -18,3 +18,8 @@ target_link_libraries(goby3_example_state_machine_publisher
   goby
   goby_zeromq
   goby3_example_messages)
+
+if(export_goby_interfaces)
+  generate_interfaces(goby3_example_state_machine_publisher)
+  generate_interfaces(goby3_example_state_machine_subscriber)
+endif()
