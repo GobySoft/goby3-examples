@@ -1,0 +1,13 @@
+import "goby/middleware/protobuf/app_config.proto";
+import "goby/zeromq/protobuf/interprocess_config.proto";
+import "goby/middleware/protobuf/pty_config.proto";
+
+message PTYExampleConfig
+{
+    // required parameters for ApplicationBase3 class
+    optional goby.middleware.protobuf.AppConfig app = 1;
+    // required parameters for connecting to 'gobyd'
+    optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
+
+    optional goby.middleware.protobuf.PTYConfig pty_config = 3;
+}
