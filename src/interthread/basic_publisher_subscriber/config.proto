@@ -1,12 +1,9 @@
 import "goby/middleware/protobuf/app_config.proto";
-import "goby/zeromq/protobuf/interprocess_config.proto";
 
 message BasicMultithreadPubSubConfig
 {
     // required parameters for ApplicationBase3 class
     optional goby.middleware.protobuf.AppConfig app = 1;
-    // required parameters for connecting to 'gobyd'
-    optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
 
     optional int32 my_value = 3;
 }

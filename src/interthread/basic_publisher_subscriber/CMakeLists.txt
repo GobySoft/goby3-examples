@@ -7,7 +7,6 @@ add_executable(goby3_example_basic_interthread
 
 target_link_libraries(goby3_example_basic_interthread
   goby
-  goby_zeromq
   goby3_example_messages)
 
 if(export_goby_interfaces)
