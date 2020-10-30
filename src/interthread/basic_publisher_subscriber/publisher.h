@@ -1,9 +1,10 @@
 #ifndef MULTITHREAD_PUBLISHER_H
 #define MULTITHREAD_PUBLISHER_H
 
-#include "config.pb.h"
 #include "goby/middleware/marshalling/protobuf.h"
-#include "goby/zeromq/application/multi_thread.h"
+
+#include "config.pb.h"
+#include "goby/middleware/application/multi_thread.h"
 #include "messages/groups.h"
 #include "messages/nav.pb.h"
 
