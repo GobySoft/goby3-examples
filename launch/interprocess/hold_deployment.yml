@@ -1,0 +1,6 @@
+deployment: hold_interprocess
+platforms:
+  - name: vehicle1
+    interfaces:
+     - goby3_example_hold_interprocess_publisher_interface.yml
+     - goby3_example_hold_interprocess_subscriber_interface.yml

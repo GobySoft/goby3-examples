@@ -1,0 +1,5 @@
+#!goby_launch -x
+gobyd --hold 'required_client: "goby3_example_hold_interprocess_publisher" required_client: "goby3_example_hold_interprocess_subscriber"' -vvvv
+
+goby3_example_hold_interprocess_publisher
+goby3_example_hold_interprocess_subscriber

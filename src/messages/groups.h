@@ -17,6 +17,7 @@ constexpr goby::middleware::Group state_report{"state_report"};
 
 constexpr goby::middleware::Group string_msg{"string_msg"};
 
+constexpr goby::middleware::Group init{"init"};
 } // namespace groups
 
 #endif
