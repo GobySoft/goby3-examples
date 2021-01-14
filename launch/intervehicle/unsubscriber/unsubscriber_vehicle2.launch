@@ -1,0 +1,4 @@
+#!goby_launch -x
+gobyd gobyd-veh2.pb.cfg
+goby3_example_intervehicle_unsubscriber unsubscriber-veh2.pb.cfg
+#goby3_example_basic_intervehicle_subscriber ../basic/subscriber-veh2.pb.cfg
