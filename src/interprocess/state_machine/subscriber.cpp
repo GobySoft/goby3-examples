@@ -1,11 +1,10 @@
-#include "goby/middleware/marshalling/protobuf.h"
-#include "goby/zeromq/application/single_thread.h"
+#include <goby/middleware/marshalling/protobuf.h>
+
+#include <goby/zeromq/application/single_thread.h>
 
 #include "machine.h"
-
 #include "messages/groups.h"
 #include "messages/state.pb.h"
-
 #include "config.pb.h"
 
 class StateMachineApp : public goby::zeromq::SingleThreadApplication<StateMachineAppConfig>

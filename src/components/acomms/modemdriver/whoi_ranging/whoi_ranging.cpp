@@ -23,11 +23,11 @@
 // Usage (WHOI Micro-Modem): run
 // > whoi_ranging /dev/tty_of_modem
 
-#include "goby/acomms/connect.h"
-#include "goby/acomms/modem_driver.h"
-#include "goby/util/debug_logger.h"
-
 #include <iostream>
+
+#include <goby/acomms/connect.h>
+#include <goby/acomms/modem_driver.h>
+#include <goby/util/debug_logger.h>
 
 #include "messages/io.h"
 

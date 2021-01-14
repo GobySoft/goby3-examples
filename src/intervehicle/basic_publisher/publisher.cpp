@@ -1,10 +1,10 @@
-#include "goby/middleware/marshalling/dccl.h"
-#include "goby/middleware/protobuf/intervehicle.pb.h"
-#include "goby/zeromq/application/single_thread.h"
+#include <goby/middleware/marshalling/dccl.h>
+
+#include <goby/middleware/protobuf/intervehicle.pb.h>
+#include <goby/zeromq/application/single_thread.h>
 
 #include "messages/groups.h"
 #include "messages/nav_dccl.pb.h" // DCCL version of NavigationReport
-
 #include "config.pb.h" // Protobuf, defines BasicPublisherConfig
 
 // optional "using" declaration (reduces verbiage)

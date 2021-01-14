@@ -28,17 +28,16 @@
 
 #include <iostream>
 
-#include "chat.pb.h"
-#include "goby/acomms/amac.h"
-#include "goby/acomms/bind.h"
-#include "goby/acomms/dccl.h"
-#include "goby/acomms/modem_driver.h"
-#include "goby/acomms/queue.h"
-#include "goby/time.h"
-#include "goby/util/as.h"
-
 #include <boost/lexical_cast.hpp>
+#include <goby/acomms/amac.h>
+#include <goby/acomms/bind.h>
+#include <goby/acomms/dccl.h>
+#include <goby/acomms/modem_driver.h>
+#include <goby/acomms/queue.h>
+#include <goby/time.h>
+#include <goby/util/as.h>
 
+#include "chat.pb.h"
 #include "chat_curses.h"
 
 // Uncomment to use the Micro-Modem 2 Flexible Data Packet instead of the traditional $CCCYC data cycle

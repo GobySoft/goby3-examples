@@ -34,12 +34,12 @@
 // > driver_simple /dev/tty_of_modem_B 2 ABCDriver
 // Also see abc_modem_simulator.cpp
 
-#include "goby/acomms/connect.h"
-#include "goby/acomms/modem_driver.h"
-#include "goby/util/binary.h"
-#include "goby/util/debug_logger.h"
-
 #include <iostream>
+
+#include <goby/acomms/connect.h>
+#include <goby/acomms/modem_driver.h>
+#include <goby/util/binary.h>
+#include <goby/util/debug_logger.h>
 
 #include "messages/io.h"
 

@@ -6,18 +6,18 @@
 
 #include <boost/asio.hpp>
 
-#include "goby/middleware/marshalling/dccl.h"
-#include "goby/middleware/marshalling/protobuf.h"
+#include <goby/middleware/marshalling/dccl.h>
+#include <goby/middleware/marshalling/protobuf.h>
 
-#include "goby/middleware/io/can.h"
-#include "goby/util/linebasedcomms/nmea_sentence.h"
-#include "goby/zeromq/application/multi_thread.h"
+#include <goby/middleware/io/can.h>
+#include <goby/util/linebasedcomms/nmea_sentence.h>
+#include <goby/zeromq/application/multi_thread.h>
+#include <goby/middleware/group.h>
 
 #include "config.pb.h"
 #include "messages/gps.pb.h"
 #include "messages/groups.h"
 
-#include "goby/middleware/group.h"
 
 using goby::glog;
 

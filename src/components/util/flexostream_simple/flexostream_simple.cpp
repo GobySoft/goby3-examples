@@ -19,10 +19,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Goby.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "goby/util/debug_logger.h"
+#include <fstream>
+
 #include <boost/asio/deadline_timer.hpp> // for deadline_timer
 #include <boost/asio/io_service.hpp>
-#include <fstream>
+
+#include <goby/util/debug_logger.h>
 
 using goby::util::Colors;
 using namespace goby::util::tcolor; // red, blue, etc.

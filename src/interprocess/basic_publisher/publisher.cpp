@@ -1,5 +1,6 @@
-#include "goby/middleware/marshalling/protobuf.h" // provides serializer / parser for Google Protocol Buffers
-#include "goby/zeromq/application/single_thread.h" // provides SingleThreadApplication
+#include <goby/middleware/marshalling/protobuf.h> // provides serializer / parser for Google Protocol Buffers
+
+#include <goby/zeromq/application/single_thread.h> // provides SingleThreadApplication
 
 #include "messages/groups.h" // defines publish/subscribe groups
 #include "messages/nav.pb.h" // Protobuf, defines NavigationReport

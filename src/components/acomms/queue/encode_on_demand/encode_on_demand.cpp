@@ -19,9 +19,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Goby.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "goby/acomms/connect.h"
-#include "goby/acomms/queue.h"
-#include "goby/util/binary.h"
+#include <goby/acomms/connect.h>
+#include <goby/acomms/queue.h>
+#include <goby/util/binary.h>
+
 #include "on_demand.pb.h"
 
 // demonstrates "encode_on_demand" functionality
