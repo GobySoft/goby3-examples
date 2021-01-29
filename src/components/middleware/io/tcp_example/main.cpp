@@ -8,16 +8,15 @@
 
 #include <goby/middleware/marshalling/protobuf.h>
 
+#include <goby/middleware/group.h>
 #include <goby/middleware/io/line_based/tcp_client.h>
 #include <goby/middleware/io/line_based/tcp_server.h>
 #include <goby/util/linebasedcomms/nmea_sentence.h>
 #include <goby/zeromq/application/multi_thread.h>
-#include <goby/middleware/group.h>
 
 #include "config.pb.h"
 #include "messages/gps.pb.h"
 #include "messages/groups.h"
-
 
 using goby::glog;
 
@@ -92,7 +91,7 @@ class TCPExample : public AppBase
             });
 
         // subscribe to events from server thread
-        interthread().subscribe<goby::middleware::io::groups::tcp_server_event>(
+        interthread().subscribe<tcp_server_in>(
             [this](const goby::middleware::protobuf::TCPServerEvent& event) {
                 glog.is_verbose() && glog << group("server")
                                           << "Got event: " << event.ShortDebugString() << std::endl;
