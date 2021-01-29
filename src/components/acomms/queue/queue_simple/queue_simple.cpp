@@ -21,12 +21,14 @@
 
 // queues a single message from the DCCL library
 
-#include "goby/acomms/connect.h"
-#include "goby/acomms/queue.h"
-#include "goby/util/binary.h"
-#include "simple.pb.h"
 #include <iostream>
 
+#include <goby/acomms/connect.h>
+#include <goby/acomms/queue.h>
+#include <goby/util/binary.h>
+#include <goby/acomms/protobuf/modem_message.pb.h>
+
+#include "simple.pb.h"
 #include "messages/io.h"
 
 void received_data(const google::protobuf::Message& msg);

@@ -19,9 +19,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Goby.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "goby/acomms/amac.h"
-#include "goby/acomms/connect.h"
-#include "goby/util/debug_logger.h"
+#include <goby/acomms/amac.h>
+#include <goby/acomms/connect.h>
+#include <goby/util/debug_logger.h>
+#include <goby/acomms/protobuf/mm_driver.pb.h>
 
 #include "messages/io.h"
 

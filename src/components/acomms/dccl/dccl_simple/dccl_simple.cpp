@@ -22,10 +22,10 @@
 // encodes/decodes a string using the DCCL codec library
 // assumes prior knowledge of the message format (required fields)
 
-#include "goby/acomms/dccl.h" // for DCCLCodec
-#include "goby/util/binary.h" // for goby::util::hex_encode
-#include "simple.pb.h"        // for `Simple` protobuf message defined in simple.proto
+#include <goby/acomms/dccl.h> // for DCCLCodec
+#include <goby/util/binary.h> // for goby::util::hex_encode
 
+#include "simple.pb.h"        // for `Simple` protobuf message defined in simple.proto
 #include "messages/io.h" // overload operator<< for google::protobuf::Message
 
 int main()

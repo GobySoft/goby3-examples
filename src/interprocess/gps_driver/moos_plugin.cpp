@@ -1,6 +1,7 @@
-#include "goby/middleware/marshalling/protobuf.h"
-#include "goby/moos/middleware/moos_plugin_translator.h"
-#include "goby/zeromq/application/multi_thread.h"
+#include <goby/middleware/marshalling/protobuf.h>
+
+#include <goby/moos/middleware/moos_plugin_translator.h>
+#include <goby/zeromq/application/multi_thread.h>
 
 #include "messages/gps.pb.h"
 #include "messages/groups.h"

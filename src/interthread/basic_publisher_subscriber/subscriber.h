@@ -1,14 +1,12 @@
 #ifndef MULTITHREAD_SUBSCRIBER_H
 #define MULTITHREAD_SUBSCRIBER_H
 
+#include <goby/middleware/marshalling/protobuf.h>
 
-#include "goby/middleware/marshalling/protobuf.h"
-
-#include "goby/middleware/application/multi_thread.h"
+#include <goby/middleware/application/multi_thread.h>
 
 #include "messages/groups.h"
 #include "messages/nav.pb.h"
-
 #include "config.pb.h"
 
 using ThreadBase = goby::middleware::SimpleThread<BasicMultithreadPubSubConfig>;

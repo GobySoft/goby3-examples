@@ -19,13 +19,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Goby.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "goby/acomms/dccl.h"
-#include "goby/util/binary.h"
-
-#include "two_message.pb.h"
 #include <exception>
 #include <iostream>
 
+#include <goby/acomms/dccl.h>
+#include <goby/util/binary.h>
+
+#include "two_message.pb.h"
 #include "messages/io.h" // overload operator<< for google::protobuf::Message
 
 using namespace goby;
