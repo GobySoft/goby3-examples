@@ -1,0 +1,12 @@
+package protobuf;
+
+message Initial
+{
+    enum State
+    {
+        UNKNOWN = 0;
+        ON = 1;
+        OFF = 2;
+    }
+    required State state = 1;
+}
