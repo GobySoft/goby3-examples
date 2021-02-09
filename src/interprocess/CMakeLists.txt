@@ -3,3 +3,5 @@ add_subdirectory(basic_subscriber)
 add_subdirectory(state_machine)
 add_subdirectory(gps_driver)
 add_subdirectory(hold)
+add_subdirectory(mavlink)
+
