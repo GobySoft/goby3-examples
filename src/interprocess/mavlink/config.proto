@@ -14,4 +14,7 @@ message MavlinkExample
 
     // any specific configuration parameters for your application
     // optional int32 my_value = 3;
+    optional int32 mavlink_sys_id = 3 [default = 2];
+    optional int32 mavlink_component_id = 4 [default = 1];
+    
 }
