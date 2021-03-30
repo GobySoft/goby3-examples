@@ -3,4 +3,4 @@ platforms:
   - name: auv0
     interfaces:
      - goby3_example_mavlink_interface.yml
-     - /home/toby/goby3/build/share/goby/interfaces/goby_mavlink_gateway_interface.yml
+     - @GOBY_INTERFACES_DIR@/goby_mavlink_gateway_interface.yml
