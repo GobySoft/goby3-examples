@@ -1,11 +1,11 @@
 #include <goby/middleware/marshalling/json.h>
-#include "nav.h"
 
 #include <goby/zeromq/application/single_thread.h>
 
 #include "messages/groups.h"
 
 #include "config.pb.h"
+#include "nav.h"
 
 using Base = goby::zeromq::SingleThreadApplication<JsonPublisherConfig>;
 
