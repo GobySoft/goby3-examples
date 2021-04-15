@@ -82,6 +82,7 @@ if(export_goby_interfaces)
   generate_interfaces_figure(launch/interprocess/json_deployment.yml ${YML_OUT_DIR} json_interfaces.pdf "")
   generate_interfaces_figure(launch/interthread/basic_interthread_deployment.yml ${YML_OUT_DIR} basic_interthread_interfaces.pdf "")
   generate_interfaces_figure(launch/intervehicle/basic/basic_intervehicle_deployment.yml ${YML_OUT_DIR} basic_intervehicle_interfaces.pdf "")
+  generate_interfaces_figure(launch/interprocess/mavlink_deployment.yml ${YML_OUT_DIR} mavlink_interfaces.pdf "")
   
 endif()
 

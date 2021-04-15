@@ -1,0 +1,9 @@
+#!goby_launch -x
+
+# Requires mavlink on UDP 14550/14551, defaults used by
+# cd ardupilot/ArduCopter
+# ../Tools/autotest/sim_vehicle.py --console --map 
+
+gobyd
+goby_mavlink_gateway --connection_type CONNECTION_UDP --udp 'bind_port: 14550 remote_address: "127.0.0.1" remote_port: 14551' -vvv -n 
+goby3_example_mavlink -v -n

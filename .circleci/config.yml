@@ -11,7 +11,7 @@ environment-template-stretch: &environment-template-stretch
 
 environment-template-buster: &environment-template-buster
   DISTRO_RELEASE_CODENAME: "buster"
-  DISTRO_RELEASE_VERSION: "debian10"  
+  DISTRO_RELEASE_VERSION: "debian10"
   
 environment-template-bionic: &environment-template-bionic
   DISTRO_RELEASE_CODENAME: "bionic"
@@ -35,6 +35,10 @@ job-template-amd64: &job-template-amd64
   working_directory: /root/goby3-examples
   steps:
     - checkout
+    - run:
+        name: Install packages.gobysoft.org key
+        command: |
+          apt-key adv --recv-key --keyserver keyserver.ubuntu.com 19478082E2F8D3FE
     - run:
         name: Add continuous build package sources.list 
         command: |
