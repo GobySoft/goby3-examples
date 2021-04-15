@@ -1,0 +1,6 @@
+deployment: basic_interprocess
+platforms:
+  - name: vehicle1
+    interfaces:
+     - goby3_example_json_publisher_interface.yml
+     - goby3_example_json_subscriber_interface.yml
