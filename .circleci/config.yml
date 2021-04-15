@@ -13,10 +13,6 @@ environment-template-buster: &environment-template-buster
   DISTRO_RELEASE_CODENAME: "buster"
   DISTRO_RELEASE_VERSION: "debian10"
   
-environment-template-xenial: &environment-template-xenial
-  DISTRO_RELEASE_CODENAME: "xenial"
-  DISTRO_RELEASE_VERSION: "ubuntu16.04"
-  
 environment-template-bionic: &environment-template-bionic
   DISTRO_RELEASE_CODENAME: "bionic"
   DISTRO_RELEASE_VERSION: "ubuntu18.04"
@@ -29,8 +25,6 @@ docker-base-stretch: &docker-base-stretch
   - image: gobysoft/goby3-debian-build-base:9.1
 docker-base-buster: &docker-base-buster
   - image: gobysoft/goby3-debian-build-base:10.1
-docker-base-xenial: &docker-base-xenial
-  - image: gobysoft/goby3-ubuntu-build-base:16.04.1
 docker-base-bionic: &docker-base-bionic
   - image: gobysoft/goby3-ubuntu-build-base:18.04.1
 docker-base-focal: &docker-base-focal
@@ -41,6 +35,10 @@ job-template-amd64: &job-template-amd64
   working_directory: /root/goby3-examples
   steps:
     - checkout
+    - run:
+        name: Install packages.gobysoft.org key
+        command: |
+          apt-key adv --recv-key --keyserver keyserver.ubuntu.com 19478082E2F8D3FE
     - run:
         name: Add continuous build package sources.list 
         command: |
@@ -60,7 +58,6 @@ workflows:
     jobs:
       - amd64-stretch-build
       - amd64-buster-build
-      - amd64-xenial-build
       - amd64-bionic-build
       - amd64-focal-build
       
@@ -75,7 +72,6 @@ workflows:
     jobs:
       - amd64-stretch-build
       - amd64-buster-build
-      - amd64-xenial-build
       - amd64-bionic-build
       - amd64-focal-build
             
@@ -92,12 +88,6 @@ jobs:
     environment:
       <<: *environment-template-common
       <<: *environment-template-buster    
-  amd64-xenial-build:
-    <<: *job-template-amd64
-    docker: *docker-base-xenial
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-xenial
   amd64-bionic-build:
     <<: *job-template-amd64
     docker: *docker-base-bionic
