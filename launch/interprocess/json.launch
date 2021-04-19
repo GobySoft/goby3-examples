@@ -1,0 +1,5 @@
+#!goby_launch -x
+gobyd
+goby3_example_json_publisher
+goby3_example_json_subscriber
+goby3_example_json_subscriber

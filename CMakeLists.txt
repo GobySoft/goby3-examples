@@ -78,8 +78,11 @@ if(export_goby_interfaces)
   generate_interfaces_figure(launch/interprocess/gps_driver_deployment.yml ${YML_OUT_DIR} gps_driver_interfaces.pdf "")  
   generate_interfaces_figure(launch/interprocess/basic_publisher_subscriber_deployment.yml ${YML_OUT_DIR} basic_interprocess_interfaces.pdf "")
   generate_interfaces_figure(launch/interprocess/state_machine_deployment.yml ${YML_OUT_DIR} state_machine_interfaces.pdf "")
+  generate_interfaces_figure(launch/interprocess/hold_deployment.yml ${YML_OUT_DIR} hold_interfaces.pdf "")
+  generate_interfaces_figure(launch/interprocess/json_deployment.yml ${YML_OUT_DIR} json_interfaces.pdf "")
   generate_interfaces_figure(launch/interthread/basic_interthread_deployment.yml ${YML_OUT_DIR} basic_interthread_interfaces.pdf "")
   generate_interfaces_figure(launch/intervehicle/basic/basic_intervehicle_deployment.yml ${YML_OUT_DIR} basic_intervehicle_interfaces.pdf "")
+  generate_interfaces_figure(launch/interprocess/mavlink_deployment.yml ${YML_OUT_DIR} mavlink_interfaces.pdf "")
   
 endif()
 

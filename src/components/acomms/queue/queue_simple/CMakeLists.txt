@@ -1,6 +1,6 @@
 # tells CMake to generate the *.pb.h and *.pb.cc files from the *.proto
 protobuf_include_dirs(${CMAKE_SOURCE_DIR}/src/components/acomms/dccl/dccl_simple)
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} ../../dccl/dccl_simple/simple.proto)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../../dccl/dccl_simple/simple.proto)
 
 # include the CMake current build ("binary") directory for the generated simple.pb.*
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
