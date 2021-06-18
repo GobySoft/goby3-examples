@@ -15,9 +15,6 @@ class HoldPublisher : public Base
   public:
     HoldPublisher() : Base(10 /*hertz*/)
     {
-        // no subscriptions so we are ready immediately
-        interprocess().ready();
-
         // publish some initial state once (that we want to ensure some/all processes get)
         Initial init;
         init.set_state(Initial::ON);

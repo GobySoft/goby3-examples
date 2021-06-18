@@ -17,10 +17,6 @@ class HoldSubscriber : public Base
         interprocess().subscribe<groups::init>([](const Initial& init) {
             std::cout << "Received initial state: " << init.DebugString() << std::endl;
         });
-
-        // after we have done all subscriptions that are required before we are ready for
-        // publications, set ready
-        interprocess().ready();
     }
 };
 
