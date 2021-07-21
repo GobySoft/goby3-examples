@@ -1,2 +1,3 @@
 add_subdirectory(driver_simple)
 add_subdirectory(whoi_ranging)
+add_subdirectory(pluggable_driver)

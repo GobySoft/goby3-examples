@@ -1,0 +1,3 @@
+#!goby_launch -x
+[env=GOBY_MODEMDRIVER_PLUGINS=../../../build/lib/libgoby3_example_pluggable_udp_multicast_driver.so] gobyd gobyd-veh1.pb.cfg
+goby3_example_basic_intervehicle_publisher publisher-veh1.pb.cfg
