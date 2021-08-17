@@ -4,6 +4,11 @@ Examples for the Goby3 middleware (https://github.com/GobySoft/goby3)
 ## Compilation
 
 Run `./build.sh` to compile the examples. You will need Goby3 installed or built from source (in the latter case, set the environmental variable GOBY3_EXAMPLES_CMAKE_FLAGS=-DGOBY_DIR=/path/to/goby3/build).
+Once compiled, include the build directory to your system PATH.
+
+```bash
+export PATH=$PATH:/path/to/goby3-examples/build/bin
+```
 
 ## Interthread
 
