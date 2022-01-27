@@ -1,6 +1,8 @@
 import "goby/middleware/protobuf/app_config.proto";
 import "goby/zeromq/protobuf/interprocess_config.proto";
 import "goby/middleware/protobuf/tcp_config.proto";
+import "goby/middleware/protobuf/pty_config.proto";
+import "goby/middleware/protobuf/serial_config.proto";
 
 message TCPExampleConfig
 {
@@ -11,6 +13,8 @@ message TCPExampleConfig
     optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
 
     optional goby.middleware.protobuf.TCPServerConfig tcp_server_config = 3;
-    optional goby.middleware.protobuf.TCPClientConfig tcp_client1_config = 4;
-    optional goby.middleware.protobuf.TCPClientConfig tcp_client2_config = 5;
+    optional goby.middleware.protobuf.TCPClientConfig tcp_client_config = 4;
+
+    optional goby.middleware.protobuf.PTYConfig pty_config = 10;
+    optional goby.middleware.protobuf.SerialConfig serial_config = 11;
 }

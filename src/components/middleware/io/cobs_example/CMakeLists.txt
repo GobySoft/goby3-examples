@@ -1,7 +1,7 @@
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR}
   config.proto)
 
-set (APP_NAME goby3_example_tcp_cobs)
+set (APP_NAME goby3_example_cobs)
 
 add_executable(${APP_NAME}
   main.cpp
