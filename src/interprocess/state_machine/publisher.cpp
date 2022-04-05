@@ -9,6 +9,8 @@
 
 using Base = goby::zeromq::SingleThreadApplication<StateMachineCtrlConfig>;
 
+using goby::middleware::Necessity;
+
 class StateMachineCtrl : public Base
 {
   public:
@@ -16,10 +18,16 @@ class StateMachineCtrl : public Base
     {
         ctrl_.set_desired_state(protobuf::ON);
 
-        interprocess().subscribe<groups::state_report, protobuf::StateReport>(
+        interprocess().subscribe<groups::gps_control, Necessity::REQUIRED>(
+            [](const protobuf::StateReport& report) {
+                // REMOVE
+            });
+        
+        interprocess().subscribe<groups::state_report, Necessity::REQUIRED>(
             [](const protobuf::StateReport& report) {
                 std::cout << "Received state report: " << report.ShortDebugString() << std::endl;
             });
+
     }
 
   private:
