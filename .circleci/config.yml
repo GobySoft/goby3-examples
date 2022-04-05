@@ -12,6 +12,10 @@ environment-template-stretch: &environment-template-stretch
 environment-template-buster: &environment-template-buster
   DISTRO_RELEASE_CODENAME: "buster"
   DISTRO_RELEASE_VERSION: "debian10"
+
+environment-template-bullseye: &environment-template-bullseye
+  DISTRO_RELEASE_CODENAME: "bullseye"
+  DISTRO_RELEASE_VERSION: "debian11"
   
 environment-template-bionic: &environment-template-bionic
   DISTRO_RELEASE_CODENAME: "bionic"
@@ -25,6 +29,8 @@ docker-base-stretch: &docker-base-stretch
   - image: gobysoft/goby3-debian-build-base:9.1
 docker-base-buster: &docker-base-buster
   - image: gobysoft/goby3-debian-build-base:10.1
+docker-base-bullseye: &docker-base-bullseye
+  - image: gobysoft/goby3-debian-build-base:11.1
 docker-base-bionic: &docker-base-bionic
   - image: gobysoft/goby3-ubuntu-build-base:18.04.1
 docker-base-focal: &docker-base-focal
@@ -45,7 +51,7 @@ job-template-amd64: &job-template-amd64
           echo "deb http://packages.gobysoft.org/ubuntu/continuous/ ${DISTRO_RELEASE_CODENAME}/" >> /etc/apt/sources.list.d/gobysoft_continuous.list 
     - run: &run-update-apt
         name: Update apt packages and install goby3 headers
-        command: apt-get update && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev
+        command: apt-get update && apt-get -y remove libdccl3-dev libdccl3 && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev
     - run:
         name: Build examples
         command: |
@@ -58,6 +64,7 @@ workflows:
     jobs:
       - amd64-stretch-build
       - amd64-buster-build
+      - amd64-bullseye-build
       - amd64-bionic-build
       - amd64-focal-build
       
@@ -72,6 +79,7 @@ workflows:
     jobs:
       - amd64-stretch-build
       - amd64-buster-build
+      - amd64-bullseye-build
       - amd64-bionic-build
       - amd64-focal-build
             
@@ -88,6 +96,12 @@ jobs:
     environment:
       <<: *environment-template-common
       <<: *environment-template-buster    
+  amd64-bullseye-build:
+    <<: *job-template-amd64
+    docker: *docker-base-bullseye
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-bullseye    
   amd64-bionic-build:
     <<: *job-template-amd64
     docker: *docker-base-bionic
