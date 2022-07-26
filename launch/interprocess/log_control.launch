@@ -1,0 +1,4 @@
+#!goby_launch -x
+gobyd
+goby_logger -vv --log_dir /tmp --load_shared_library ../../build/lib/libgoby3_example_messages.so
+goby3_example_log_control_publisher -vvv
