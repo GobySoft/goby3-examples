@@ -5,10 +5,6 @@ environment-template-common: &environment-template-common
   DEBIAN_PRIORITY: "critical"
   DEBCONF_NOWARNINGS: "yes"
 
-environment-template-stretch: &environment-template-stretch
-  DISTRO_RELEASE_CODENAME: "stretch"
-  DISTRO_RELEASE_VERSION: "debian9"
-
 environment-template-buster: &environment-template-buster
   DISTRO_RELEASE_CODENAME: "buster"
   DISTRO_RELEASE_VERSION: "debian10"
@@ -25,8 +21,10 @@ environment-template-focal: &environment-template-focal
   DISTRO_RELEASE_CODENAME: "focal"
   DISTRO_RELEASE_VERSION: "ubuntu20.04"
 
-docker-base-stretch: &docker-base-stretch
-  - image: gobysoft/goby3-debian-build-base:9.1
+environment-template-jammy: &environment-template-jammy
+  DISTRO_RELEASE_CODENAME: "jammy"
+  DISTRO_RELEASE_VERSION: "ubuntu22.04"
+  
 docker-base-buster: &docker-base-buster
   - image: gobysoft/goby3-debian-build-base:10.1
 docker-base-bullseye: &docker-base-bullseye
@@ -35,7 +33,9 @@ docker-base-bionic: &docker-base-bionic
   - image: gobysoft/goby3-ubuntu-build-base:18.04.1
 docker-base-focal: &docker-base-focal
   - image: gobysoft/goby3-ubuntu-build-base:20.04.1
-
+docker-base-jammy: &docker-base-jammy
+  - image: gobysoft/goby3-ubuntu-build-base:22.04.1
+    
 ## Pre-declare job templates
 job-template-amd64: &job-template-amd64
   working_directory: /root/goby3-examples
@@ -62,11 +62,11 @@ workflows:
   version: 2
   commit:
     jobs:
-      - amd64-stretch-build
       - amd64-buster-build
       - amd64-bullseye-build
       - amd64-bionic-build
       - amd64-focal-build
+      - amd64-jammy-build
       
   nightly:
     triggers:
@@ -77,19 +77,13 @@ workflows:
               only:
                 - /.*/
     jobs:
-      - amd64-stretch-build
       - amd64-buster-build
       - amd64-bullseye-build
       - amd64-bionic-build
       - amd64-focal-build
+      - amd64-jammy-build
             
 jobs:
-  amd64-stretch-build:
-    <<: *job-template-amd64
-    docker: *docker-base-stretch
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-stretch    
   amd64-buster-build:
     <<: *job-template-amd64
     docker: *docker-base-buster
@@ -114,3 +108,9 @@ jobs:
     environment:
       <<: *environment-template-common
       <<: *environment-template-focal    
+  amd64-jammy-build:
+    <<: *job-template-amd64
+    docker: *docker-base-jammy
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-jammy    
