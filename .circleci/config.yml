@@ -13,10 +13,6 @@ environment-template-bullseye: &environment-template-bullseye
   DISTRO_RELEASE_CODENAME: "bullseye"
   DISTRO_RELEASE_VERSION: "debian11"
   
-environment-template-bionic: &environment-template-bionic
-  DISTRO_RELEASE_CODENAME: "bionic"
-  DISTRO_RELEASE_VERSION: "ubuntu18.04"
-
 environment-template-focal: &environment-template-focal
   DISTRO_RELEASE_CODENAME: "focal"
   DISTRO_RELEASE_VERSION: "ubuntu20.04"
@@ -29,8 +25,6 @@ docker-base-buster: &docker-base-buster
   - image: gobysoft/goby3-debian-build-base:10.1
 docker-base-bullseye: &docker-base-bullseye
   - image: gobysoft/goby3-debian-build-base:11.1
-docker-base-bionic: &docker-base-bionic
-  - image: gobysoft/goby3-ubuntu-build-base:18.04.1
 docker-base-focal: &docker-base-focal
   - image: gobysoft/goby3-ubuntu-build-base:20.04.1
 docker-base-jammy: &docker-base-jammy
@@ -64,7 +58,6 @@ workflows:
     jobs:
       - amd64-buster-build
       - amd64-bullseye-build
-      - amd64-bionic-build
       - amd64-focal-build
       - amd64-jammy-build
       
@@ -79,7 +72,6 @@ workflows:
     jobs:
       - amd64-buster-build
       - amd64-bullseye-build
-      - amd64-bionic-build
       - amd64-focal-build
       - amd64-jammy-build
             
@@ -96,12 +88,6 @@ jobs:
     environment:
       <<: *environment-template-common
       <<: *environment-template-bullseye    
-  amd64-bionic-build:
-    <<: *job-template-amd64
-    docker: *docker-base-bionic
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-bionic    
   amd64-focal-build:
     <<: *job-template-amd64
     docker: *docker-base-focal
