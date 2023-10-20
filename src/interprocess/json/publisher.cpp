@@ -21,6 +21,13 @@ class JsonPublisher : public Base
 
         std::cout << "Tx: " << nav << std::endl;
         interprocess().publish<groups::nav>(nav);
+
+        nlohmann::json nav2;
+        nav2["x2"] = 10;
+        nav2["y2"] = 20;
+        nav2["z2"] = 30;
+        std::cout << "Tx: " << nav2.dump() << std::endl;
+        interprocess().publish<groups::nav>(nav2);
     }
 };
 
