@@ -25,6 +25,7 @@
 #include <goby/acomms/protobuf/mm_driver.pb.h>
 
 #include "messages/io.h"
+using goby3_examples::operator<<;
 
 void init_transmission(const goby::acomms::protobuf::ModemTransmission& msg);
 

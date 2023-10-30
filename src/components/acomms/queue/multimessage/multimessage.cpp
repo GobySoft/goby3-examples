@@ -30,6 +30,7 @@
 
 #include "simple.pb.h"
 #include "messages/io.h"
+using goby3_examples::operator<<;
 
 void received_data(const google::protobuf::Message& msg);
 

@@ -27,6 +27,7 @@
 
 #include "simple.pb.h"        // for `Simple` protobuf message defined in simple.proto
 #include "messages/io.h" // overload operator<< for google::protobuf::Message
+using goby3_examples::operator<<;
 
 int main()
 {

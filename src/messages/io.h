@@ -25,13 +25,10 @@
 
 #include <google/protobuf/message.h>
 
-namespace google
+namespace goby3_examples
 {
-namespace protobuf
-{
-std::ostream& operator<<(std::ostream& os, const Message& msg)
+std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& msg)
 {
     return os << msg.DebugString() << std::endl;
 }
-} // namespace protobuf
-} // namespace google
+} // namespace goby3_examples

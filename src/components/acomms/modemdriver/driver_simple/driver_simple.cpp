@@ -42,6 +42,7 @@
 #include <goby/util/debug_logger.h>
 
 #include "messages/io.h"
+using goby3_examples::operator<<;
 
 void handle_data_receive(const goby::acomms::protobuf::ModemTransmission& data_msg);
 
