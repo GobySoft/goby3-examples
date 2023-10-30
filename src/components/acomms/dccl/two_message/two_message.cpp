@@ -27,6 +27,7 @@
 
 #include "two_message.pb.h"
 #include "messages/io.h" // overload operator<< for google::protobuf::Message
+using goby3_examples::operator<<;
 
 using namespace goby;
 

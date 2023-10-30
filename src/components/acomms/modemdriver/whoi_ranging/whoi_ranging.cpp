@@ -30,6 +30,7 @@
 #include <goby/util/debug_logger.h>
 
 #include "messages/io.h"
+using goby3_examples::operator<<;
 
 int usage()
 {
