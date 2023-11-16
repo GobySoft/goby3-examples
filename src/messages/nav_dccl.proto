@@ -15,20 +15,20 @@ message NavigationReport
         min: -10000
         max: 10000
         precision: 1
-        units {derived_dimensions: "length"}
+        units { derived_dimensions: "length" }
     }];
     required double y = 2 [(dccl.field) = {
         min: -10000
         max: 10000
         precision: 1
-        units {derived_dimensions: "length"}
+        units { derived_dimensions: "length" }
     }];
 
     required double z = 3 [(dccl.field) = {
         min: -6000
         max: 0
         precision: 0
-        units {derived_dimensions: "length"}
+        units { derived_dimensions: "length" }
     }];
 
     enum VehicleClass
@@ -39,4 +39,16 @@ message NavigationReport
     }
     optional VehicleClass veh_class = 4;
     optional bool battery_ok = 5;
+}
+
+message NavigationWithID
+{
+    option (dccl.msg) = {
+        codec_version: 3
+        id: 126
+        max_bytes: 32
+        unit_system: "si"
+    };
+    required int32 vehicle_id = 1 [(dccl.field) = { min: 1 max: 10 }];
+    required NavigationReport nav = 2;
 }
