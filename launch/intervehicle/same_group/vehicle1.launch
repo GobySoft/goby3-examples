@@ -1,0 +1,3 @@
+#!goby_launch -x
+gobyd gobyd-veh1.pb.cfg
+goby3_example_intervehicle_same_group same_group-veh1.pb.cfg
