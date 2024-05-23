@@ -5,13 +5,13 @@ environment-template-common: &environment-template-common
   DEBIAN_PRIORITY: "critical"
   DEBCONF_NOWARNINGS: "yes"
 
-environment-template-buster: &environment-template-buster
-  DISTRO_RELEASE_CODENAME: "buster"
-  DISTRO_RELEASE_VERSION: "debian10"
-
 environment-template-bullseye: &environment-template-bullseye
   DISTRO_RELEASE_CODENAME: "bullseye"
   DISTRO_RELEASE_VERSION: "debian11"
+
+environment-template-bookworm: &environment-template-bookworm
+  DISTRO_RELEASE_CODENAME: "bookworm"
+  DISTRO_RELEASE_VERSION: "debian12"
   
 environment-template-focal: &environment-template-focal
   DISTRO_RELEASE_CODENAME: "focal"
@@ -20,15 +20,21 @@ environment-template-focal: &environment-template-focal
 environment-template-jammy: &environment-template-jammy
   DISTRO_RELEASE_CODENAME: "jammy"
   DISTRO_RELEASE_VERSION: "ubuntu22.04"
+
+environment-template-noble: &environment-template-noble
+  DISTRO_RELEASE_CODENAME: "noble"
+  DISTRO_RELEASE_VERSION: "ubuntu24.04"
   
-docker-base-buster: &docker-base-buster
-  - image: gobysoft/goby3-debian-build-base:10.1
 docker-base-bullseye: &docker-base-bullseye
   - image: gobysoft/goby3-debian-build-base:11.1
+docker-base-bookworm: &docker-base-bookworm
+  - image: gobysoft/goby3-debian-build-base:12.1
 docker-base-focal: &docker-base-focal
   - image: gobysoft/goby3-ubuntu-build-base:20.04.1
 docker-base-jammy: &docker-base-jammy
   - image: gobysoft/goby3-ubuntu-build-base:22.04.1
+docker-base-noble: &docker-base-noble
+  - image: gobysoft/goby3-ubuntu-build-base:24.04.1
     
 ## Pre-declare job templates
 job-template-amd64: &job-template-amd64
@@ -56,10 +62,11 @@ workflows:
   version: 2
   commit:
     jobs:
-      - amd64-buster-build
       - amd64-bullseye-build
+      - amd64-bookworm-build
       - amd64-focal-build
       - amd64-jammy-build
+      - amd64-noble-build
       
   nightly:
     triggers:
@@ -70,24 +77,25 @@ workflows:
               only:
                 - /.*/
     jobs:
-      - amd64-buster-build
       - amd64-bullseye-build
+      - amd64-bookworm-build
       - amd64-focal-build
       - amd64-jammy-build
+      - amd64-noble-build
             
-jobs:
-  amd64-buster-build:
-    <<: *job-template-amd64
-    docker: *docker-base-buster
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-buster    
+jobs: 
   amd64-bullseye-build:
     <<: *job-template-amd64
     docker: *docker-base-bullseye
     environment:
       <<: *environment-template-common
       <<: *environment-template-bullseye    
+  amd64-bookworm-build:
+    <<: *job-template-amd64
+    docker: *docker-base-bookworm
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-bookworm
   amd64-focal-build:
     <<: *job-template-amd64
     docker: *docker-base-focal
@@ -100,3 +108,9 @@ jobs:
     environment:
       <<: *environment-template-common
       <<: *environment-template-jammy    
+  amd64-noble-build:
+    <<: *job-template-amd64
+    docker: *docker-base-noble
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-noble    
