@@ -51,7 +51,7 @@ job-template-amd64: &job-template-amd64
           echo "deb http://packages.gobysoft.org/ubuntu/continuous/ ${DISTRO_RELEASE_CODENAME}/" >> /etc/apt/sources.list.d/gobysoft_continuous.list 
     - run: &run-update-apt
         name: Update apt packages and install goby3 headers
-        command: apt-get update && apt-get -y remove libdccl3-dev libdccl3 && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev
+        command: apt-get update && apt-get -y remove libdccl3-dev libdccl3 && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev clang
     - run:
         name: Build examples
         command: |
