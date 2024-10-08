@@ -1,0 +1,8 @@
+deployment: basic_intervehicle
+platforms:
+  - name: vehicle1
+    interfaces:
+     - goby3_example_basic_intervehicle_publisher_interface.yml
+  - name: vehicle2
+    interfaces:
+     - goby3_example_basic_intervehicle_subscriber_interface.yml
