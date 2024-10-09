@@ -1,0 +1,3 @@
+#!goby_launch -x
+gobyd gobyd-veh1.pb.cfg
+goby3_example_broadcast_intervehicle_publisher publisher-veh1.pb.cfg
