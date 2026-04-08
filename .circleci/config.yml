@@ -13,10 +13,6 @@ environment-template-bookworm: &environment-template-bookworm
   DISTRO_RELEASE_CODENAME: "bookworm"
   DISTRO_RELEASE_VERSION: "debian12"
   
-environment-template-focal: &environment-template-focal
-  DISTRO_RELEASE_CODENAME: "focal"
-  DISTRO_RELEASE_VERSION: "ubuntu20.04"
-
 environment-template-jammy: &environment-template-jammy
   DISTRO_RELEASE_CODENAME: "jammy"
   DISTRO_RELEASE_VERSION: "ubuntu22.04"
@@ -29,8 +25,6 @@ docker-base-bullseye: &docker-base-bullseye
   - image: gobysoft/goby3-debian-build-base:11.1
 docker-base-bookworm: &docker-base-bookworm
   - image: gobysoft/goby3-debian-build-base:12.1
-docker-base-focal: &docker-base-focal
-  - image: gobysoft/goby3-ubuntu-build-base:20.04.1
 docker-base-jammy: &docker-base-jammy
   - image: gobysoft/goby3-ubuntu-build-base:22.04.1
 docker-base-noble: &docker-base-noble
@@ -64,7 +58,6 @@ workflows:
     jobs:
       - amd64-bullseye-build
       - amd64-bookworm-build
-      - amd64-focal-build
       - amd64-jammy-build
       - amd64-noble-build
       
@@ -79,7 +72,6 @@ workflows:
     jobs:
       - amd64-bullseye-build
       - amd64-bookworm-build
-      - amd64-focal-build
       - amd64-jammy-build
       - amd64-noble-build
             
@@ -96,12 +88,6 @@ jobs:
     environment:
       <<: *environment-template-common
       <<: *environment-template-bookworm
-  amd64-focal-build:
-    <<: *job-template-amd64
-    docker: *docker-base-focal
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-focal    
   amd64-jammy-build:
     <<: *job-template-amd64
     docker: *docker-base-jammy
