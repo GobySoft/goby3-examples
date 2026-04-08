@@ -1,0 +1,60 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 7 * * *"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: amd64-bullseye-build
+            image: gobysoft/goby3-debian-build-base:11.1
+            distro_release_codename: bullseye
+            distro_release_version: debian11
+          - name: amd64-bookworm-build
+            image: gobysoft/goby3-debian-build-base:12.1
+            distro_release_codename: bookworm
+            distro_release_version: debian12
+          - name: amd64-jammy-build
+            image: gobysoft/goby3-ubuntu-build-base:22.04.1
+            distro_release_codename: jammy
+            distro_release_version: ubuntu22.04
+          - name: amd64-noble-build
+            image: gobysoft/goby3-ubuntu-build-base:24.04.1
+            distro_release_codename: noble
+            distro_release_version: ubuntu24.04
+
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.image }}
+
+    env:
+      CC: /usr/bin/clang
+      CXX: /usr/bin/clang++
+      DEBIAN_FRONTEND: noninteractive
+      DEBIAN_PRIORITY: critical
+      DEBCONF_NOWARNINGS: "yes"
+      DISTRO_RELEASE_CODENAME: ${{ matrix.distro_release_codename }}
+      DISTRO_RELEASE_VERSION: ${{ matrix.distro_release_version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install packages.gobysoft.org key
+        run: apt-key adv --recv-key --keyserver keyserver.ubuntu.com 19478082E2F8D3FE
+
+      - name: Add continuous build package sources.list
+        run: echo "deb http://packages.gobysoft.org/ubuntu/continuous/ ${DISTRO_RELEASE_CODENAME}/" >> /etc/apt/sources.list.d/gobysoft_continuous.list
+
+      - name: Update apt packages and install goby3 headers
+        run: apt-get update && apt-get -y remove libdccl3-dev libdccl3 && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev clang
+
+      - name: Build examples
+        run: mkdir -p build && cd build && cmake .. && cmake --build . -- -j4
