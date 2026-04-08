@@ -33,11 +33,11 @@ jobs:
         run: |
           . /etc/os-release
           
-          install -d /etc/apt/keyrings
-          curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x19478082E2F8D3FE" | gpg --dearmor > /etc/apt/keyrings/gobysoft.gpg
+          sudo install -d /etc/apt/keyrings
+          curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x19478082E2F8D3FE" | gpg --dearmor | sudo tee /etc/apt/keyrings/gobysoft.gpg > /dev/null
           
-          echo "deb [signed-by=/etc/apt/keyrings/gobysoft.gpg] http://packages.gobysoft.org/debian/release/ $VERSION_CODENAME/" > /etc/apt/sources.list.d/gobysoft_release.list
+          echo "deb [signed-by=/etc/apt/keyrings/gobysoft.gpg] http://packages.gobysoft.org/debian/release/ $VERSION_CODENAME/" | sudo tee /etc/apt/sources.list.d/gobysoft_release.list > /dev/null
 
-          apt-get update
-          apt-get install -y libgoby3-dev libgoby3-moos-dev clang
+          sudo apt-get update
+          sudo apt-get install -y libgoby3-dev libgoby3-moos-dev clang
           
