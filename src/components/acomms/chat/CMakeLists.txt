@@ -2,7 +2,7 @@ set(CURSES_NEED_NCURSES TRUE)
 find_package(Curses)
 
 if(CURSES_FOUND)
-  protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} chat.proto)
+  protobuf_generate_cpp_dccl(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} chat.proto)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
   add_executable(goby_chat chat.cpp chat_curses.cpp ${PROTO_SRCS} ${PROTO_HDRS})

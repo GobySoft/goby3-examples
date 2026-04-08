@@ -68,7 +68,7 @@ function(PROTOBUF_INCLUDE_DIRS)
   endforeach()
 endfunction()
 
-function(PROTOBUF_GENERATE_CPP SRCS HDRS CPP_OUT_DIR)
+function(PROTOBUF_GENERATE_CPP_DCCL SRCS HDRS CPP_OUT_DIR)
   protobuf_include_dirs(${CMAKE_CURRENT_BINARY_DIR})
 
   if(NOT ARGN)
@@ -103,51 +103,15 @@ function(PROTOBUF_GENERATE_CPP SRCS HDRS CPP_OUT_DIR)
 
 endfunction()
 
+# prefer CMake included with Protobuf
+find_package(protobuf QUIET CONFIG)
 
-find_path(PROTOBUF_INCLUDE_DIR google/protobuf/service.h)
-
-# so that we can use Google's included descriptor.proto
-list(APPEND ALL_PROTOBUF_INCLUDE_DIRS "-I${PROTOBUF_INCLUDE_DIR}")
-
-
-# Google's provided vcproj files generate libraries with a "lib"
-# prefix on Windows
-if(WIN32)
-    set(PROTOBUF_ORIG_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
-    set(CMAKE_FIND_LIBRARY_PREFIXES "lib" "")
+# if that fails, use the CMake shipped module
+if(NOT Protobuf_FOUND)
+  find_package(Protobuf REQUIRED MODULE)
+  set(protobuf_VERSION ${Protobuf_VERSION})
 endif()
 
-find_library(PROTOBUF_LIBRARY NAMES protobuf
-             DOC "The Google Protocol Buffers Library"
-)
-find_library(PROTOBUF_PROTOC_LIBRARY NAMES protoc
-             DOC "The Google Protocol Buffers Compiler Library"
-)
-find_program(PROTOBUF_PROTOC_EXECUTABLE NAMES protoc
-             DOC "The Google Protocol Buffers Compiler"
-)
-
-mark_as_advanced(PROTOBUF_INCLUDE_DIR
-                 PROTOBUF_LIBRARY
-                 PROTOBUF_PROTOC_LIBRARY
-                 PROTOBUF_PROTOC_EXECUTABLE)
-
-# Restore original find library prefixes
-if(WIN32)
-    set(CMAKE_FIND_LIBRARY_PREFIXES "${PROTOBUF_ORIG_FIND_LIBRARY_PREFIXES}")
-endif()
-
-include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(PROTOBUF DEFAULT_MSG
-    PROTOBUF_LIBRARY PROTOBUF_INCLUDE_DIR)
-
-if(PROTOBUF_FOUND)
-    set(PROTOBUF_INCLUDE_DIRS ${PROTOBUF_INCLUDE_DIR})
-    set(PROTOBUF_LIBRARIES    ${PROTOBUF_LIBRARY})
-
-    execute_process(COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --version
-      OUTPUT_VARIABLE PROTOC_VERSION_STRING)
-    string(REPLACE "libprotoc "
-      "" PROTOC_VERSION ${PROTOC_VERSION_STRING})
-
+if(Protobuf_FOUND)
+  set(ProtobufLocal_FOUND True)
 endif()
