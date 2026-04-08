@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "dccl/protobuf/option_extensions.proto";
 
 package protobuf;

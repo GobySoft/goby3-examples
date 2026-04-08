@@ -1,3 +1,4 @@
+syntax = "proto2";
 package protobuf;
 
 enum State
