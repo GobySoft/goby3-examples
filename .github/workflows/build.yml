@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install packages.gobysoft.org key
-        run: gpg --no-default-keyring --keyring /usr/share/keyrings/gobysoft-archive-keyring.gpg --keyserver keyserver.ubuntu.com --recv-keys 19478082E2F8D3FE
+        run: curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x19478082E2F8D3FE" | gpg --dearmor -o /usr/share/keyrings/gobysoft-archive-keyring.gpg
 
       - name: Add continuous build package sources.list
         run: echo "deb [signed-by=/usr/share/keyrings/gobysoft-archive-keyring.gpg] http://packages.gobysoft.org/ubuntu/continuous/ ${DISTRO_RELEASE_CODENAME}/" >> /etc/apt/sources.list.d/gobysoft_continuous.list
