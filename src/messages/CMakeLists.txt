@@ -1,4 +1,4 @@
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${project_INC_DIR}/messages
+protobuf_generate_cpp_dccl(PROTO_SRCS PROTO_HDRS ${project_INC_DIR}/messages
   nav.proto
   nav_dccl.proto
   gps.proto

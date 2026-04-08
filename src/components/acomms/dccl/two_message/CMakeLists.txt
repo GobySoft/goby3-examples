@@ -1,4 +1,4 @@
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} two_message.proto)
+protobuf_generate_cpp_dccl(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} two_message.proto)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(two_message two_message.cpp ${PROTO_SRCS} ${PROTO_HDRS})
 target_link_libraries(two_message goby ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES})
