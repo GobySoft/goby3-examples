@@ -36,6 +36,7 @@ function(add_goby_executable)
       IMPORT_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
+        ${protoc_out_dir}
         ${args_PROTO_IMPORT_DIRS}
         ${GOBY_PROTOBUF_IMPORT_DIRS}
       TARGET ${args_TARGET}
