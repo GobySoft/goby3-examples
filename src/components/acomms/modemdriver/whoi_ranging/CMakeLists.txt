@@ -1,3 +1,3 @@
-add_executable(whoi_ranging whoi_ranging.cpp)
-target_link_libraries(whoi_ranging goby ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES})
+add_goby_executable(TARGET whoi_ranging
+  SOURCES whoi_ranging.cpp)
 install(TARGETS whoi_ranging RUNTIME DESTINATION bin)

@@ -1,3 +1,3 @@
-add_executable(flexostream_simple flexostream_simple.cpp)
-target_link_libraries(flexostream_simple goby ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES})
+add_goby_executable(TARGET flexostream_simple
+  SOURCES flexostream_simple.cpp)
 install(TARGETS flexostream_simple RUNTIME DESTINATION bin)
