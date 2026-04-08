@@ -1,4 +1,4 @@
-# GobyApp.cmake - convenience functions for building Goby application targets
+# GobyTarget.cmake - convenience functions for building Goby targets
 #
 # Provides:
 #   add_goby_executable(TARGET <name>
@@ -109,6 +109,8 @@ function(add_goby_executable)
   endif()
 
   target_link_libraries(${args_TARGET} goby ${args_LINK_LIBRARIES})
+
+  install(TARGETS ${args_TARGET} RUNTIME DESTINATION bin)
 
   if(export_goby_interfaces)
     generate_interfaces(${args_TARGET})
