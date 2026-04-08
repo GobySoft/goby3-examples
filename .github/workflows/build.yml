@@ -15,10 +15,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: amd64-bullseye-build
-            image: gobysoft/goby3-debian-build-base:11.1
-            distro_release_codename: bullseye
-            distro_release_version: debian11
           - name: amd64-bookworm-build
             image: gobysoft/goby3-debian-build-base:12.1
             distro_release_codename: bookworm

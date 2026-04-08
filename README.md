@@ -28,22 +28,34 @@ When finished, type CTRL-C into the original terminal (the one from which `goby_
 
 ## Interprocess
 
-### Basic Multi-Process Single-Threaded Publish/Subscribe
+### Basic Multi-Process Single-Threaded Publish/Subscribe (ZeroMQ)
 
-This example takes much of the same code from the basic interthread example above, and splits it into two single-threaded processes, communicating on the interprocess layer via the `gobyd`.
+This example takes much of the same code from the basic interthread example above, and splits it into two single-threaded processes, communicating on the interprocess layer via the `gobyd` (ZeroMQ-based broker).
 
-The code for this example is given in src/interprocess/basic_publisher and src/interprocess/basic_subscriber. To run using the default UNIX sockets use:
+The code for this example is given in src/interprocess/zeromq/basic_publisher and src/interprocess/zeromq/basic_subscriber. To run using the default UNIX sockets use:
 
 ```
-cd launch/interprocess
+cd launch/interprocess/zeromq
 goby_launch -x basic_publisher_subscriber.launch
 ```
 
 As will be apparent if you look at the contents of `basic_publisher_subscriber.launch`, this will launch `gobyd`, the publisher application, and two copies of the subscriber application, each in their own XTerm windows. When finished, type CTRL-C into the original terminal (the one from which `goby_launch` was run)
 
+### Basic Multi-Process Single-Threaded Publish/Subscribe (UDP Multicast)
+
+This example is equivalent to the ZeroMQ example above but uses the UDP Multicast (udpm) interprocess transport instead. No central broker (`gobyd`) is required.
+
+The code for this example is given in src/interprocess/udpm/basic_publisher and src/interprocess/udpm/basic_subscriber. To run:
+
+```
+cd launch/interprocess/udpm
+goby_launch -x basic_publisher_subscriber.launch
+```
+
+This will launch the publisher application and two copies of the subscriber application, each in their own XTerm windows. When finished, type CTRL-C into the original terminal.
 
 ### GPS Driver
-A working example using a standard NMEA-0183 GPS is given in `src/interprocess/gps_driver`.
+A working example using a standard NMEA-0183 GPS is given in `src/interprocess/zeromq/gps_driver`.
 
 This example consists of two processes: `goby3_example_gps_driver` which has three threads: one thread blocks reading the serial port, one subscribes to the data read by the first thread and writes it to the screen (as a proxy for doing some data analysis on it), while the third (the main thread) waits for control data published by another process. Based on the control data parameter, the main thread spawns or joins the reader thread. `gps_controller` is a simple application that writes the value from the configuration file, and then quits.
 

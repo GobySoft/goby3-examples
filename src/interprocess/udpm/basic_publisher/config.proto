@@ -1,0 +1,14 @@
+syntax = "proto2";
+import "goby/middleware/protobuf/app_config.proto";
+import "goby/udpm/protobuf/interprocess_config.proto";
+
+message BasicPublisherConfig
+{
+    // required parameters for ApplicationBase3 class
+    optional goby.middleware.protobuf.AppConfig app = 1;
+    // required parameters for the UDP Multicast interprocess portal
+    optional goby.udpm.protobuf.InterProcessPortalConfig interprocess = 2;
+
+    // any specific parameters for your application
+    optional int32 my_value = 3;
+}
