@@ -43,7 +43,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${project_LIB_DIR} CACHE PATH
 
 include_directories(${project_INC_DIR})
 
-# Import directories for protobuf_generate across all targets
+# Import directories passed to protoc for all Goby targets (via GobyApp.cmake)
 set(GOBY_PROTOBUF_IMPORT_DIRS
   ${DCCL_INCLUDE_DIR}
   ${GOBY_INCLUDE_DIR}

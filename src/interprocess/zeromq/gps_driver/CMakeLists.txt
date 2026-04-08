@@ -9,21 +9,8 @@ add_goby_executable(TARGET goby3_example_gps_controller
   LINK_LIBRARIES goby_zeromq goby3_example_messages)
 
 if(build_moos)
-  set(moos_plugin_protoc_out_dir ${CMAKE_CURRENT_BINARY_DIR}/gps_moos_plugin)
-  file(MAKE_DIRECTORY ${moos_plugin_protoc_out_dir})
-  protobuf_generate(
-    LANGUAGE dccl
-    PROTOC_OPTIONS --cpp_out=${moos_plugin_protoc_out_dir}
-    PROTOC_OUT_DIR ${moos_plugin_protoc_out_dir}
+  add_goby_library(TARGET gps_moos_plugin
+    SOURCES moos_plugin.cpp
     PROTOS config.proto
-    GENERATE_EXTENSIONS .pb.h .pb.cc
-    IMPORT_DIRS
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ${moos_plugin_protoc_out_dir}
-      ${GOBY_PROTOBUF_IMPORT_DIRS}
-    OUT_VAR MOOS_PROTO_GENERATED
-  )
-  add_library(gps_moos_plugin SHARED moos_plugin.cpp ${MOOS_PROTO_GENERATED})
-  target_include_directories(gps_moos_plugin PRIVATE ${moos_plugin_protoc_out_dir})
-  target_link_libraries(gps_moos_plugin goby goby_zeromq goby_moos goby3_example_messages)
+    LINK_LIBRARIES goby goby_zeromq goby_moos goby3_example_messages)
 endif()
