@@ -144,6 +144,7 @@ int main(int argc, char* argv[])
     //
     goby::acomms::protobuf::DriverConfig driver_cfg;
     driver_cfg.set_modem_id(my_id_);
+    driver_cfg.set_connection_type(goby::acomms::protobuf::DriverConfig::CONNECTION_SERIAL);
     driver_cfg.set_serial_port(serial_port);
 
 #ifdef USE_FLEXIBLE_DATA_PACKET

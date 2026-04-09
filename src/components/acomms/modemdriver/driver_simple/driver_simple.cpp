@@ -65,6 +65,8 @@ int main(int argc, char* argv[])
 
     // set the serial port given on the command line
     cfg.set_serial_port(argv[1]);
+    cfg.set_connection_type(goby::acomms::protobuf::DriverConfig::CONNECTION_SERIAL);
+
     using google::protobuf::uint32;
     // set the source id of this modem
     uint32 our_id = goby::util::as<uint32>(argv[2]);
