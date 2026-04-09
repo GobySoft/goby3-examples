@@ -27,8 +27,8 @@
 // and sent on a fixed rotating cycle
 
 #include <iostream>
+#include <stdexcept>
 
-#include <boost/lexical_cast.hpp>
 #include <goby/acomms/amac.h>
 #include <goby/acomms/bind.h>
 #include <goby/acomms/dccl.h>
@@ -76,10 +76,10 @@ int main(int argc, char* argv[])
 
     try
     {
-        my_id_ = boost::lexical_cast<int>(argv[2]);
-        buddy_id_ = boost::lexical_cast<int>(argv[3]);
+        my_id_ = std::stoi(argv[2]);
+        buddy_id_ = std::stoi(argv[3]);
     }
-    catch (boost::bad_lexical_cast&)
+    catch (std::invalid_argument&)
     {
         std::cerr << "bad value for my_id: " << argv[2] << " or buddy_id: " << argv[3]
                   << ". these must be unsigned integers." << std::endl;
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
     }
 
     std::string log_file = argv[4];
-    fout_.open(log_file.c_str());
+    fout_.open(log_file);
     if (!fout_.is_open())
     {
         std::cerr << "bad value for log_file: " << log_file << std::endl;

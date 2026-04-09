@@ -47,9 +47,7 @@ goby3_examples::apps::MavlinkExample::MavlinkExample()
                    std::tuple<int, int, mavlink::common::msg::HEARTBEAT>,
                    goby::middleware::MarshallingScheme::MAVLINK>(
             [](const std::tuple<int, int, mavlink::common::msg::HEARTBEAT>& hb_with_metadata) {
-                int sysid, compid;
-                mavlink::common::msg::HEARTBEAT hb;
-                std::tie(sysid, compid, hb) = hb_with_metadata;
+                auto [sysid, compid, hb] = hb_with_metadata;
                 goby::glog.is_verbose() &&
                     goby::glog << group("in") << "Received heartbeat [sysid: " << sysid
                                << ", compid: " << compid << "]: " << hb.to_yaml() << std::endl;

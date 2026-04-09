@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
 
     // 10 hz is good
     int i = 0;
-    while (1)
+    while (true)
     {
         ++i;
         // this is when any signals will be emitted and the modem serial comms are performed
