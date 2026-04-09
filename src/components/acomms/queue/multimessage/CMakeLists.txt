@@ -1,10 +1,4 @@
-# tells CMake to generate the *.pb.h and *.pb.cc files from the *.proto
-protobuf_include_dirs(${CMAKE_SOURCE_DIR}/src/components/acomms/dccl/dccl_simple)
-protobuf_generate_cpp_dccl(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} ../../dccl/dccl_simple/simple.proto)
-
-# include the CMake current build ("binary") directory for the generated simple.pb.*
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-add_executable(queue_multimessage multimessage.cpp ${PROTO_SRCS} ${PROTO_HDRS})
-target_link_libraries(queue_multimessage goby ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES})
-install(TARGETS queue_multimessage RUNTIME DESTINATION bin)
+add_goby_executable(TARGET queue_multimessage
+  SOURCES multimessage.cpp
+  PROTOS ${CMAKE_CURRENT_SOURCE_DIR}/../../dccl/dccl_simple/simple.proto
+  PROTO_IMPORT_DIRS ${CMAKE_SOURCE_DIR}/src/components/acomms/dccl/dccl_simple)

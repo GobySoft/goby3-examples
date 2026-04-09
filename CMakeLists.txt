@@ -1,28 +1,26 @@
-cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 project(goby3-examples C CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 
-if(((NOT DEFINED CMAKE_CXX_STANDARD) OR ("${CMAKE_CXX_STANDARD}" STREQUAL "03") OR ("${CMAKE_CXX_STANDARD}" STREQUAL "11") OR ("${CMAKE_CXX_STANDARD}" STREQUAL "14")))
+if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
   set(CMAKE_CXX_STANDARD 17)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  message ("Setting CMAKE_CXX_STANDARD to 17 as required by Goby. If you wish to use a newer standard, set CMAKE_CXX_STANDARD directly")
+  message("Setting CMAKE_CXX_STANDARD to 17 as required by Goby. If you wish to use a newer standard, set CMAKE_CXX_STANDARD directly")
 endif()
 
-find_package(ProtobufLocal REQUIRED)
-include_directories(${PROTOBUF_INCLUDE_DIRS})
+find_package(Protobuf REQUIRED)
+include_directories(${Protobuf_INCLUDE_DIRS})
 
 find_package(DCCL REQUIRED)
 get_target_property(DCCL_INCLUDE_DIR dccl INTERFACE_INCLUDE_DIRECTORIES)
 
 message("Using DCCL in ${DCCL_INCLUDE_DIR}")
 include_directories("${DCCL_INCLUDE_DIR}")
-protobuf_include_dirs("${DCCL_INCLUDE_DIR}")
 
 find_package(GOBY 3.0 REQUIRED zeromq)
 
 include_directories("${GOBY_INCLUDE_DIR}")
-protobuf_include_dirs("${GOBY_INCLUDE_DIR}")
 
 # create variables for various directories
 get_filename_component(project_SRC_DIR src ABSOLUTE)
@@ -44,7 +42,15 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${project_LIB_DIR} CACHE PATH
   "Output directory for the static libraries (archives)" )
 
 include_directories(${project_INC_DIR})
-protobuf_include_dirs(${project_INC_DIR})
+
+# Import directories passed to protoc for all Goby targets (via GobyApp.cmake)
+set(GOBY_PROTOBUF_IMPORT_DIRS
+  ${DCCL_INCLUDE_DIR}
+  ${GOBY_INCLUDE_DIR}
+  ${project_INC_DIR}
+)
+
+include(GobyTarget)
 
 option(export_goby_interfaces OFF "Build Goby Publish/Subscribe interface files (YML) from code")
 

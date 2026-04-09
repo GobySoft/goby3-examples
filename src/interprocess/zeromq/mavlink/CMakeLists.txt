@@ -1,16 +1,4 @@
-set(APP goby3_example_mavlink)
-
-protobuf_generate_cpp_dccl(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} config.proto)
-
-add_executable(${APP}
-  app.cpp
-  ${PROTO_SRCS} ${PROTO_HDRS})
-
-target_link_libraries(${APP}
-  goby
-  goby_zeromq
-  goby3_example_messages)
-
-if(export_goby_interfaces)
-  generate_interfaces(${APP})
-endif()
+add_goby_executable(TARGET goby3_example_mavlink
+  SOURCES app.cpp
+  PROTOS config.proto
+  LINK_LIBRARIES goby_zeromq goby3_example_messages)

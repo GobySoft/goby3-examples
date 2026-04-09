@@ -1,6 +1,4 @@
-protobuf_generate_cpp_dccl(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} simple_status.proto)
-add_library(gobyexample_protobuf SHARED ${PROTO_SRCS} ${PROTO_HDRS})
-
-target_link_libraries(gobyexample_protobuf
-  goby)
+add_goby_library(TARGET gobyexample_protobuf
+  PROTOS simple_status.proto
+  LINK_LIBRARIES goby)
 
