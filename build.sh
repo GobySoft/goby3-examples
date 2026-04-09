@@ -1,21 +1,14 @@
 #!/bin/bash
 
-if [ -z "${GOBY3_EXAMPLES_CMAKE_FLAGS}" ]; then
-    GOBY3_EXAMPLES_CMAKE_FLAGS=
-fi
-
-if [ -z "${GOBY3_EXAMPLES_MAKE_FLAGS}" ]; then
-    GOBY3_EXAMPLES_MAKE_FLAGS=
-fi
-
 set -e -u
 mkdir -p build
 
+_cmake_flags="${GOBY3_EXAMPLES_CMAKE_FLAGS:-}"
+_make_flags="${GOBY3_EXAMPLES_MAKE_FLAGS:-}"
+
+cd build
+
 echo "Configuring..."
-echo "cmake .. ${GOBY3_EXAMPLES_CMAKE_FLAGS}"
-pushd build >& /dev/null
-cmake .. ${GOBY3_EXAMPLES_CMAKE_FLAGS}
+(set -x; cmake .. ${_cmake_flags})
 echo "Building..."
-echo "make ${GOBY3_EXAMPLES_MAKE_FLAGS} $@"
-make ${GOBY3_EXAMPLES_MAKE_FLAGS} $@
-popd >& /dev/null
+(set -x; cmake --build . -- ${_make_flags} $@)
