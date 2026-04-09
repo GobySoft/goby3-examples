@@ -79,7 +79,13 @@ int main(int argc, char* argv[])
         my_id_ = std::stoi(argv[2]);
         buddy_id_ = std::stoi(argv[3]);
     }
-    catch (std::invalid_argument&)
+    catch (const std::invalid_argument&)
+    {
+        std::cerr << "bad value for my_id: " << argv[2] << " or buddy_id: " << argv[3]
+                  << ". these must be unsigned integers." << std::endl;
+        return startup_failure();
+    }
+    catch (const std::out_of_range&)
     {
         std::cerr << "bad value for my_id: " << argv[2] << " or buddy_id: " << argv[3]
                   << ". these must be unsigned integers." << std::endl;
