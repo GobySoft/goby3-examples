@@ -3,8 +3,11 @@ import "goby/protobuf/option_extensions.proto";
 
 message GobyMessage
 {
-    option (dccl.msg).id = 4;
-    option (dccl.msg).max_bytes = 32;
+    option (dccl.msg) = {
+        codec_version: 4
+        id: 4
+        max_bytes: 32
+    };
 
     // enable "pass through" of data request to the application
     option (goby.msg).queue.encode_on_demand = true;
@@ -15,6 +18,6 @@ message GobyMessage
     // priority
     option (goby.msg).queue.on_demand_skew_seconds = 0.1;
 
-    required int32 a = 1 [(dccl.field).min = 0, (dccl.field).max = 254];
-    required int32 b = 2 [(dccl.field).min = 0, (dccl.field).max = 510];
+    required int32 a = 1 [(dccl.field) = {min: 0 max: 254}];
+    required int32 b = 2 [(dccl.field) = {min: 0 max: 510}];
 }
