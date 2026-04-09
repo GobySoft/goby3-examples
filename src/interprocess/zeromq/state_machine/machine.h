@@ -49,7 +49,7 @@ template <typename App> struct On : boost::statechart::state<On<App>, Machine<Ap
     }
     // state exit
     ~On() { std::cout << "Leaving state: ON" << std::endl; }
-    typedef boost::mpl::list<boost::statechart::transition<EvTurnOff, Off<App> > > reactions;
+    using reactions = boost::mpl::list<boost::statechart::transition<EvTurnOff, Off<App>>>;
 };
 
 template <typename App> struct Off : boost::statechart::state<Off<App>, Machine<App> >
@@ -66,7 +66,7 @@ template <typename App> struct Off : boost::statechart::state<Off<App>, Machine<
     }
     ~Off() { std::cout << "Leaving state: OFF" << std::endl; }
 
-    typedef boost::mpl::list<boost::statechart::transition<EvTurnOn, On<App> > > reactions;
+    using reactions = boost::mpl::list<boost::statechart::transition<EvTurnOn, On<App>>>;
 };
 } // namespace statechart
 

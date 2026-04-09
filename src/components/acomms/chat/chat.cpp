@@ -27,8 +27,8 @@
 // and sent on a fixed rotating cycle
 
 #include <iostream>
+#include <stdexcept>
 
-#include <boost/lexical_cast.hpp>
 #include <goby/acomms/amac.h>
 #include <goby/acomms/bind.h>
 #include <goby/acomms/dccl.h>
@@ -76,10 +76,16 @@ int main(int argc, char* argv[])
 
     try
     {
-        my_id_ = boost::lexical_cast<int>(argv[2]);
-        buddy_id_ = boost::lexical_cast<int>(argv[3]);
+        my_id_ = std::stoi(argv[2]);
+        buddy_id_ = std::stoi(argv[3]);
     }
-    catch (boost::bad_lexical_cast&)
+    catch (const std::invalid_argument&)
+    {
+        std::cerr << "bad value for my_id: " << argv[2] << " or buddy_id: " << argv[3]
+                  << ". these must be unsigned integers." << std::endl;
+        return startup_failure();
+    }
+    catch (const std::out_of_range&)
     {
         std::cerr << "bad value for my_id: " << argv[2] << " or buddy_id: " << argv[3]
                   << ". these must be unsigned integers." << std::endl;
@@ -87,7 +93,7 @@ int main(int argc, char* argv[])
     }
 
     std::string log_file = argv[4];
-    fout_.open(log_file.c_str());
+    fout_.open(log_file);
     if (!fout_.is_open())
     {
         std::cerr << "bad value for log_file: " << log_file << std::endl;
@@ -138,6 +144,7 @@ int main(int argc, char* argv[])
     //
     goby::acomms::protobuf::DriverConfig driver_cfg;
     driver_cfg.set_modem_id(my_id_);
+    driver_cfg.set_connection_type(goby::acomms::protobuf::DriverConfig::CONNECTION_SERIAL);
     driver_cfg.set_serial_port(serial_port);
 
 #ifdef USE_FLEXIBLE_DATA_PACKET

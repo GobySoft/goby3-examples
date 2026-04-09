@@ -7,46 +7,19 @@ package goby.example;
 
 message SimpleStatus
 {
-    option (dccl.msg).id = 20;
-    option (dccl.msg).max_bytes = 32;
-    option (dccl.msg).codec_version = 3;
+    option (dccl.msg) = {
+        codec_version: 4
+        id: 20
+        max_bytes: 32
+    };
 
-    optional double timestamp = 1
-        [(dccl.field).codec = "_time", (dccl.field).in_head = true];
-    optional int32 src = 2 [
-        (dccl.field).max = 31,
-        (dccl.field).min = 0,
-        (dccl.field).in_head = true
-    ];
-    optional int32 dest = 3 [
-        (dccl.field).max = 31,
-        (dccl.field).min = 0,
-        (dccl.field).in_head = true
-    ];
+    optional double timestamp = 1 [(dccl.field) = {codec: "_time" in_head: true}];
+    optional int32 src = 2 [(dccl.field) = {min: 0 max: 31 in_head: true}];
+    optional int32 dest = 3 [(dccl.field) = {min: 0 max: 31 in_head: true}];
 
-    optional double x = 10 [
-        (dccl.field).max = 100000,
-        (dccl.field).min = -100000,
-        (dccl.field).precision = 0
-    ];
-    optional double y = 11 [
-        (dccl.field).max = 100000,
-        (dccl.field).min = -100000,
-        (dccl.field).precision = 0
-    ];
-    optional double speed = 12 [
-        (dccl.field).max = 20.0,
-        (dccl.field).min = -2.0,
-        (dccl.field).precision = 1
-    ];
-    optional double heading = 13 [
-        (dccl.field).max = 360.00,
-        (dccl.field).min = 0.00,
-        (dccl.field).precision = 2
-    ];
-    optional double depth = 14 [
-        (dccl.field).max = 6400.0,
-        (dccl.field).min = 0.0,
-        (dccl.field).precision = 1
-    ];
+    optional double x = 10 [(dccl.field) = {min: -100000 max: 100000 precision: 0}];
+    optional double y = 11 [(dccl.field) = {min: -100000 max: 100000 precision: 0}];
+    optional double speed = 12 [(dccl.field) = {min: -2.0 max: 20.0 precision: 1}];
+    optional double heading = 13 [(dccl.field) = {min: 0.00 max: 360.00 precision: 2}];
+    optional double depth = 14 [(dccl.field) = {min: 0.0 max: 6400.0 precision: 1}];
 }

@@ -61,6 +61,8 @@ int main(int argc, char* argv[])
 
     // set the serial port given on the command line
     cfg.set_serial_port(argv[1]);
+    cfg.set_connection_type(goby::acomms::protobuf::DriverConfig::CONNECTION_SERIAL);
+
     using google::protobuf::uint32;
     // set the source id of this modem
     uint32 our_id = 1;
@@ -122,7 +124,7 @@ int main(int argc, char* argv[])
 
     // 10 hz is good
     int i = 0;
-    while (1)
+    while (true)
     {
         ++i;
         // this is when any signals will be emitted and the modem serial comms are performed

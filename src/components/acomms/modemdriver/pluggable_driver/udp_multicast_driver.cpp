@@ -98,8 +98,8 @@ void PluggableUDPMulticastDriver::handle_initiate_transmission(
 
     if (!msg.has_max_frame_bytes())
     {
-        if (rate_to_bytes_.count(msg.rate()))
-            msg.set_max_frame_bytes(rate_to_bytes_[msg.rate()]);
+        if (auto it = rate_to_bytes_.find(msg.rate()); it != rate_to_bytes_.end())
+            msg.set_max_frame_bytes(it->second);
         else
             msg.set_max_frame_bytes(multicast_driver_cfg().max_frame_size());
     }

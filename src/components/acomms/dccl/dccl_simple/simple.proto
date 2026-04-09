@@ -4,10 +4,12 @@ import "dccl/option_extensions.proto";
 message Simple
 {
     // see http://gobysoft.org/wiki/DcclIdTable
-    option (dccl.msg).id = 124;
-
     // if, for example, we want to use on the WHOI Micro-Modem rate 0
-    option (dccl.msg).max_bytes = 32;
+    option (dccl.msg) = {
+        codec_version: 4
+        id: 124
+        max_bytes: 32
+    };
 
-    required string telegram = 1 [(dccl.field).max_length = 30];
+    required string telegram = 1 [(dccl.field) = {max_length: 30}];
 }

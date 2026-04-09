@@ -17,7 +17,7 @@ class BasicSubscriber : public Base
     // event driven subscriber doesn't need any loop() method (default constructor for Base)
     BasicSubscriber()
     {
-        // C++11 lambda that turns this->incoming_nav into a basic function that will be called when we get subscribed mail
+        // lambda that turns this->incoming_nav into a basic function that will be called when we get subscribed mail
         auto nav_callback = [this](const NavigationReport& nav) { this->incoming_nav(nav); };
         // subscribe to a group for a given variable type (that matches the callback argument)
         // and when we receive messages, call the nav_callback function

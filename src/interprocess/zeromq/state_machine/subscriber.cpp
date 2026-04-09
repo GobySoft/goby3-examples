@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <goby/middleware/marshalling/protobuf.h>
 
 #include <goby/zeromq/application/single_thread.h>
@@ -25,7 +27,7 @@ class StateMachineApp : public goby::zeromq::SingleThreadApplication<StateMachin
 
     void initialize() override
     {
-        machine_.reset(new statechart::Machine<StateMachineApp>(*this));
+        machine_ = std::make_unique<statechart::Machine<StateMachineApp>>(*this);
         machine_->initiate();
     }
 
@@ -40,7 +42,7 @@ class StateMachineApp : public goby::zeromq::SingleThreadApplication<StateMachin
     template <typename App> friend struct statechart::On;
 
   private:
-    std::unique_ptr<statechart::Machine<StateMachineApp> > machine_;
+    std::unique_ptr<statechart::Machine<StateMachineApp>> machine_;
 };
 
 int main(int argc, char* argv[]) { return goby::run<StateMachineApp>(argc, argv); }

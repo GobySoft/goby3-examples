@@ -35,6 +35,7 @@
 // Also see abc_modem_simulator.cpp
 
 #include <iostream>
+#include <memory>
 
 #include <goby/acomms/connect.h>
 #include <goby/acomms/modem_driver.h>
@@ -59,11 +60,13 @@ int main(int argc, char* argv[])
     //
     // 1. Create and initialize the driver we want
     //
-    goby::acomms::ModemDriverBase* driver = 0;
+    std::unique_ptr<goby::acomms::ModemDriverBase> driver;
     goby::acomms::protobuf::DriverConfig cfg;
 
     // set the serial port given on the command line
     cfg.set_serial_port(argv[1]);
+    cfg.set_connection_type(goby::acomms::protobuf::DriverConfig::CONNECTION_SERIAL);
+
     using google::protobuf::uint32;
     // set the source id of this modem
     uint32 our_id = goby::util::as<uint32>(argv[2]);
@@ -77,7 +80,7 @@ int main(int argc, char* argv[])
         if (boost::iequals(argv[3], "ABCDriver"))
         {
             std::cout << "Starting Example driver ABCDriver" << std::endl;
-            driver = new goby::acomms::ABCDriver;
+            driver = std::make_unique<goby::acomms::ABCDriver>();
         }
     }
 
@@ -85,7 +88,7 @@ int main(int argc, char* argv[])
     if (!driver)
     {
         std::cout << "Starting WHOI Micro-Modem MMDriver" << std::endl;
-        driver = new goby::acomms::MMDriver;
+        driver = std::make_unique<goby::acomms::MMDriver>();
         // turn data quality factor message on
         // (example of setting NVRAM configuration)
         cfg.MutableExtension(goby::acomms::micromodem::protobuf::config)->add_nvram_cfg("DQF,1");
@@ -121,7 +124,7 @@ int main(int argc, char* argv[])
 
     // 10 hz is good
     int i = 0;
-    while (1)
+    while (true)
     {
         ++i;
         driver->do_work();
@@ -134,7 +137,6 @@ int main(int argc, char* argv[])
         usleep(100000);
     }
 
-    delete driver;
     return 0;
 }
 
