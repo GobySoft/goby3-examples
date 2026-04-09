@@ -1,2 +1,2 @@
-add_goby_executable(TARGET flexostream_simple
+add_goby_executable(TARGET goby3_example_flexostream_simple
   SOURCES flexostream_simple.cpp)

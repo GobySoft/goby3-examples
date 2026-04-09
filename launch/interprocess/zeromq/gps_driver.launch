@@ -4,4 +4,4 @@ goby3_example_gps_driver --serial 'port: "/dev/ttyUSB0"' -vvv
 
 ## Uncomment this section for MOOS plugin demonstration
 # [kill=SIGTERM] MOOSDB
-# GOBY_MOOS_GATEWAY_PLUGINS=`pwd`/../../build/lib/libgps_moos_plugin.so goby_moos_gateway -vvv
+# GOBY_MOOS_GATEWAY_PLUGINS=`pwd`/../../build/lib/libgoby3_example_gps_moos_plugin.so goby_moos_gateway -vvv
