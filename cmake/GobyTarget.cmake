@@ -113,7 +113,7 @@ function(add_goby_executable)
   install(TARGETS ${args_TARGET} RUNTIME DESTINATION bin)
 
   if(export_goby_interfaces)
-    generate_interfaces(${args_TARGET})
+    generate_interfaces(TARGET ${args_TARGET})
   endif()
 endfunction()
 
