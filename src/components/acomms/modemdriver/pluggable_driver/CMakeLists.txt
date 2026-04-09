@@ -1,5 +1,5 @@
-protobuf_generate_cpp_dccl(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} udp_multicast_driver.proto)
+add_goby_library(TARGET goby3_example_pluggable_udp_multicast_driver
+  SOURCES udp_multicast_driver.cpp
+  PROTOS udp_multicast_driver.proto
+  LINK_LIBRARIES goby)
 
-add_library(goby3_example_pluggable_udp_multicast_driver SHARED udp_multicast_driver.cpp ${PROTO_SRCS} ${PROTO_HDRS})
-
-target_link_libraries(goby3_example_pluggable_udp_multicast_driver goby)
