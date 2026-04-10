@@ -21,14 +21,14 @@
 
 using goby::glog;
 
-constexpr goby::middleware::Group udp_server_in{"udp_server_in"};
-constexpr goby::middleware::Group udp_server_out{"udp_server_out"};
+GOBY_DEFINE_GROUP(groups, udp_server_in)
+GOBY_DEFINE_GROUP(groups, udp_server_out)
 
-constexpr goby::middleware::Group udp_client1_in{"udp_client1_in"};
-constexpr goby::middleware::Group udp_client1_out{"udp_client1_out"};
+GOBY_DEFINE_GROUP(groups, udp_client1_in)
+GOBY_DEFINE_GROUP(groups, udp_client1_out)
 
-constexpr goby::middleware::Group udp_client2_in{"udp_client2_in"};
-constexpr goby::middleware::Group udp_client2_out{"udp_client2_out"};
+GOBY_DEFINE_GROUP(groups, udp_client2_in)
+GOBY_DEFINE_GROUP(groups, udp_client2_out)
 
 // Define a Configurator to provide reasonable configuration defaults so this example can be run without manual configuration
 class UDPConfigurator : public goby::middleware::ProtobufConfigurator<UDPExampleConfig>
@@ -80,7 +80,7 @@ class UDPExample : public AppBase
         glog.add_group("client2", goby::util::Colors::lt_blue);
 
         // subscribe to incoming data from server thread
-        interthread().subscribe<udp_server_in>(
+        interthread().subscribe<groups::udp_server_in>(
             [this](const goby::middleware::protobuf::IOData& udp_data_in) {
                 glog.is_verbose() && glog << group("server")
                                           << "Got request: " << udp_data_in.ShortDebugString()
@@ -89,11 +89,11 @@ class UDPExample : public AppBase
                 goby::middleware::protobuf::IOData udp_data_out;
                 udp_data_out.set_data("Response");
                 *udp_data_out.mutable_udp_dest() = udp_data_in.udp_src();
-                interthread().publish<udp_server_out>(udp_data_out);
+                interthread().publish<groups::udp_server_out>(udp_data_out);
             });
 
         // subscribe to incoming data from client thread 1
-        interthread().subscribe<udp_client1_in>(
+        interthread().subscribe<groups::udp_client1_in>(
             [this](const goby::middleware::protobuf::IOData& udp_data_in) {
                 glog.is_verbose() && glog << group("client1")
                                           << "Got response: " << udp_data_in.ShortDebugString()
@@ -101,7 +101,7 @@ class UDPExample : public AppBase
             });
 
         // subscribe to incoming data from client thread 2
-        interthread().subscribe<udp_client2_in>(
+        interthread().subscribe<groups::udp_client2_in>(
             [this](const goby::middleware::protobuf::IOData& udp_data_in) {
                 glog.is_verbose() && glog << group("client2")
                                           << "Got response: " << udp_data_in.ShortDebugString()
@@ -111,11 +111,11 @@ class UDPExample : public AppBase
 
         // launch the UDP threads
         using UDPServerThread =
-            goby::middleware::io::UDPOneToManyThread<udp_server_in, udp_server_out>;
+            goby::middleware::io::UDPOneToManyThread<groups::udp_server_in, groups::udp_server_out>;
         using UDPClient1Thread =
-            goby::middleware::io::UDPPointToPointThread<udp_client1_in, udp_client1_out>;
+            goby::middleware::io::UDPPointToPointThread<groups::udp_client1_in, groups::udp_client1_out>;
         using UDPClient2Thread =
-            goby::middleware::io::UDPPointToPointThread<udp_client2_in, udp_client2_out>;
+            goby::middleware::io::UDPPointToPointThread<groups::udp_client2_in, groups::udp_client2_out>;
 
         launch_thread<UDPServerThread>(cfg().udp_server_config());
         launch_thread<UDPClient1Thread>(cfg().udp_client1_config());
@@ -135,6 +135,6 @@ void UDPExample::loop()
     udp_data.set_data("Request");
     // no udp_dest required in IOData message because we're using UDPPointToPointThread with a pre-configured destination for all messages
     
-    interthread().publish<udp_client1_out>(udp_data);
-    interthread().publish<udp_client2_out>(udp_data);
+    interthread().publish<groups::udp_client1_out>(udp_data);
+    interthread().publish<groups::udp_client2_out>(udp_data);
 }

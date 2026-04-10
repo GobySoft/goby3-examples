@@ -20,14 +20,14 @@
 
 using goby::glog;
 
-constexpr goby::middleware::Group tcp_server_in{"tcp_server_in"};
-constexpr goby::middleware::Group tcp_server_out{"tcp_server_out"};
+GOBY_DEFINE_GROUP(groups, tcp_server_in)
+GOBY_DEFINE_GROUP(groups, tcp_server_out)
 
-constexpr goby::middleware::Group tcp_client1_in{"tcp_client1_in"};
-constexpr goby::middleware::Group tcp_client1_out{"tcp_client1_out"};
+GOBY_DEFINE_GROUP(groups, tcp_client1_in)
+GOBY_DEFINE_GROUP(groups, tcp_client1_out)
 
-constexpr goby::middleware::Group tcp_client2_in{"tcp_client2_in"};
-constexpr goby::middleware::Group tcp_client2_out{"tcp_client2_out"};
+GOBY_DEFINE_GROUP(groups, tcp_client2_in)
+GOBY_DEFINE_GROUP(groups, tcp_client2_out)
 
 // Define a Configurator to provide reasonable configuration defaults so this example can be run without manual configuration
 class TCPConfigurator : public goby::middleware::ProtobufConfigurator<TCPExampleConfig>
@@ -78,7 +78,7 @@ class TCPExample : public AppBase
         glog.add_group("client2", goby::util::Colors::lt_blue);
 
         // subscribe to incoming data from server thread
-        interthread().subscribe<tcp_server_in>(
+        interthread().subscribe<groups::tcp_server_in>(
             [this](const goby::middleware::protobuf::IOData& tcp_data_in) {
                 glog.is_verbose() && glog << group("server")
                                           << "Got request: " << tcp_data_in.ShortDebugString()
@@ -87,18 +87,18 @@ class TCPExample : public AppBase
                 goby::middleware::protobuf::IOData tcp_data_out;
                 tcp_data_out.set_data("Response\n");
                 *tcp_data_out.mutable_tcp_dest() = tcp_data_in.tcp_src();
-                interthread().publish<tcp_server_out>(tcp_data_out);
+                interthread().publish<groups::tcp_server_out>(tcp_data_out);
             });
 
         // subscribe to events from server thread
-        interthread().subscribe<tcp_server_in>(
+        interthread().subscribe<groups::tcp_server_in>(
             [this](const goby::middleware::protobuf::TCPServerEvent& event) {
                 glog.is_verbose() && glog << group("server")
                                           << "Got event: " << event.ShortDebugString() << std::endl;
             });
 
         // subscribe to incoming data from client thread 1
-        interthread().subscribe<tcp_client1_in>(
+        interthread().subscribe<groups::tcp_client1_in>(
             [this](const goby::middleware::protobuf::IOData& tcp_data_in) {
                 glog.is_verbose() && glog << group("client1")
                                           << "Got response: " << tcp_data_in.ShortDebugString()
@@ -106,7 +106,7 @@ class TCPExample : public AppBase
             });
 
         // subscribe to incoming data from client thread 2
-        interthread().subscribe<tcp_client2_in>(
+        interthread().subscribe<groups::tcp_client2_in>(
             [this](const goby::middleware::protobuf::IOData& tcp_data_in) {
                 glog.is_verbose() && glog << group("client2")
                                           << "Got response: " << tcp_data_in.ShortDebugString()
@@ -115,11 +115,11 @@ class TCPExample : public AppBase
 
         // launch the TCP threads
         using TCPServerThread =
-            goby::middleware::io::TCPServerThreadLineBased<tcp_server_in, tcp_server_out>;
+            goby::middleware::io::TCPServerThreadLineBased<groups::tcp_server_in, groups::tcp_server_out>;
         using TCPClient1Thread =
-            goby::middleware::io::TCPClientThreadLineBased<tcp_client1_in, tcp_client1_out>;
+            goby::middleware::io::TCPClientThreadLineBased<groups::tcp_client1_in, groups::tcp_client1_out>;
         using TCPClient2Thread =
-            goby::middleware::io::TCPClientThreadLineBased<tcp_client2_in, tcp_client2_out>;
+            goby::middleware::io::TCPClientThreadLineBased<groups::tcp_client2_in, groups::tcp_client2_out>;
 
         launch_thread<TCPServerThread>(cfg().tcp_server_config());
         launch_thread<TCPClient1Thread>(cfg().tcp_client1_config());
@@ -139,6 +139,6 @@ void TCPExample::loop()
     tcp_data.set_data("Request\n");
     // no tcp_dest required in IOData message because we're using TCPPointToPointThread with a pre-configured destination for all messages
 
-    interthread().publish<tcp_client1_out>(tcp_data);
-    interthread().publish<tcp_client2_out>(tcp_data);
+    interthread().publish<groups::tcp_client1_out>(tcp_data);
+    interthread().publish<groups::tcp_client2_out>(tcp_data);
 }
