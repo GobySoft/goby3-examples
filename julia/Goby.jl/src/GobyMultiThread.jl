@@ -186,7 +186,7 @@ end
 
 function task_spawn(task_module::Module)
     task_id = task_module_to_id[task_module]
-    println("Spawning $run as task ID $task_id")
+    println("Spawning $task_module as task ID $task_id")
 
     runner = (id, mod::Module) -> begin
         if isdefined(mod, :start)

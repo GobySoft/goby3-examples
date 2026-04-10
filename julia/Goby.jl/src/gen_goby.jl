@@ -1,7 +1,7 @@
 using YAML
 
 struct InvalidInterfaceError <: Exception
-var::String
+    message::String
 end
 
 # turns Julia/Protobuf scoping (".") into C++ scoping ("::")
@@ -27,8 +27,8 @@ end
 function collect_layer(layer::String, layer_yaml)
     publish = Vector{String}()
     subscribe = Vector{String}()
-    layer_function=haskey(layer_yaml, "alias") ? layer_yaml["alias"] : layer
-    layer_enum=uppercase(layer)
+    layer_function = haskey(layer_yaml, "alias") ? layer_yaml["alias"] : layer
+    layer_enum = uppercase(layer)
 
     required_keys = (["group", "scheme", "type"])
     if haskey(layer_yaml, "publishes")
