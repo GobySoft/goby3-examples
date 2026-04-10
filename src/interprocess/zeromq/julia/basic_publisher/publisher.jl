@@ -5,20 +5,20 @@
 # Run with:
 #   julia build/julia/basic_publisher/publisher.jl <config.pb.cfg>
 
-const GOBY_APPLICATION_LIB = joinpath(@__DIR__, "libbasic_julia_publisher")
 include(joinpath(@__DIR__, "..", "goby_application_init.jl"))
+init_cxxwrap("basic_julia_publisher")
 
 # ---------------------------------------------------------------------------
 # Publisher loop – called at the frequency specified in goby_cfg below.
 # ---------------------------------------------------------------------------
 function loop()
-    nav = NavigationReport(
+    nav = protobuf.NavigationReport(
         x = 95.0 + rand() * 20,
         y = 195.0 + rand() * 20,
         z = -305.0 + rand() * 10,
     )
     println("Tx: x=$(nav.x) y=$(nav.y) z=$(nav.z)")
-    Goby.publish(Main.app, Goby.INTERPROCESS, "navigation", nav)
+    Goby.publish(Main.app, Goby.INTERPROCESS, "groups::nav", nav)
 end
 
 # goby_cfg is inspected by Goby.run() to configure the loop frequency.
@@ -28,5 +28,5 @@ goby_cfg = Dict(
 )
 
 config_str = Goby.read_cli_cfg()
-app = BasicJuliaPublisher(config_str)
+app = Goby.BasicJuliaPublisher(config_str)
 Goby.run(app)

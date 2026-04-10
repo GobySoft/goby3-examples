@@ -23,7 +23,7 @@ endif()
 
 message(STATUS "Found Goby.jl at ${GOBY_JULIA_SRC_DIR}")
 
-set(GOBY_JULIA_DIR "${project_BUILD_DIR}/julia/goby")
+set(GOBY_JULIA_DIR "${project_BUILD_DIR}/julia/Goby.jl")
 
 # Copy Goby.jl source to the build directory so that Julia can write Manifest.toml
 set(GOBY_JULIA_MANIFEST "${GOBY_JULIA_DIR}/Manifest.toml")

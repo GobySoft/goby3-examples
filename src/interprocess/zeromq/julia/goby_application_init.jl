@@ -13,13 +13,17 @@
 using Pkg
 Pkg.activate(joinpath(@__DIR__, "Goby.jl"), io=devnull)
 
-using CxxWrap
-@wrapmodule(() -> GOBY_APPLICATION_LIB)
-function __init__()
-    @initcxx
-end
-
 using Goby
 
+function init_cxxwrap(app_name)
+    lib_path_expr = :(joinpath(@__DIR__, $app_name, "lib"*$app_name*".so"))
+    @eval Goby begin
+        @wrapmodule(() -> $lib_path_expr)
+        function __init__()
+            @initcxx
+        end
+    end
+end
+
 include(joinpath(@__DIR__, "protobuf", "protobuf.jl"))
-using .protobuf: NavigationReport
+using .protobuf

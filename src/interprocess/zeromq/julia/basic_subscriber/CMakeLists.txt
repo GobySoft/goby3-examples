@@ -7,4 +7,3 @@ add_goby_julia_application(
     INCLUDE_HEADERS messages/nav.pb.h messages/groups.h ${GOBY_INCLUDE_DIR}/goby/zeromq/application/single_thread.h
     JULIA_PROTO_TARGETS julia_proto_nav
 )
-
