@@ -1,0 +1,12 @@
+application:
+  name: BasicJuliaSubscriber
+  cpp_type: goby.zeromq.SingleThreadApplication
+  config:
+    scheme: PROTOBUF
+    type: BasicJuliaSubscriberConfig
+
+interprocess:
+  subscribes:
+    - group: groups::nav
+      scheme: PROTOBUF
+      type: protobuf::NavigationReport

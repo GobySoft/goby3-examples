@@ -1,0 +1,12 @@
+application:
+  name: BasicJuliaPublisher
+  cpp_type: goby.zeromq.SingleThreadApplication
+  config:
+    scheme: PROTOBUF
+    type: BasicJuliaPublisherConfig
+
+interprocess:
+  publishes:
+    - group: groups::nav
+      scheme: PROTOBUF
+      type: protobuf::NavigationReport

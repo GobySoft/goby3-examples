@@ -52,6 +52,20 @@ set(GOBY_PROTOBUF_IMPORT_DIRS
 
 include(GobyTarget)
 
+# Julia examples – enabled by default if julia is found on the system
+find_program(JULIA julia)
+if(JULIA)
+  set(_julia_examples_default ON)
+else()
+  set(_julia_examples_default OFF)
+endif()
+option(enable_julia_examples
+  "Build Julia interprocess examples (requires julia, CxxWrap.jl, and JlCxx C++ headers)"
+  ${_julia_examples_default})
+if(enable_julia_examples)
+  include(GobyJulia)
+endif()
+
 option(export_goby_interfaces OFF "Build Goby Publish/Subscribe interface files (YML) from code")
 
 if(export_goby_interfaces)
