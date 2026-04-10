@@ -7,6 +7,6 @@ application:
 
 interprocess:
   publishes:
-    - group: groups::nav
+    - group: groups::nav2
       scheme: PROTOBUF
-      type: protobuf::NavigationReport
+      type: goby3_examples::protobuf::NavigationReport

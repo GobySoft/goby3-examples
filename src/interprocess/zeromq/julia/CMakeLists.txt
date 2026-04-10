@@ -8,11 +8,11 @@ configure_file(goby_application_init.jl "${JULIA_OUT_DIR}/goby_application_init.
 # code generator (ProtoBuf.protojl).  The output is placed at
 #   ${JULIA_OUT_DIR}/protobuf/protobuf.jl
 # and shared between the publisher and subscriber scripts.
-goby_generate_julia_proto(
-    "${CMAKE_SOURCE_DIR}/src/messages/nav.proto"
-    "${CMAKE_SOURCE_DIR}/src/messages"
-    "${JULIA_OUT_DIR}"
-)
+#goby_generate_julia_proto(
+#    "${CMAKE_SOURCE_DIR}/src/messages/nav.proto"
+#    "${CMAKE_SOURCE_DIR}/src/"
+#    "${JULIA_OUT_DIR}"
+#)
 
 add_subdirectory(basic_publisher)
 add_subdirectory(basic_subscriber)

@@ -25,5 +25,10 @@ function init_cxxwrap(app_name)
     end
 end
 
-include(joinpath(@__DIR__, "protobuf", "protobuf.jl"))
-using .protobuf
+module Test
+macro include_protos()
+    return :(Base.include(Base.@__MODULE__, "/home/toby/opensource/goby3-examples/build/julia/goby3_examples/goby3_examples.jl"))
+end
+end
+#Base.include(Base.@__MODULE__, joinpath(@__DIR__, "protobuf", "protobuf.jl"))
+

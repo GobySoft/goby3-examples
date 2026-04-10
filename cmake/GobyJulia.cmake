@@ -30,18 +30,6 @@ set(GOBY_JULIA_MANIFEST "${GOBY_JULIA_DIR}/Manifest.toml")
 file(COPY "${GOBY_JULIA_SRC_DIR}/src" DESTINATION "${GOBY_JULIA_DIR}")
 file(COPY "${GOBY_JULIA_SRC_DIR}/Project.toml" DESTINATION "${GOBY_JULIA_DIR}")
 
-# -- Install Julia packages at build time --------------------------------------
-add_custom_command(
-    OUTPUT "${GOBY_JULIA_MANIFEST}"
-    COMMAND "${JULIA}"
-    ARGS --project="${GOBY_JULIA_DIR}" -L "${GOBY_JULIA_DIR}/src/pkg.jl" -e "'install_pkgs()'"
-    COMMENT "Installing Julia packages for Goby.jl"
-)
-
-add_custom_target(goby_julia_packages
-    DEPENDS "${GOBY_JULIA_MANIFEST}"
-)
-
 # -- Locate JlCxx (the C++ side of CxxWrap.jl) ---------------------------------
 if(NOT DEFINED CXXWRAP_PREFIX)
     execute_process(
@@ -123,6 +111,13 @@ function(GOBY_GENERATE_JULIA OUTPUT_TARGET JULIA_OUT_DIR INTERFACE_YML CONFIG_PR
         string(APPEND INCLUDE_STR "\"${_arg}\",")
     endforeach()
 
+    add_custom_command(
+      OUTPUT "${GOBY_JULIA_MANIFEST}"
+      COMMAND "${JULIA}"
+      ARGS --project="${GOBY_JULIA_DIR}" -L "${GOBY_JULIA_DIR}/src/pkg.jl" -e "'install_pkgs()'"
+      COMMENT "Installing Julia packages for Goby.jl"
+    )
+
     # Generate the C++ wrapper from the interface YAML using Goby.jl's gen_goby.jl
     add_custom_command(
         OUTPUT "${OUTPUT_CPP}"
@@ -153,44 +148,126 @@ function(GOBY_GENERATE_JULIA OUTPUT_TARGET JULIA_OUT_DIR INTERFACE_YML CONFIG_PR
     )
 endfunction()
 
-# -- GOBY_GENERATE_JULIA_PROTO -------------------------------------------------
-# Generate Julia protobuf bindings from a .proto file using ProtoBuf.jl.
-#
-# goby_generate_julia_proto(PROTO_FILE INCLUDE_DIR JULIA_OUT_DIR)
-#
-#   PROTO_FILE    - path to the .proto file (e.g. src/messages/nav.proto)
-#   INCLUDE_DIR   - directory to pass as the proto search path to protojl
-#   JULIA_OUT_DIR - output directory for the generated Julia files
-#
-# The generated files are placed in a subdirectory named after the proto package.
-# Use add_dependencies(<target> julia_proto_<basename>) to depend on the output.
-function(GOBY_GENERATE_JULIA_PROTO PROTO_FILE INCLUDE_DIR JULIA_OUT_DIR)
-    get_filename_component(_proto_name "${PROTO_FILE}" NAME)
-    get_filename_component(_proto_we   "${PROTO_FILE}" NAME_WE)
+function(PROTOBUF_JULIA_INCLUDE_DIRS)
+  if(NOT ARGN)
+    message(SEND_ERROR "Error: PROTOBUF_JULIA_INCLUDE_DIRS() called without any directories")
+    return()
+  endif()  
 
-    file(MAKE_DIRECTORY "${JULIA_OUT_DIR}")
+  foreach(DIR ${ARGN})
+    set(project_julia_proto_includes "${project_julia_proto_includes},\"${DIR}\"" CACHE INTERNAL "Project Julia Proto Includes")
+  endforeach()
 
-    # We cannot know the exact output filename ahead of time (it depends on the
-    # package name declared inside the .proto file), so we use a stamp file to
-    # track whether the generation has run.
-    set(_stamp "${JULIA_OUT_DIR}/.${_proto_we}_pb.stamp")
+endfunction()
 
-    add_custom_command(
+unset(project_julia_protos CACHE)
+unset(project_julia_proto_includes CACHE)
+unset(project_julia_proto_depends CACHE)
+unset(project_julia_proto_output CACHE)
+
+# protobuf_generate_julia(package proto_files)
+# - package: directory style package subdirectory (e.g. "protobuf" for package protobuf;)
+# - proto_files: variable length listing of path to .proto file(s) to generate.
+function(PROTOBUF_GENERATE_JULIA PACKAGE)
+  if(NOT ARGN)
+    message(SEND_ERROR "Error: PROTOBUF_GENERATE_JULIA() called without any proto files")
+    return()
+  endif(NOT ARGN)
+
+  set(JULIA_OUT_DIR ${project_BUILD_DIR}/julia)
+  file(MAKE_DIRECTORY ${JULIA_OUT_DIR})
+  protobuf_julia_include_dirs(${CMAKE_CURRENT_SOURCE_DIR})
+ 
+  foreach(FIL ${ARGN})
+
+    # full file name (relative to current source directory)
+    get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
+    # relative file name (need to do this in case an absolute path is passed in)
+    STRING(REGEX REPLACE "^${CMAKE_CURRENT_SOURCE_DIR}/" "" REL_FIL ${ABS_FIL})
+    # name without extension, e.g. for "foo.proto", ${FIL_WE} is "foo"
+    get_filename_component(FIL_WE ${REL_FIL} NAME_WE)
+    # relative directory to current source directory, e.g. for "dir/foo.proto", ${FIL_DIR} is "dir"
+    get_filename_component(FIL_DIR ${REL_FIL} DIRECTORY BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    # expected generated output file
+    set(PROTO_JL_OUT "${JULIA_OUT_DIR}/${PACKAGE}/${FIL_WE}_pb.jl")
+
+    set(project_julia_protos "${project_julia_protos},\"${FIL_WE}.proto\"" CACHE INTERNAL "Project Julia Protos")
+    set(project_julia_proto_output "${project_julia_proto_output};${PROTO_JL_OUT}" CACHE INTERNAL "Project Julia Proto Outputs")
+    set(project_julia_proto_depends "${project_julia_proto_depends};${CMAKE_CURRENT_SOURCE_DIR}/${FIL_WE}.proto" CACHE INTERNAL "Project Julia Proto Dependency list")
+  endforeach()
+  
+endfunction()
+
+# Run the actual generation of the proto files collected by PROTOBUF_GENERATE_JULIA at once (required to get modules correct with Protobuf.jl)
+macro(generate_julia_protos)
+  # remove empty item at the beginning of the list
+  list(POP_FRONT project_julia_proto_output)
+  list(POP_FRONT project_julia_proto_depends)
+  
+  string(SUBSTRING "${project_julia_proto_includes}" 1 -1 project_julia_proto_includes)
+  string(SUBSTRING "${project_julia_protos}" 1 -1 project_julia_protos)
+#  message("PROTOS: ${project_julia_protos}")
+#  message("PROTO DEPENDS: ${project_julia_proto_depends}")
+#  message("INCLUDES: ${project_julia_proto_includes}")
+#  message("OUTPUT: ${project_julia_proto_output}")
+  add_custom_command(
       OUTPUT "${GOBY_JULIA_MANIFEST}"
       COMMAND "${JULIA}"
-      ARGS --project=${GOBY_JULIA_DIR} -L "${GOBY_JULIA_DIR}/src/pkg.jl" -e "'install_pkgs()'"
+      ARGS --project="${GOBY_JULIA_DIR}" -L "${GOBY_JULIA_DIR}/src/pkg.jl" -e "'install_pkgs()'"
       COMMENT "Installing Julia packages for Goby.jl"
     )
     
-    add_custom_command(
-        OUTPUT "${_stamp}"
-        DEPENDS "${PROTO_FILE}" "${GOBY_JULIA_MANIFEST}"
-        COMMAND "${JULIA}"
-        ARGS --project=${GOBY_JULIA_DIR} -L ${GOBY_JULIA_DIR}/src/gen_goby.jl -e "'gen_proto([\"${_proto_name}\"],[\"${INCLUDE_DIR}\"],\"${JULIA_OUT_DIR}\",\"${_stamp}\")'"
-        COMMENT "Generating Julia protobuf bindings for ${_proto_name}"
-    )
+  add_custom_command(
+    OUTPUT ${project_julia_proto_output}
+    DEPENDS ${GOBY_JULIA_MANIFEST} ${project_julia_proto_depends}
+    COMMAND ${JULIA}
+    ARGS --project=${GOBY_JULIA_DIR} -L ${GOBY_JULIA_DIR}/src/gen_goby.jl -e "'gen_proto([${project_julia_protos}],[${project_julia_proto_includes}],\"${project_BUILD_DIR}/julia\")'"
+    COMMENT "Running Julia protocol buffer compiler on all project protos"
+  )
+  add_custom_target(julia_build_protos ALL
+    DEPENDS ${project_julia_proto_output}
+  )
+  
+endmacro()
 
-    add_custom_target("julia_proto_${_proto_we}"
-        DEPENDS "${_stamp}"
-    )
-endfunction()
+# # -- GOBY_GENERATE_JULIA_PROTO -------------------------------------------------
+# # Generate Julia protobuf bindings from a .proto file using ProtoBuf.jl.
+# #
+# # goby_generate_julia_proto(PROTO_FILE INCLUDE_DIR JULIA_OUT_DIR)
+# #
+# #   PROTO_FILE    - path to the .proto file (e.g. src/messages/nav.proto)
+# #   INCLUDE_DIR   - directory to pass as the proto search path to protojl
+# #   JULIA_OUT_DIR - output directory for the generated Julia files
+# #
+# # The generated files are placed in a subdirectory named after the proto package.
+# # Use add_dependencies(<target> julia_proto_<basename>) to depend on the output.
+# function(GOBY_GENERATE_JULIA_PROTO PROTO_FILE INCLUDE_DIR JULIA_OUT_DIR)
+#     get_filename_component(_proto_name "${PROTO_FILE}" NAME)
+#     get_filename_component(_proto_we   "${PROTO_FILE}" NAME_WE)
+
+#     file(MAKE_DIRECTORY "${JULIA_OUT_DIR}")
+
+#     # We cannot know the exact output filename ahead of time (it depends on the
+#     # package name declared inside the .proto file), so we use a stamp file to
+#     # track whether the generation has run.
+#     set(_stamp "${JULIA_OUT_DIR}/.${_proto_we}_pb.stamp")
+
+#     add_custom_command(
+#       OUTPUT "${GOBY_JULIA_MANIFEST}"
+#       COMMAND "${JULIA}"
+#       ARGS --project=${GOBY_JULIA_DIR} -L "${GOBY_JULIA_DIR}/src/pkg.jl" -e "'install_pkgs()'"
+#       COMMENT "Installing Julia packages for Goby.jl"
+#     )
+    
+#     add_custom_command(
+#         OUTPUT "${_stamp}"
+#         DEPENDS "${PROTO_FILE}" "${GOBY_JULIA_MANIFEST}"
+#         COMMAND "${JULIA}"
+#         ARGS --project=${GOBY_JULIA_DIR} -L ${GOBY_JULIA_DIR}/src/gen_goby.jl -e "'gen_proto([\"${_proto_name}\"],[\"${INCLUDE_DIR}\"],\"${JULIA_OUT_DIR}\",\"${_stamp}\")'"
+#         COMMENT "Generating Julia protobuf bindings for ${_proto_name}"
+#     )
+
+#     add_custom_target("julia_proto_${_proto_we}"
+#         DEPENDS "${_stamp}"
+#     )
+# endfunction()

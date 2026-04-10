@@ -6,6 +6,7 @@
 namespace groups
 {
 constexpr goby::middleware::Group nav{"navigation", goby::middleware::Group::broadcast_group};
+constexpr goby::middleware::Group nav2{"groups::nav2"};
 
 constexpr goby::middleware::Group gps_raw_in{"gps_raw_in"};
 constexpr goby::middleware::Group gps_raw_out{"gps_raw_out"};

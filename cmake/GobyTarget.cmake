@@ -191,7 +191,6 @@ endfunction()
 #                        defaults to ${project_BUILD_DIR}/julia/<TARGET>
 #   LINK_LIBRARIES     - (optional) additional targets to depend on and link
 #   INCLUDE_HEADERS    - (optional) extra headers for the generated C++ wrapper
-#   JULIA_PROTO_TARGETS- (optional) julia_proto_<x> targets to depend on
 function(add_goby_julia_application)
   cmake_parse_arguments(args
     ""
@@ -243,7 +242,7 @@ function(add_goby_julia_application)
 
   # Depend on Julia proto generation targets
   if(args_JULIA_PROTO_TARGETS)
-    add_dependencies("${args_TARGET}" ${args_JULIA_PROTO_TARGETS})
+    add_dependencies("${args_TARGET}" ${project_julia_proto_output})
   endif()
 endfunction()
 
