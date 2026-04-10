@@ -8,11 +8,6 @@
 #   4. Provides GOBY_GENERATE_JULIA() to build the C++ side of a Goby-Julia app
 #   5. Provides GOBY_GENERATE_JULIA_PROTO() to generate Julia protobuf bindings
 #
-# Prerequisites (installed by the user):
-#   - julia executable in PATH
-#   - Julia packages: CxxWrap (>=0.17.4), ProtoBuf (>=1.2.0), YAML (>=0.4.13), ThreadPools (>=2.1.1)
-#   - JlCxx C++ library (installed alongside CxxWrap.jl)
-#   - Goby installed with Julia support (provides share/goby/Goby.jl)
 
 # -- Locate Goby.jl from the goby installation ---------------------------------
 get_filename_component(GOBY_JULIA_SRC_DIR "${GOBY_INCLUDE_DIR}/../share/goby/Goby.jl" ABSOLUTE)
@@ -28,21 +23,23 @@ endif()
 
 message(STATUS "Found Goby.jl at ${GOBY_JULIA_SRC_DIR}")
 
-set(GOBY_JULIA_DIR "${project_BUILD_DIR}/julia/Goby.jl")
+set(GOBY_JULIA_DIR "${project_BUILD_DIR}/julia/goby")
 
 # Copy Goby.jl source to the build directory so that Julia can write Manifest.toml
-file(COPY "${GOBY_JULIA_SRC_DIR}" DESTINATION "${project_BUILD_DIR}/julia")
+set(GOBY_JULIA_MANIFEST "${GOBY_JULIA_DIR}/Manifest.toml")
+file(COPY "${GOBY_JULIA_SRC_DIR}/src" DESTINATION "${GOBY_JULIA_DIR}")
+file(COPY "${GOBY_JULIA_SRC_DIR}/Project.toml" DESTINATION "${GOBY_JULIA_DIR}")
 
 # -- Install Julia packages at build time --------------------------------------
 add_custom_command(
-    OUTPUT "${GOBY_JULIA_DIR}/Manifest.toml"
+    OUTPUT "${GOBY_JULIA_MANIFEST}"
     COMMAND "${JULIA}"
-    ARGS --project="${GOBY_JULIA_DIR}" -L "${GOBY_JULIA_DIR}/src/pkg.jl" -e "install_pkgs()"
-    COMMENT "Installing Julia packages for Goby.jl (CxxWrap, ProtoBuf, YAML, ThreadPools)"
+    ARGS --project="${GOBY_JULIA_DIR}" -L "${GOBY_JULIA_DIR}/src/pkg.jl" -e "'install_pkgs()'"
+    COMMENT "Installing Julia packages for Goby.jl"
 )
 
 add_custom_target(goby_julia_packages
-    DEPENDS "${GOBY_JULIA_DIR}/Manifest.toml"
+    DEPENDS "${GOBY_JULIA_MANIFEST}"
 )
 
 # -- Locate JlCxx (the C++ side of CxxWrap.jl) ---------------------------------
@@ -129,11 +126,11 @@ function(GOBY_GENERATE_JULIA OUTPUT_TARGET JULIA_OUT_DIR INTERFACE_YML CONFIG_PR
     # Generate the C++ wrapper from the interface YAML using Goby.jl's gen_goby.jl
     add_custom_command(
         OUTPUT "${OUTPUT_CPP}"
-        DEPENDS "${GOBY_JULIA_DIR}/Manifest.toml" "${ABS_INTERFACE_YML}" ${_proto_generated}
+        DEPENDS "${GOBY_JULIA_MANIFEST}" "${ABS_INTERFACE_YML}" ${_proto_generated}
         COMMAND "${JULIA}"
-        ARGS --project="${GOBY_JULIA_DIR}"
+        ARGS --project=${GOBY_JULIA_DIR}
              -L "${GOBY_JULIA_DIR}/src/gen_goby.jl"
-             -e "goby_gen_cpp(\"${ABS_INTERFACE_YML}\",\"${OUTPUT_CPP}\",[${INCLUDE_STR}])"
+             -e "'goby_gen_cpp(\"${ABS_INTERFACE_YML}\",\"${OUTPUT_CPP}\",[${INCLUDE_STR}])'"
         COMMENT "Generating Julia C++ wrapper for ${OUTPUT_TARGET}"
     )
 
@@ -179,14 +176,17 @@ function(GOBY_GENERATE_JULIA_PROTO PROTO_FILE INCLUDE_DIR JULIA_OUT_DIR)
     set(_stamp "${JULIA_OUT_DIR}/.${_proto_we}_pb.stamp")
 
     add_custom_command(
+      OUTPUT "${GOBY_JULIA_MANIFEST}"
+      COMMAND "${JULIA}"
+      ARGS --project=${GOBY_JULIA_DIR} -L "${GOBY_JULIA_DIR}/src/pkg.jl" -e "'install_pkgs()'"
+      COMMENT "Installing Julia packages for Goby.jl"
+    )
+    
+    add_custom_command(
         OUTPUT "${_stamp}"
-        DEPENDS "${PROTO_FILE}" "${GOBY_JULIA_DIR}/Manifest.toml"
+        DEPENDS "${PROTO_FILE}" "${GOBY_JULIA_MANIFEST}"
         COMMAND "${JULIA}"
-        ARGS --project="${GOBY_JULIA_DIR}"
-             -e "using ProtoBuf; \
-                 protojl(\"${_proto_name}\", [\"${INCLUDE_DIR}\"], \"${JULIA_OUT_DIR}\", \
-                         always_use_modules=false); \
-                 open(\"${_stamp}\", \"w\") do io; write(io, \"done\"); end"
+        ARGS --project=${GOBY_JULIA_DIR} -L ${GOBY_JULIA_DIR}/src/gen_goby.jl -e "'gen_proto([\"${_proto_name}\"],[\"${INCLUDE_DIR}\"],\"${JULIA_OUT_DIR}\",\"${_stamp}\")'"
         COMMENT "Generating Julia protobuf bindings for ${_proto_name}"
     )
 

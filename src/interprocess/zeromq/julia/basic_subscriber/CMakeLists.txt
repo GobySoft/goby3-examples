@@ -4,7 +4,7 @@ add_goby_julia_application(
     INTERFACE_YML interface.yml
     CONFIG_PROTO config.proto
     LINK_LIBRARIES goby3_example_messages
-    INCLUDE_HEADERS messages/nav.pb.h messages/groups.h
+    INCLUDE_HEADERS messages/nav.pb.h messages/groups.h ${GOBY_INCLUDE_DIR}/goby/zeromq/application/single_thread.h
     JULIA_PROTO_TARGETS julia_proto_nav
 )
 
