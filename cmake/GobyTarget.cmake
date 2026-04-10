@@ -16,6 +16,15 @@
 #     [PROTOC_OUT_DIR <dir>]
 #     [STATIC] [MODULE])
 #
+#   add_goby_julia_application(TARGET <name>
+#     SCRIPT <julia_script>
+#     INTERFACE_YML <interface.yml>
+#     CONFIG_PROTO <config.proto>
+#     [OUTPUT_DIR <dir>]
+#     [LINK_LIBRARIES <libs>...]
+#     [INCLUDE_HEADERS <relative_headers>...]
+#     [JULIA_PROTO_TARGETS <targets>...])
+#
 # For add_goby_executable, linking against goby is implied.
 # Proto files are compiled with protoc --cpp_out + --dccl_out (matching the
 # original protobuf_generate_cpp_dccl behaviour).
@@ -164,6 +173,77 @@ function(add_goby_library)
 
   if(args_LINK_LIBRARIES)
     target_link_libraries(${args_TARGET} ${args_LINK_LIBRARIES})
+  endif()
+endfunction()
+
+# add_goby_julia_application - build a Julia Goby application target
+#
+# Copies the Julia script to the build output directory, generates the C++
+# bridge shared library via goby_generate_julia() (from GobyJulia.cmake),
+# and wires up all required build dependencies.
+#
+# Parameters:
+#   TARGET             - shared library target name (e.g. basic_julia_publisher)
+#   SCRIPT             - Julia script filename (relative to CMAKE_CURRENT_SOURCE_DIR)
+#   INTERFACE_YML      - path to interface.yml (relative or absolute)
+#   CONFIG_PROTO       - path to config.proto (relative or absolute)
+#   OUTPUT_DIR         - (optional) build output directory;
+#                        defaults to ${project_BUILD_DIR}/julia/<TARGET>
+#   LINK_LIBRARIES     - (optional) additional targets to depend on and link
+#   INCLUDE_HEADERS    - (optional) extra headers for the generated C++ wrapper
+#   JULIA_PROTO_TARGETS- (optional) julia_proto_<x> targets to depend on
+function(add_goby_julia_application)
+  cmake_parse_arguments(args
+    ""
+    "TARGET;SCRIPT;INTERFACE_YML;CONFIG_PROTO;OUTPUT_DIR"
+    "LINK_LIBRARIES;INCLUDE_HEADERS;JULIA_PROTO_TARGETS"
+    ${ARGN})
+
+  if(NOT args_TARGET)
+    message(FATAL_ERROR "add_goby_julia_application: TARGET is required")
+  endif()
+  if(NOT args_SCRIPT)
+    message(FATAL_ERROR "add_goby_julia_application: SCRIPT is required")
+  endif()
+  if(NOT args_INTERFACE_YML)
+    message(FATAL_ERROR "add_goby_julia_application: INTERFACE_YML is required")
+  endif()
+  if(NOT args_CONFIG_PROTO)
+    message(FATAL_ERROR "add_goby_julia_application: CONFIG_PROTO is required")
+  endif()
+
+  if(NOT args_OUTPUT_DIR)
+    set(args_OUTPUT_DIR "${project_BUILD_DIR}/julia/${args_TARGET}")
+  endif()
+
+  file(MAKE_DIRECTORY "${args_OUTPUT_DIR}")
+
+  # Copy the Julia script to the build output directory
+  get_filename_component(_script_name "${args_SCRIPT}" NAME)
+  configure_file("${args_SCRIPT}" "${args_OUTPUT_DIR}/${_script_name}" COPYONLY)
+
+  # Resolve interface.yml and config.proto to absolute paths
+  get_filename_component(_abs_interface_yml "${args_INTERFACE_YML}" ABSOLUTE)
+  get_filename_component(_abs_config_proto  "${args_CONFIG_PROTO}"  ABSOLUTE)
+
+  # Build the C++ bridge shared library
+  goby_generate_julia(
+    "${args_TARGET}"
+    "${args_OUTPUT_DIR}"
+    "${_abs_interface_yml}"
+    "${_abs_config_proto}"
+    ${args_INCLUDE_HEADERS}
+  )
+
+  # Link and depend on additional libraries
+  if(args_LINK_LIBRARIES)
+    add_dependencies("${args_TARGET}" ${args_LINK_LIBRARIES})
+    target_link_libraries("${args_TARGET}" ${args_LINK_LIBRARIES})
+  endif()
+
+  # Depend on Julia proto generation targets
+  if(args_JULIA_PROTO_TARGETS)
+    add_dependencies("${args_TARGET}" ${args_JULIA_PROTO_TARGETS})
   endif()
 endfunction()
 

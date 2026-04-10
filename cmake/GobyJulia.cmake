@@ -2,7 +2,7 @@
 # Support for building Goby applications with a Julia interface
 #
 # This file is included when enable_julia_examples is ON. It:
-#   1. Locates Goby.jl (bundled with this repo or from the goby installation)
+#   1. Locates Goby.jl installed with goby (${GOBY_INCLUDE_DIR}/../share/goby/Goby.jl)
 #   2. Installs Julia package dependencies for Goby.jl at build time
 #   3. Locates JlCxx for C++/Julia interop
 #   4. Provides GOBY_GENERATE_JULIA() to build the C++ side of a Goby-Julia app
@@ -12,27 +12,21 @@
 #   - julia executable in PATH
 #   - Julia packages: CxxWrap (>=0.17.4), ProtoBuf (>=1.2.0), YAML (>=0.4.13), ThreadPools (>=2.1.1)
 #   - JlCxx C++ library (installed alongside CxxWrap.jl)
-#
-# Usage:
-#   # In a CMakeLists.txt:
-#   goby_generate_julia(my_app ${MY_JULIA_DIR} interface.yml config.proto
-#       messages/nav.pb.h messages/groups.h)
-#   target_link_libraries(my_app goby3_example_messages)
-#
-#   goby_generate_julia_proto(nav.proto ${SRC_DIR}/messages ${JULIA_OUT_DIR})
+#   - Goby installed with Julia support (provides share/goby/Goby.jl)
 
-# -- Locate Goby.jl source -----------------------------------------------------
-# Prefer the copy installed with goby (${GOBY_INCLUDE_DIR}/../share/goby/Goby.jl)
-# and fall back to the bundled copy in this repository.
-get_filename_component(_goby_install_julia "${GOBY_INCLUDE_DIR}/../share/goby/Goby.jl" ABSOLUTE)
+# -- Locate Goby.jl from the goby installation ---------------------------------
+get_filename_component(GOBY_JULIA_SRC_DIR "${GOBY_INCLUDE_DIR}/../share/goby/Goby.jl" ABSOLUTE)
 
-if(EXISTS "${_goby_install_julia}/Project.toml")
-    set(GOBY_JULIA_SRC_DIR "${_goby_install_julia}")
-    message(STATUS "Goby.jl found in goby installation: ${GOBY_JULIA_SRC_DIR}")
-else()
-    set(GOBY_JULIA_SRC_DIR "${CMAKE_SOURCE_DIR}/julia/Goby.jl")
-    message(STATUS "Goby.jl not found in goby installation, using bundled copy: ${GOBY_JULIA_SRC_DIR}")
+if(NOT EXISTS "${GOBY_JULIA_SRC_DIR}/Project.toml")
+    message(WARNING
+        "Goby.jl not found at ${GOBY_JULIA_SRC_DIR}. "
+        "Julia examples will not be built. "
+        "Ensure Goby is installed with Julia support (requires goby >= 3.3).")
+    set(enable_julia_examples OFF CACHE BOOL "" FORCE)
+    return()
 endif()
+
+message(STATUS "Found Goby.jl at ${GOBY_JULIA_SRC_DIR}")
 
 set(GOBY_JULIA_DIR "${project_BUILD_DIR}/julia/Goby.jl")
 
