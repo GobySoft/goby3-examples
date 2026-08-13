@@ -1,24 +1,28 @@
 # Julia subscriber equivalent to basic_subscriber.
 #
-# Subscribes to NavigationReport messages on the "navigation" group and
+# Subscribes to NavigationReport messages on the "groups::julia_nav" group and
 # prints each received message.
 #
 # Run with:
-#   julia build/julia/basic_subscriber/subscriber.jl <config.pb.cfg>
+#   julia build/julia/basic_julia_subscriber/subscriber.jl <config.pb.cfg>
 
 include(joinpath(@__DIR__, "..", "goby_application_init.jl"))
 init_cxxwrap("basic_julia_subscriber")
-Test.@include_protos()
+include_protos(@__MODULE__, "goby3_examples")
 
 # ---------------------------------------------------------------------------
-# start() is called by Goby.run() before entering the event loop.
+# Called by Goby for each NavigationReport received. The message type is
+# inferred by Goby.subscribe() from this argument type.
 # ---------------------------------------------------------------------------
 function receive_incoming_msg(nav::goby3_examples.protobuf.NavigationReport)
     println("Rx: x=$(nav.x) y=$(nav.y) z=$(nav.z)")
 end
 
+# start() is called by Goby.run() before entering the event loop.
 function start()
-    Goby.subscribe(Main.app, Goby.INTERPROCESS, "groups::nav2", receive_incoming_msg)
+    # the group is given by its string value, which GOBY_DEFINE_GROUP sets to
+    # the fully-qualified C++ name (see src/messages/groups.h)
+    Goby.subscribe(Main.app, Goby.INTERPROCESS, "groups::julia_nav", receive_incoming_msg)
 end
 
 config_str = Goby.read_cli_cfg()

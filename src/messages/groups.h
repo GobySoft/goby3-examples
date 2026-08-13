@@ -3,10 +3,7 @@
 
 #include "goby/middleware/group.h"
 
-namespace groups
-{
 GOBY_DEFINE_INTERVEHICLE_GROUP(groups, nav, goby::middleware::Group::broadcast_group)
-GOBY_DEFINE_GROUP(groups, nav2)
 
 GOBY_DEFINE_GROUP(groups, gps_raw_in)
 GOBY_DEFINE_GROUP(groups, gps_raw_out)
@@ -19,5 +16,6 @@ GOBY_DEFINE_GROUP(groups, state_report)
 GOBY_DEFINE_GROUP(groups, string_msg)
 
 GOBY_DEFINE_GROUP(groups, init)
+GOBY_DEFINE_GROUP(groups, julia_nav)
 
 #endif

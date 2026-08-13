@@ -64,6 +64,10 @@ option(enable_julia_examples
   ${_julia_examples_default})
 if(enable_julia_examples)
   include(GobyJulia)
+endif()
+# GobyJulia sets enable_julia_examples to OFF if any of its dependencies
+# (Goby.jl, CxxWrap.jl, JlCxx) are missing, so re-check before using it
+if(enable_julia_examples)
   protobuf_julia_include_dirs("${DCCL_INCLUDE_DIR}")
   protobuf_julia_include_dirs("${GOBY_INCLUDE_DIR}")
   protobuf_julia_include_dirs("${project_INC_DIR}")
@@ -101,7 +105,7 @@ foreach(I ${INCLUDE_FILES})
   configure_file(${project_SRC_DIR}/${I} ${project_INC_DIR}/${I} @ONLY)
 endforeach()
 
-
+# must run after all protobuf_generate_julia() calls have been collected
 if(enable_julia_examples)
   generate_julia_protos()
 endif()

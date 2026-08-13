@@ -54,6 +54,42 @@ goby_launch -x basic_publisher_subscriber.launch
 
 This will launch the publisher application and two copies of the subscriber application, each in their own XTerm windows. When finished, type CTRL-C into the original terminal.
 
+### Basic Multi-Process Publish/Subscribe in Julia (ZeroMQ)
+
+This example is the Julia equivalent of the basic ZeroMQ publisher/subscriber above: the application logic is written in Julia (using the `Goby` Julia module installed with Goby), while the Goby application itself is a C++ shared library generated from an `interface.yml` describing what the application publishes and subscribes.
+
+The code is given in `src/interprocess/zeromq/julia/basic_publisher` and `src/interprocess/zeromq/julia/basic_subscriber`. Each application consists of:
+
+- `publisher.jl` / `subscriber.jl`: the application logic
+- `interface.yml`: the publish/subscribe interface, from which the C++ bridge is generated
+- `config.proto`: the application's configuration message
+
+These examples are built only if `julia` is found on the `PATH` and [CxxWrap.jl](https://github.com/JuliaInterop/CxxWrap.jl) is installed:
+
+```bash
+julia -e 'import Pkg; Pkg.add("CxxWrap")'
+```
+
+They can be explicitly disabled with `-Denable_julia_examples=OFF`. The remaining Julia dependencies (ProtoBuf.jl, YAML.jl) are installed into `build/julia/Goby.jl` at build time.
+
+To run:
+
+```
+cd launch/interprocess/zeromq
+goby_launch -x julia_publisher_subscriber.launch
+```
+
+This launches `gobyd`, the Julia subscriber, and the Julia publisher, each in their own XTerm window. When finished, type CTRL-C into the original terminal (the one from which `goby_launch` was run).
+
+The publisher sends a `NavigationReport` at 10 Hz on the `groups::julia_nav` group, which the subscriber prints as it receives them. Note that the Julia code identifies a group by its string value: `GOBY_DEFINE_GROUP` in `src/messages/groups.h` sets that string to the fully-qualified C++ name, so the group named in `interface.yml` and the string passed to `Goby.publish()`/`Goby.subscribe()` are the same text.
+
+Unlike the C++ applications, the Julia applications take the path to their configuration file as their only argument, so `basic_julia_publisher.pb.cfg` and `basic_julia_subscriber.pb.cfg` are provided alongside the launch file. They can also be run directly:
+
+```
+julia build/julia/basic_julia_publisher/publisher.jl <config.pb.cfg>
+julia build/julia/basic_julia_subscriber/subscriber.jl <config.pb.cfg>
+```
+
 ### GPS Driver
 A working example using a standard NMEA-0183 GPS is given in `src/interprocess/zeromq/gps_driver`.
 

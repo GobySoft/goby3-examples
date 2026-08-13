@@ -1,4 +1,9 @@
 syntax = "proto2";
+
+// Same contents as nav.proto, but in the goby3_examples.protobuf package.
+// The Julia examples use this rather than nav.proto because ProtoBuf.jl
+// generates a Julia module per Protobuf package, and nav.proto's bare
+// "protobuf" package would collide with the ProtoBuf.jl module namespace.
 package goby3_examples.protobuf;
 
 message NavigationReport
