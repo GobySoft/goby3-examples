@@ -58,10 +58,29 @@ include(GobyTarget)
 set(PYTHON_DOC_STRING "Build the examples written in Python (requires Goby built with -Dbuild_python=ON)")
 if(COMMAND goby_add_python_app AND pybind11_FOUND AND GOBY_GEN_CPP_COMMAND)
   option(build_python ${PYTHON_DOC_STRING} ON)
-  include(GobyPythonApp)
 else()
   option(build_python ${PYTHON_DOC_STRING} OFF)
   message(">> setting build_python to OFF ... if you need this functionality: 1) build and install Goby with -Dbuild_python=ON; 2) run cmake -Dbuild_python=ON")
+endif()
+
+# not in the branch above: build_python can also be set to ON explicitly, and then the Goby side
+# has to be reported as missing rather than failing later on an undefined command
+if(build_python)
+  if(NOT COMMAND goby_add_python_app)
+    message(FATAL_ERROR
+      "build_python=ON but Goby does not provide goby_add_python_app(). Build Goby with "
+      "-Dbuild_python=ON and re-run cmake there, so that GobyPython.cmake is written next to "
+      "goby-config.cmake, then point this project at it with -DGOBY_DIR=/path/to/goby3/build.")
+  endif()
+  if(NOT pybind11_FOUND)
+    message(FATAL_ERROR "build_python=ON but pybind11 was not found. Install pybind11-dev (or pip install pybind11).")
+  endif()
+  if(NOT GOBY_GEN_CPP_COMMAND)
+    message(FATAL_ERROR
+      "build_python=ON but the goby_gen_cpp generator was not found. Install the goby Python "
+      "package (python3-goby3), or set -DGOBY_PYTHON_SOURCE_DIR=/path/to/goby3/src/python.")
+  endif()
+  include(GobyPythonApp)
 endif()
 
 option(export_goby_interfaces OFF "Build Goby Publish/Subscribe interface files (YML) from code")
