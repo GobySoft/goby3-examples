@@ -1,6 +1,6 @@
 # Julia subscriber equivalent to basic_subscriber.
 #
-# Subscribes to NavigationReport messages on the "julia_navigation" group and
+# Subscribes to NavigationReport messages on the "groups::julia_nav" group and
 # prints each received message.
 #
 # Run with:
@@ -20,9 +20,9 @@ end
 
 # start() is called by Goby.run() before entering the event loop.
 function start()
-    # the group is given by its string value (see groups::julia_nav in
-    # src/messages/groups.h), not by the C++ symbol name
-    Goby.subscribe(Main.app, Goby.INTERPROCESS, "julia_navigation", receive_incoming_msg)
+    # the group is given by its string value, which GOBY_DEFINE_GROUP sets to
+    # the fully-qualified C++ name (see src/messages/groups.h)
+    Goby.subscribe(Main.app, Goby.INTERPROCESS, "groups::julia_nav", receive_incoming_msg)
 end
 
 config_str = Goby.read_cli_cfg()

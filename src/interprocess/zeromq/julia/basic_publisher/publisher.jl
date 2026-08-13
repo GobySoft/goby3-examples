@@ -1,6 +1,6 @@
 # Julia publisher equivalent to basic_publisher.
 #
-# Publishes NavigationReport messages at 10 Hz on the "julia_navigation" group.
+# Publishes NavigationReport messages at 10 Hz on the "groups::julia_nav" group.
 #
 # Run with:
 #   julia build/julia/basic_julia_publisher/publisher.jl <config.pb.cfg>
@@ -20,9 +20,9 @@ function loop()
     )
 
     println("Tx: x=$(nav.x) y=$(nav.y) z=$(nav.z)")
-    # the group is given by its string value (see groups::julia_nav in
-    # src/messages/groups.h), not by the C++ symbol name
-    Goby.publish(Main.app, Goby.INTERPROCESS, "julia_navigation", nav)
+    # the group is given by its string value, which GOBY_DEFINE_GROUP sets to
+    # the fully-qualified C++ name (see src/messages/groups.h)
+    Goby.publish(Main.app, Goby.INTERPROCESS, "groups::julia_nav", nav)
 end
 
 # goby_cfg is inspected by Goby.run() to configure the loop frequency.

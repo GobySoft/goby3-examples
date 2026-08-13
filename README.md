@@ -72,21 +72,23 @@ julia -e 'import Pkg; Pkg.add("CxxWrap")'
 
 They can be explicitly disabled with `-Denable_julia_examples=OFF`. The remaining Julia dependencies (ProtoBuf.jl, YAML.jl) are installed into `build/julia/Goby.jl` at build time.
 
-Unlike the C++ examples, the Julia applications take the path to their configuration file as a positional argument. To run, first write a minimal configuration for each, e.g. `publisher.pb.cfg`:
+To run:
 
 ```
-app { name: "basic_julia_publisher" }
-interprocess { platform: "vehicle1" }
+cd launch/interprocess/zeromq
+goby_launch -x julia_publisher_subscriber.launch
 ```
 
-then, with `gobyd` running:
+This launches `gobyd`, the Julia subscriber, and the Julia publisher, each in their own XTerm window. When finished, type CTRL-C into the original terminal (the one from which `goby_launch` was run).
+
+The publisher sends a `NavigationReport` at 10 Hz on the `groups::julia_nav` group, which the subscriber prints as it receives them. Note that the Julia code identifies a group by its string value: `GOBY_DEFINE_GROUP` in `src/messages/groups.h` sets that string to the fully-qualified C++ name, so the group named in `interface.yml` and the string passed to `Goby.publish()`/`Goby.subscribe()` are the same text.
+
+Unlike the C++ applications, the Julia applications take the path to their configuration file as their only argument, so `basic_julia_publisher.pb.cfg` and `basic_julia_subscriber.pb.cfg` are provided alongside the launch file. They can also be run directly:
 
 ```
-julia build/julia/basic_julia_publisher/publisher.jl publisher.pb.cfg
-julia build/julia/basic_julia_subscriber/subscriber.jl subscriber.pb.cfg
+julia build/julia/basic_julia_publisher/publisher.jl <config.pb.cfg>
+julia build/julia/basic_julia_subscriber/subscriber.jl <config.pb.cfg>
 ```
-
-The publisher sends a `NavigationReport` at 10 Hz on the `julia_navigation` group, which the subscriber prints as it receives them.
 
 ### GPS Driver
 A working example using a standard NMEA-0183 GPS is given in `src/interprocess/zeromq/gps_driver`.
