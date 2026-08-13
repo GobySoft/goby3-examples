@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+// Same contents as nav.proto, but in the goby3_examples.protobuf package.
+// The Julia examples use this rather than nav.proto because ProtoBuf.jl
+// generates a Julia module per Protobuf package, and nav.proto's bare
+// "protobuf" package would collide with the ProtoBuf.jl module namespace.
+package goby3_examples.protobuf;
+
+message NavigationReport
+{
+    required double x = 1;
+    required double y = 2;
+    required double z = 3;
+    enum VehicleClass
+    {
+        AUV = 1;
+        USV = 2;
+        SHIP = 3;
+    }
+    optional VehicleClass veh_class = 4;
+    optional bool battery_ok = 5;
+}
