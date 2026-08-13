@@ -43,7 +43,7 @@ jobs:
       DISTRO_RELEASE_VERSION: ${{ matrix.distro_release_version }}
       # Julia is installed from the official generic Linux tarball rather than a distribution
       # package, which is how upstream expects it to be deployed. Bump here to update.
-      JULIA_VERSION: "1.10.10"
+      JULIA_VERSION: "1.11.5"
 
     steps:
       - name: Checkout
