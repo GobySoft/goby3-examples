@@ -21,8 +21,8 @@
 
 using goby::glog;
 
-constexpr goby::middleware::Group can_in{"can_in"};
-constexpr goby::middleware::Group can_out{"can_out"};
+GOBY_DEFINE_GROUP(groups, can_in)
+GOBY_DEFINE_GROUP(groups, can_out)
 
 using AppBase = goby::zeromq::MultiThreadApplication<CanExampleConfig>;
 using ThreadBase = goby::middleware::SimpleThread<CanExampleConfig>;
@@ -32,7 +32,7 @@ class CanDataHandleThread : public ThreadBase
   public:
     CanDataHandleThread(const CanExampleConfig& cfg) : ThreadBase(cfg)
     {
-        interthread().subscribe<can_in, can_frame>([this](const can_frame& rec_frame) {
+        interthread().subscribe<groups::can_in, can_frame>([this](const can_frame& rec_frame) {
             if (glog.is_verbose())
             {
                 glog << "Data_rec: " << std::hex << rec_frame.can_id << "  ";
@@ -51,7 +51,7 @@ class CanExample : public AppBase
   public:
     CanExample() : AppBase()
     {
-        using CanThread = goby::middleware::io::CanThread<can_in, can_out>;
+        using CanThread = goby::middleware::io::CanThread<groups::can_in, groups::can_out>;
 
         launch_thread<CanThread>(cfg().can_config());
         launch_thread<CanDataHandleThread>();

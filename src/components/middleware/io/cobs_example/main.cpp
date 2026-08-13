@@ -22,17 +22,17 @@
 
 using goby::glog;
 
-constexpr goby::middleware::Group tcp_server_in{"tcp_server_in"};
-constexpr goby::middleware::Group tcp_server_out{"tcp_server_out"};
+GOBY_DEFINE_GROUP(groups, tcp_server_in)
+GOBY_DEFINE_GROUP(groups, tcp_server_out)
 
-constexpr goby::middleware::Group tcp_client_in{"tcp_client_in"};
-constexpr goby::middleware::Group tcp_client_out{"tcp_client_out"};
+GOBY_DEFINE_GROUP(groups, tcp_client_in)
+GOBY_DEFINE_GROUP(groups, tcp_client_out)
 
-constexpr goby::middleware::Group pty_in{"pty_in"};
-constexpr goby::middleware::Group pty_out{"pty_out"};
+GOBY_DEFINE_GROUP(groups, pty_in)
+GOBY_DEFINE_GROUP(groups, pty_out)
 
-constexpr goby::middleware::Group serial_in{"serial_in"};
-constexpr goby::middleware::Group serial_out{"serial_out"};
+GOBY_DEFINE_GROUP(groups, serial_in)
+GOBY_DEFINE_GROUP(groups, serial_out)
 
 // Define a Configurator to provide reasonable configuration defaults so this example can be run without manual configuration
 class TCPConfigurator : public goby::middleware::ProtobufConfigurator<TCPExampleConfig>
@@ -92,7 +92,7 @@ class TCPExample : public AppBase
         glog.add_group("serial", goby::util::Colors::lt_red);
 
         // subscribe to incoming data from server thread
-        interthread().subscribe<tcp_server_in>(
+        interthread().subscribe<groups::tcp_server_in>(
             [this](const goby::middleware::protobuf::IOData& tcp_data_in) {
                 glog.is_verbose() && glog << group("server")
                                           << "Got request: " << tcp_data_in.ShortDebugString()
@@ -101,18 +101,18 @@ class TCPExample : public AppBase
                 goby::middleware::protobuf::IOData tcp_data_out;
                 tcp_data_out.set_data("Response");
                 *tcp_data_out.mutable_tcp_dest() = tcp_data_in.tcp_src();
-                interthread().publish<tcp_server_out>(tcp_data_out);
+                interthread().publish<groups::tcp_server_out>(tcp_data_out);
             });
 
         // subscribe to events from server thread
-        interthread().subscribe<tcp_server_in>(
+        interthread().subscribe<groups::tcp_server_in>(
             [this](const goby::middleware::protobuf::TCPServerEvent& event) {
                 glog.is_verbose() && glog << group("server")
                                           << "Got event: " << event.ShortDebugString() << std::endl;
             });
 
         // subscribe to incoming data from client thread
-        interthread().subscribe<tcp_client_in>(
+        interthread().subscribe<groups::tcp_client_in>(
             [this](const goby::middleware::protobuf::IOData& tcp_data_in) {
                 glog.is_verbose() && glog << group("client")
                                           << "Got response: " << tcp_data_in.ShortDebugString()
@@ -120,14 +120,14 @@ class TCPExample : public AppBase
             });
 
         // subscribe to incoming data from serial thread
-        interthread().subscribe<serial_in>(
+        interthread().subscribe<groups::serial_in>(
             [this](const goby::middleware::protobuf::IOData& serial_data_in) {
                 glog.is_verbose() && glog << group("serial") << "Got message from pty: "
                                           << serial_data_in.ShortDebugString() << std::endl;
             });
 
         // subscribe to incoming data from pty thread
-        interthread().subscribe<pty_in>(
+        interthread().subscribe<groups::pty_in>(
             [this](const goby::middleware::protobuf::IOData& pty_data_in) {
                 glog.is_verbose() && glog << group("pty") << "Got message from serial: "
                                           << pty_data_in.ShortDebugString() << std::endl;
@@ -135,11 +135,11 @@ class TCPExample : public AppBase
 
         // launch the TCP threads
         using TCPServerThread =
-            goby::middleware::io::TCPServerThreadCOBS<tcp_server_in, tcp_server_out>;
+            goby::middleware::io::TCPServerThreadCOBS<groups::tcp_server_in, groups::tcp_server_out>;
         using TCPClientThread =
-            goby::middleware::io::TCPClientThreadCOBS<tcp_client_in, tcp_client_out>;
-        using PTYThread = goby::middleware::io::PTYThreadCOBS<pty_in, pty_out>;
-        using SerialThread = goby::middleware::io::SerialThreadCOBS<serial_in, serial_out>;
+            goby::middleware::io::TCPClientThreadCOBS<groups::tcp_client_in, groups::tcp_client_out>;
+        using PTYThread = goby::middleware::io::PTYThreadCOBS<groups::pty_in, groups::pty_out>;
+        using SerialThread = goby::middleware::io::SerialThreadCOBS<groups::serial_in, groups::serial_out>;
 
         launch_thread<TCPServerThread>(cfg().tcp_server_config());
         launch_thread<TCPClientThread>(cfg().tcp_client_config());
@@ -159,13 +159,13 @@ void TCPExample::loop()
     goby::middleware::protobuf::IOData tcp_data;
     tcp_data.set_data("Request");
     // no tcp_dest required in IOData message because we're using TCPPointToPointThread with a pre-configured destination for all messages
-    interthread().publish<tcp_client_out>(tcp_data);
+    interthread().publish<groups::tcp_client_out>(tcp_data);
 
     goby::middleware::protobuf::IOData serial_data;
     serial_data.set_data("ToPTY");
-    interthread().publish<serial_out>(serial_data);
+    interthread().publish<groups::serial_out>(serial_data);
 
     goby::middleware::protobuf::IOData pty_data;
     pty_data.set_data("ToSerial");
-    interthread().publish<pty_out>(pty_data);
+    interthread().publish<groups::pty_out>(pty_data);
 }
