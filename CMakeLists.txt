@@ -52,6 +52,23 @@ set(GOBY_PROTOBUF_IMPORT_DIRS
 
 include(GobyTarget)
 
+# Julia examples – enabled by default if julia is found on the system
+find_program(JULIA julia)
+if(JULIA)
+  set(_julia_examples_default ON)
+else()
+  set(_julia_examples_default OFF)
+endif()
+option(enable_julia_examples
+  "Build Julia interprocess examples (requires julia, CxxWrap.jl, and JlCxx C++ headers)"
+  ${_julia_examples_default})
+if(enable_julia_examples)
+  include(GobyJulia)
+  protobuf_julia_include_dirs("${DCCL_INCLUDE_DIR}")
+  protobuf_julia_include_dirs("${GOBY_INCLUDE_DIR}")
+  protobuf_julia_include_dirs("${project_INC_DIR}")
+endif()
+
 option(export_goby_interfaces OFF "Build Goby Publish/Subscribe interface files (YML) from code")
 
 if(export_goby_interfaces)
@@ -83,3 +100,8 @@ file(GLOB_RECURSE INCLUDE_FILES RELATIVE ${project_SRC_DIR}
 foreach(I ${INCLUDE_FILES})
   configure_file(${project_SRC_DIR}/${I} ${project_INC_DIR}/${I} @ONLY)
 endforeach()
+
+
+if(enable_julia_examples)
+  generate_julia_protos()
+endif()
