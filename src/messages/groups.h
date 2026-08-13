@@ -5,20 +5,19 @@
 
 namespace groups
 {
-constexpr goby::middleware::Group nav{"navigation", goby::middleware::Group::broadcast_group};
-constexpr goby::middleware::Group nav2{"groups::nav2"};
+GOBY_DEFINE_INTERVEHICLE_GROUP(groups, nav, goby::middleware::Group::broadcast_group)
+GOBY_DEFINE_GROUP(groups, nav2)
 
-constexpr goby::middleware::Group gps_raw_in{"gps_raw_in"};
-constexpr goby::middleware::Group gps_raw_out{"gps_raw_out"};
-constexpr goby::middleware::Group gps_data{"gps_data"};
-constexpr goby::middleware::Group gps_control{"gps_control"};
+GOBY_DEFINE_GROUP(groups, gps_raw_in)
+GOBY_DEFINE_GROUP(groups, gps_raw_out)
+GOBY_DEFINE_GROUP(groups, gps_data)
+GOBY_DEFINE_GROUP(groups, gps_control)
 
-constexpr goby::middleware::Group state_control{"state_control"};
-constexpr goby::middleware::Group state_report{"state_report"};
+GOBY_DEFINE_GROUP(groups, state_control)
+GOBY_DEFINE_GROUP(groups, state_report)
 
-constexpr goby::middleware::Group string_msg{"string_msg"};
+GOBY_DEFINE_GROUP(groups, string_msg)
 
-constexpr goby::middleware::Group init{"init"};
-} // namespace groups
+GOBY_DEFINE_GROUP(groups, init)
 
 #endif
