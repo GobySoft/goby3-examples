@@ -111,6 +111,15 @@ function(add_goby_python_app)
   get_filename_component(_main "${args_MAIN}" ABSOLUTE)
   set(_pythonpath "${${args_TARGET}_PYTHON_DIRECTORY}:${_python_proto_dir}")
 
+  # When building against an uninstalled Goby, the goby package and its generated protobuf
+  # modules live in Goby's source and build trees rather than on the interpreter's path. Once
+  # Goby is installed (python3-goby3) both are already importable and these are empty.
+  foreach(_goby_python_dir "${GOBY_PYTHON_SOURCE_DIR}" "${GOBY_PYTHON_PROTO_DIR}")
+    if(_goby_python_dir AND IS_DIRECTORY "${_goby_python_dir}")
+      set(_pythonpath "${_pythonpath}:${_goby_python_dir}")
+    endif()
+  endforeach()
+
   file(GENERATE
     OUTPUT "${project_BIN_DIR}/${args_TARGET}"
     CONTENT "#!/bin/sh
