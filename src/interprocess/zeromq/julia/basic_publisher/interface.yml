@@ -7,6 +7,6 @@ application:
 
 interprocess:
   publishes:
-    - group: groups::nav2
+    - group: groups::julia_nav
       scheme: PROTOBUF
       type: goby3_examples::protobuf::NavigationReport

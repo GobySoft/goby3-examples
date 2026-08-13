@@ -54,6 +54,40 @@ goby_launch -x basic_publisher_subscriber.launch
 
 This will launch the publisher application and two copies of the subscriber application, each in their own XTerm windows. When finished, type CTRL-C into the original terminal.
 
+### Basic Multi-Process Publish/Subscribe in Julia (ZeroMQ)
+
+This example is the Julia equivalent of the basic ZeroMQ publisher/subscriber above: the application logic is written in Julia (using the `Goby` Julia module installed with Goby), while the Goby application itself is a C++ shared library generated from an `interface.yml` describing what the application publishes and subscribes.
+
+The code is given in `src/interprocess/zeromq/julia/basic_publisher` and `src/interprocess/zeromq/julia/basic_subscriber`. Each application consists of:
+
+- `publisher.jl` / `subscriber.jl`: the application logic
+- `interface.yml`: the publish/subscribe interface, from which the C++ bridge is generated
+- `config.proto`: the application's configuration message
+
+These examples are built only if `julia` is found on the `PATH` and [CxxWrap.jl](https://github.com/JuliaInterop/CxxWrap.jl) is installed:
+
+```bash
+julia -e 'import Pkg; Pkg.add("CxxWrap")'
+```
+
+They can be explicitly disabled with `-Denable_julia_examples=OFF`. The remaining Julia dependencies (ProtoBuf.jl, YAML.jl) are installed into `build/julia/Goby.jl` at build time.
+
+Unlike the C++ examples, the Julia applications take the path to their configuration file as a positional argument. To run, first write a minimal configuration for each, e.g. `publisher.pb.cfg`:
+
+```
+app { name: "basic_julia_publisher" }
+interprocess { platform: "vehicle1" }
+```
+
+then, with `gobyd` running:
+
+```
+julia build/julia/basic_julia_publisher/publisher.jl publisher.pb.cfg
+julia build/julia/basic_julia_subscriber/subscriber.jl subscriber.pb.cfg
+```
+
+The publisher sends a `NavigationReport` at 10 Hz on the `julia_navigation` group, which the subscriber prints as it receives them.
+
 ### GPS Driver
 A working example using a standard NMEA-0183 GPS is given in `src/interprocess/zeromq/gps_driver`.
 

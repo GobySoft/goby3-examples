@@ -3,5 +3,7 @@ add_goby_library(TARGET goby3_example_messages
   PROTOC_OUT_DIR ${project_INC_DIR}/messages
   LINK_LIBRARIES ${Protobuf_LIBRARIES} dccl)
 
-
-protobuf_generate_julia("goby3_examples" "julia_nav.proto")
+# protobuf_generate_julia is only defined when GobyJulia.cmake is included
+if(enable_julia_examples)
+  protobuf_generate_julia("goby3_examples" "julia_nav.proto")
+endif()

@@ -6,7 +6,13 @@
 namespace groups
 {
 constexpr goby::middleware::Group nav{"navigation", goby::middleware::Group::broadcast_group};
-constexpr goby::middleware::Group nav2{"groups::nav2"};
+
+// used by the Julia examples: the Julia code refers to a group by this string
+// value (not by the C++ symbol name), so it must be kept in sync with the group
+// passed to Goby.publish()/Goby.subscribe() in publisher.jl/subscriber.jl.
+// Note that a group used from Julia must not have a numeric value, as
+// Group::operator std::string() then appends ";<numeric>" to the string.
+constexpr goby::middleware::Group julia_nav{"julia_navigation"};
 
 constexpr goby::middleware::Group gps_raw_in{"gps_raw_in"};
 constexpr goby::middleware::Group gps_raw_out{"gps_raw_out"};
