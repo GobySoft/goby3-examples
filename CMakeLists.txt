@@ -52,6 +52,18 @@ set(GOBY_PROTOBUF_IMPORT_DIRS
 
 include(GobyTarget)
 
+## examples written in Python, which need Goby built with -Dbuild_python=ON
+# (goby-config.cmake includes GobyPython.cmake, which provides goby_add_python_app and looks for
+# pybind11 and the goby_gen_cpp generator)
+set(PYTHON_DOC_STRING "Build the examples written in Python (requires Goby built with -Dbuild_python=ON)")
+if(COMMAND goby_add_python_app AND pybind11_FOUND AND GOBY_GEN_CPP_COMMAND)
+  option(build_python ${PYTHON_DOC_STRING} ON)
+  include(GobyPythonApp)
+else()
+  option(build_python ${PYTHON_DOC_STRING} OFF)
+  message(">> setting build_python to OFF ... if you need this functionality: 1) build and install Goby with -Dbuild_python=ON; 2) run cmake -Dbuild_python=ON")
+endif()
+
 option(export_goby_interfaces OFF "Build Goby Publish/Subscribe interface files (YML) from code")
 
 if(export_goby_interfaces)
