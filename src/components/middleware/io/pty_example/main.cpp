@@ -16,8 +16,8 @@
 
 using goby::glog;
 
-constexpr goby::middleware::Group pty_in{"pty_in"};
-constexpr goby::middleware::Group pty_out{"pty_out"};
+GOBY_DEFINE_GROUP(groups, pty_in)
+GOBY_DEFINE_GROUP(groups, pty_out)
 
 using AppBase = goby::zeromq::MultiThreadApplication<PTYExampleConfig>;
 using ThreadBase = goby::middleware::SimpleThread<PTYExampleConfig>;
@@ -27,7 +27,7 @@ class PTYDataHandleThread : public ThreadBase
   public:
     PTYDataHandleThread(const PTYExampleConfig& cfg) : ThreadBase(cfg)
     {
-        interthread().subscribe<pty_in>([this](const goby::middleware::protobuf::IOData& data) {
+        interthread().subscribe<groups::pty_in>([this](const goby::middleware::protobuf::IOData& data) {
             glog.is_verbose() && glog << data.DebugString() << std::endl;
         });
     }
@@ -40,7 +40,7 @@ class PTYExample : public AppBase
   public:
     PTYExample() : AppBase()
     {
-        using PTYThread = goby::middleware::io::PTYThreadLineBased<pty_in, pty_out>;
+        using PTYThread = goby::middleware::io::PTYThreadLineBased<groups::pty_in, groups::pty_out>;
 
         launch_thread<PTYThread>(cfg().pty_config());
         launch_thread<PTYDataHandleThread>();
