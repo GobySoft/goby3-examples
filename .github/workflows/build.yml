@@ -41,6 +41,9 @@ jobs:
       DEBCONF_NOWARNINGS: "yes"
       DISTRO_RELEASE_CODENAME: ${{ matrix.distro_release_codename }}
       DISTRO_RELEASE_VERSION: ${{ matrix.distro_release_version }}
+      # Julia is installed from the official generic Linux tarball rather than a distribution
+      # package, which is how upstream expects it to be deployed. Bump here to update.
+      JULIA_VERSION: "1.10.10"
 
     steps:
       - name: Checkout
@@ -62,11 +65,20 @@ jobs:
       - name: Install Python example dependencies
         run: apt-get -y install python3-goby3 pybind11-dev python3-dev
 
-      # The Julia examples need Goby.jl (goby3-julia), julia itself, and CxxWrap.jl, whose
-      # JlCxx headers are what the generated C++ links against.
+      - name: Install Julia
+        run: |
+          wget -qO /tmp/julia.tar.gz \
+            "https://julialang-s3.julialang.org/bin/linux/x64/${JULIA_VERSION%.*}/julia-${JULIA_VERSION}-linux-x86_64.tar.gz"
+          mkdir -p /opt/julia
+          tar xzf /tmp/julia.tar.gz -C /opt/julia --strip-components=1
+          ln -sf /opt/julia/bin/julia /usr/local/bin/julia
+          julia --version
+
+      # The Julia examples need Goby.jl (goby3-julia) and CxxWrap.jl, whose JlCxx headers are
+      # what the generated C++ links against.
       - name: Install Julia example dependencies
         run: |
-          apt-get -y install goby3-julia julia
+          apt-get -y install goby3-julia
           julia -e 'import Pkg; Pkg.add("CxxWrap")'
 
       - name: Configure examples
