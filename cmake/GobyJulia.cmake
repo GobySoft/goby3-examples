@@ -202,8 +202,12 @@ function(PROTOBUF_GENERATE_JULIA PACKAGE)
     get_filename_component(FIL_WE ${REL_FIL} NAME_WE)
     # relative directory to current source directory, e.g. for "dir/foo.proto", ${FIL_DIR} is "dir"
     get_filename_component(FIL_DIR ${REL_FIL} DIRECTORY BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-    # expected generated output file
-    set(PROTO_JL_OUT "${JULIA_OUT_DIR}/${PACKAGE}/${FIL_WE}_pb.jl")
+    # ProtoBuf.jl writes one <name>_pb.jl per proto into a directory tree that
+    # mirrors the proto's package (e.g. package goby3_examples.protobuf gives
+    # goby3_examples/protobuf/foo_pb.jl), which we can't derive here without
+    # parsing the .proto. Track the top-level module file instead: it is
+    # generated for every package and is the file the Julia scripts include.
+    set(PROTO_JL_OUT "${JULIA_OUT_DIR}/${PACKAGE}/${PACKAGE}.jl")
 
     set(project_julia_protos "${project_julia_protos},\"${FIL_WE}.proto\"" CACHE INTERNAL "Project Julia Protos")
     set(project_julia_proto_output "${project_julia_proto_output};${PROTO_JL_OUT}" CACHE INTERNAL "Project Julia Proto Outputs")
@@ -217,15 +221,21 @@ macro(generate_julia_protos)
   # remove empty item at the beginning of the list
   list(REMOVE_AT project_julia_proto_output 0)
   list(REMOVE_AT project_julia_proto_depends 0)
+  # several protos may share a package, and thus a top-level module file
+  list(REMOVE_DUPLICATES project_julia_proto_output)
 
   string(SUBSTRING "${project_julia_proto_includes}" 1 -1 project_julia_proto_includes)
   string(SUBSTRING "${project_julia_protos}" 1 -1 project_julia_protos)
 
+  # gen_proto() writes this once it has generated all the bindings
+  set(project_julia_proto_stamp "${project_BUILD_DIR}/julia/.protos.stamp")
+
   add_custom_command(
     OUTPUT ${project_julia_proto_output}
+    BYPRODUCTS ${project_julia_proto_stamp}
     DEPENDS ${project_julia_proto_depends}
     COMMAND ${JULIA}
-    ARGS --project=${GOBY_JULIA_DIR} -L ${GOBY_JULIA_DIR}/src/gen_goby.jl -e "'gen_proto([${project_julia_protos}],[${project_julia_proto_includes}],\"${project_BUILD_DIR}/julia\")'"
+    ARGS --project=${GOBY_JULIA_DIR} -L ${GOBY_JULIA_DIR}/src/gen_goby.jl -e "'gen_proto([${project_julia_protos}],[${project_julia_proto_includes}],\"${project_BUILD_DIR}/julia\",\"${project_julia_proto_stamp}\")'"
     COMMENT "Running Julia protocol buffer compiler on all project protos"
   )
   add_custom_target(julia_build_protos ALL
