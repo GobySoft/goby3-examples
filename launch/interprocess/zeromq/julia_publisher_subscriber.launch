@@ -1,7 +1,4 @@
 #! goby_launch -x
-# The Julia applications are scripts rather than binaries on the PATH, so they
-# are launched via julia with a path into the build directory (relative to this
-# file) and are given explicit [name=] directives for goby_launch.
 gobyd
-[name=basic_julia_subscriber] julia ../../../build/julia/basic_julia_subscriber/subscriber.jl basic_julia_subscriber.pb.cfg
-[name=basic_julia_publisher] julia ../../../build/julia/basic_julia_publisher/publisher.jl basic_julia_publisher.pb.cfg
+basic_julia_subscriber basic_julia_subscriber.pb.cfg
+basic_julia_publisher basic_julia_publisher.pb.cfg
