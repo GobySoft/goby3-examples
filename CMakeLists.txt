@@ -80,7 +80,6 @@ if(build_python)
       "build_python=ON but the goby_gen_cpp generator was not found. Install the goby Python "
       "package (python3-goby3), or set -DGOBY_PYTHON_SOURCE_DIR=/path/to/goby3/src/python.")
   endif()
-  include(GobyPythonApp)
 endif()
 
 # Julia examples – enabled by default if julia is found on the system
