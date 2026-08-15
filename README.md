@@ -41,6 +41,33 @@ goby_launch -x basic_publisher_subscriber.launch
 
 As will be apparent if you look at the contents of `basic_publisher_subscriber.launch`, this will launch `gobyd`, the publisher application, and two copies of the subscriber application, each in their own XTerm windows. When finished, type CTRL-C into the original terminal (the one from which `goby_launch` was run)
 
+### Basic Multi-Process Single-Threaded Publish/Subscribe in Python (ZeroMQ)
+
+The same example written in Python instead of C++. The code is in `src/interprocess/zeromq/python/basic_publisher_subscriber`.
+
+This requires Goby built and installed with `-Dbuild_python=ON`; the examples enable the Python examples automatically when that is the case (`cmake -Dbuild_python=OFF` to skip them).
+
+```
+cd launch/interprocess/zeromq
+goby_launch -x python_basic_publisher_subscriber.launch
+```
+
+Because the group (`groups::nav`) and the message (`protobuf::NavigationReport`) are the same ones the C++ example uses, the applications interoperate: the launch file above runs the Python publisher with both the Python and the C++ subscriber, and either publisher feeds either subscriber.
+
+A Goby Python application is two files. `publisher.yml` declares the publish/subscribe interface, which the build turns into the C++ glue that makes the statically typed Goby calls (Goby resolves groups, types and schemes at compile time, which Python cannot do at import time). `publisher.py` is the application itself, and looks like its C++ counterpart:
+
+```python
+class BasicPublisher(SingleThreadApplication):
+    def __init__(self):
+        super().__init__(loop_frequency_hertz=10)
+
+    def loop(self):
+        nav = nav_pb2.NavigationReport(x=..., y=..., z=...)
+        self.interprocess().publish(groups.nav, nav)
+```
+
+Command line and configuration file handling are the same as for a C++ application, so `goby3_example_python_basic_publisher --help`, `--example_config` and `--my_value 10` all work as expected.
+
 ### Basic Multi-Process Single-Threaded Publish/Subscribe (UDP Multicast)
 
 This example is equivalent to the ZeroMQ example above but uses the UDP Multicast (udpm) interprocess transport instead. No central broker (`gobyd`) is required.
@@ -83,11 +110,11 @@ This launches `gobyd`, the Julia subscriber, and the Julia publisher, each in th
 
 The publisher sends a `NavigationReport` at 10 Hz on the `groups::julia_nav` group, which the subscriber prints as it receives them. Note that the Julia code identifies a group by its string value: `GOBY_DEFINE_GROUP` in `src/messages/groups.h` sets that string to the fully-qualified C++ name, so the group named in `interface.yml` and the string passed to `Goby.publish()`/`Goby.subscribe()` are the same text.
 
-Unlike the C++ applications, the Julia applications take the path to their configuration file as their only argument, so `basic_julia_publisher.pb.cfg` and `basic_julia_subscriber.pb.cfg` are provided alongside the launch file. They can also be run directly:
+Unlike the C++ applications, the Julia applications take the path to their configuration file as their only argument, so `basic_julia_publisher.pb.cfg` and `basic_julia_subscriber.pb.cfg` are provided alongside the launch file:
 
 ```
-julia build/julia/basic_julia_publisher/publisher.jl <config.pb.cfg>
-julia build/julia/basic_julia_subscriber/subscriber.jl <config.pb.cfg>
+basic_julia_publisher <config.pb.cfg>
+basic_julia_subscriber <config.pb.cfg>
 ```
 
 ### GPS Driver

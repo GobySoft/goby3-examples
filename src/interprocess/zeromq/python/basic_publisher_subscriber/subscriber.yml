@@ -1,0 +1,13 @@
+# Publish/subscribe interface for the Python subscriber. See publisher.yml for what this file is.
+application:
+  name: BasicPythonSubscriber
+  cpp_type: goby::zeromq::SingleThreadApplication
+  config:
+    scheme: PROTOBUF
+    type: goby3_example.protobuf.BasicPythonSubscriberConfig
+
+interprocess:
+  subscribes:
+    - group: groups::nav
+      scheme: PROTOBUF
+      type: protobuf.NavigationReport

@@ -1,0 +1,20 @@
+# Publish/subscribe interface for the Python publisher.
+#
+# Goby resolves groups, message types and marshalling schemes at compile time, which Python
+# cannot do at import time. Declaring the interface here lets the generator emit the C++ glue
+# that makes those statically typed calls. See share/goby/interface/README.md for the format.
+#
+# The group and message type are the same ones the C++ publisher uses (src/messages/groups.h
+# and src/messages/nav.proto), so a Python publisher and a C++ subscriber interoperate.
+application:
+  name: BasicPythonPublisher
+  cpp_type: goby::zeromq::SingleThreadApplication
+  config:
+    scheme: PROTOBUF
+    type: goby3_example.protobuf.BasicPythonPublisherConfig
+
+interprocess:
+  publishes:
+    - group: groups::nav
+      scheme: PROTOBUF
+      type: protobuf.NavigationReport

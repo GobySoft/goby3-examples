@@ -1,9 +1,14 @@
-add_goby_julia_application(
-    TARGET basic_julia_publisher
-    SCRIPT publisher.jl
-    INTERFACE_YML interface.yml
-    CONFIG_PROTO config.proto
-    LINK_LIBRARIES goby3_example_messages
-    INCLUDE_HEADERS messages/julia_nav.pb.h messages/groups.h ${GOBY_INCLUDE_DIR}/goby/zeromq/application/single_thread.h
-)
+add_goby_library(TARGET goby3_example_julia_publisher_config
+  PROTOS config.proto
+  PROTOC_OUT_DIR ${project_INC_DIR}/julia_publisher_config
+  LINK_LIBRARIES ${Protobuf_LIBRARIES} dccl)
 
+goby_add_julia_app(TARGET basic_julia_publisher
+  INTERFACE_YML interface.yml
+  MAIN publisher.jl
+  INCLUDES messages/julia_nav.pb.h messages/groups.h
+           julia_publisher_config/config.pb.h
+           ${GOBY_INCLUDE_DIR}/goby/zeromq/application/single_thread.h
+  LINK_LIBRARIES goby goby_zeromq goby3_example_messages goby3_example_julia_publisher_config)
+
+target_include_directories(basic_julia_publisher PRIVATE ${project_INC_DIR})

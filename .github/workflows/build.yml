@@ -41,6 +41,9 @@ jobs:
       DEBCONF_NOWARNINGS: "yes"
       DISTRO_RELEASE_CODENAME: ${{ matrix.distro_release_codename }}
       DISTRO_RELEASE_VERSION: ${{ matrix.distro_release_version }}
+      # Julia is installed from the official generic Linux tarball rather than a distribution
+      # package, which is how upstream expects it to be deployed. Bump here to update.
+      JULIA_VERSION: "1.12.2"
 
     steps:
       - name: Checkout
@@ -57,5 +60,43 @@ jobs:
       - name: Update apt packages and install goby3 headers
         run: apt-get update && apt-get -y remove libdccl3-dev libdccl3 && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev clang
 
+      # The Python examples need the goby Python package (for the goby module and the
+      # goby_gen_cpp generator) and pybind11 to compile the generated extension module.
+      - name: Install Python example dependencies
+        run: apt-get -y install python3-goby3 pybind11-dev python3-dev
+
+      - name: Install Julia
+        run: |
+          wget -qO /tmp/julia.tar.gz \
+            "https://julialang-s3.julialang.org/bin/linux/x64/${JULIA_VERSION%.*}/julia-${JULIA_VERSION}-linux-x86_64.tar.gz"
+          mkdir -p /opt/julia
+          tar xzf /tmp/julia.tar.gz -C /opt/julia --strip-components=1
+          ln -sf /opt/julia/bin/julia /usr/local/bin/julia
+          julia --version
+
+      # The Julia examples need Goby.jl (goby3-julia) and CxxWrap.jl, whose JlCxx headers are
+      # what the generated C++ links against.
+      - name: Install Julia example dependencies
+        run: |
+          apt-get -y install goby3-julia
+          julia -e 'import Pkg; Pkg.add("CxxWrap")'
+
+      - name: Configure examples
+        # Both are requested explicitly rather than left to autodetection, so that a missing
+        # dependency fails the build instead of quietly dropping the examples from it
+        run: mkdir -p build && cd build && cmake .. -Dbuild_python=ON -Denable_julia_examples=ON
+
+      # GobyJulia.cmake warns and turns enable_julia_examples back OFF when a piece is missing,
+      # which would otherwise leave this job passing without having built anything Julia
+      - name: Check that the Python and Julia examples are enabled
+        run: |
+          cd build
+          for _option in build_python enable_julia_examples; do
+            if ! grep -q "^${_option}:BOOL=ON$" CMakeCache.txt; then
+              echo "::error::${_option} is not ON: its examples would be silently skipped"
+              exit 1
+            fi
+          done
+
       - name: Build examples
-        run: mkdir -p build && cd build && cmake .. && cmake --build . -- -j4
+        run: cd build && cmake --build . -- -j4

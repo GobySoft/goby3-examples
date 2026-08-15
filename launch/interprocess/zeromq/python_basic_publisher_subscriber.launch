@@ -1,0 +1,6 @@
+#!goby_launch -x
+gobyd
+goby3_example_python_basic_publisher --my_value 10
+goby3_example_python_basic_subscriber
+# the Python publisher and the C++ subscriber use the same group and message, so they interoperate
+goby3_example_basic_interprocess_subscriber

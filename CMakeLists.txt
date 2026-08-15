@@ -52,25 +52,51 @@ set(GOBY_PROTOBUF_IMPORT_DIRS
 
 include(GobyTarget)
 
-# Julia examples – enabled by default if julia is found on the system
-find_program(JULIA julia)
-if(JULIA)
-  set(_julia_examples_default ON)
+## examples written in Python, which need Goby built with -Dbuild_python=ON
+# (goby-config.cmake includes GobyPython.cmake, which provides goby_add_python_app and looks for
+# pybind11 and the goby_gen_cpp generator)
+set(PYTHON_DOC_STRING "Build the examples written in Python (requires Goby built with -Dbuild_python=ON)")
+if(COMMAND goby_add_python_app AND pybind11_FOUND AND GOBY_GEN_CPP_COMMAND)
+  option(build_python ${PYTHON_DOC_STRING} ON)
 else()
-  set(_julia_examples_default OFF)
+  option(build_python ${PYTHON_DOC_STRING} OFF)
+  message(">> setting build_python to OFF ... if you need this functionality: 1) build and install Goby with -Dbuild_python=ON; 2) run cmake -Dbuild_python=ON")
 endif()
-option(enable_julia_examples
-  "Build Julia interprocess examples (requires julia, CxxWrap.jl, and JlCxx C++ headers)"
-  ${_julia_examples_default})
-if(enable_julia_examples)
-  include(GobyJulia)
+
+# not in the branch above: build_python can also be set to ON explicitly, and then the Goby side
+# has to be reported as missing rather than failing later on an undefined command
+if(build_python)
+  if(NOT COMMAND goby_add_python_app)
+    message(FATAL_ERROR
+      "build_python=ON but Goby does not provide goby_add_python_app(). Build Goby with "
+      "-Dbuild_python=ON and re-run cmake there, so that GobyPython.cmake is written next to "
+      "goby-config.cmake, then point this project at it with -DGOBY_DIR=/path/to/goby3/build.")
+  endif()
+  if(NOT pybind11_FOUND)
+    message(FATAL_ERROR "build_python=ON but pybind11 was not found. Install pybind11-dev (or pip install pybind11).")
+  endif()
+  if(NOT GOBY_GEN_CPP_COMMAND)
+    message(FATAL_ERROR
+      "build_python=ON but the goby_gen_cpp generator was not found. Install the goby Python "
+      "package (python3-goby3), or set -DGOBY_PYTHON_SOURCE_DIR=/path/to/goby3/src/python.")
+  endif()
 endif()
-# GobyJulia sets enable_julia_examples to OFF if any of its dependencies
-# (Goby.jl, CxxWrap.jl, JlCxx) are missing, so re-check before using it
+
+## examples written in Julia, which need julia and CxxWrap.jl
+include(GobyJulia)
+set(JULIA_DOC_STRING "Build the examples written in Julia (requires julia and CxxWrap.jl)")
+if(GOBY_JULIA_FOUND)
+  option(enable_julia_examples ${JULIA_DOC_STRING} ON)
+else()
+  option(enable_julia_examples ${JULIA_DOC_STRING} OFF)
+  message(">> setting enable_julia_examples to OFF ... ${GOBY_JULIA_NOT_FOUND_REASON}")
+endif()
+
 if(enable_julia_examples)
-  protobuf_julia_include_dirs("${DCCL_INCLUDE_DIR}")
-  protobuf_julia_include_dirs("${GOBY_INCLUDE_DIR}")
-  protobuf_julia_include_dirs("${project_INC_DIR}")
+  if(NOT GOBY_JULIA_FOUND)
+    message(FATAL_ERROR "enable_julia_examples=ON but ${GOBY_JULIA_NOT_FOUND_REASON}")
+  endif()
+  goby_julia_proto_include_dirs("${DCCL_INCLUDE_DIR}" "${GOBY_INCLUDE_DIR}" "${project_INC_DIR}")
 endif()
 
 option(export_goby_interfaces OFF "Build Goby Publish/Subscribe interface files (YML) from code")
@@ -105,7 +131,7 @@ foreach(I ${INCLUDE_FILES})
   configure_file(${project_SRC_DIR}/${I} ${project_INC_DIR}/${I} @ONLY)
 endforeach()
 
-# must run after all protobuf_generate_julia() calls have been collected
-if(enable_julia_examples)
-  generate_julia_protos()
+# must run after all goby_add_julia_protos() calls have been collected
+if(enable_julia_examples AND CMAKE_VERSION VERSION_LESS 3.19)
+  goby_generate_julia_protos()
 endif()
