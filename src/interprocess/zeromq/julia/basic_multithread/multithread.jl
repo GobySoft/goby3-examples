@@ -13,14 +13,14 @@
 #      message. The alert below is a NamedTuple.
 #   3. INTERPROCESS is only available from Main, so a task that needs the outside world hands
 #      the message to Main over INTERTHREAD, as the subscriber task does here. Publishing to it
-#      from a task instead throws, but the throw stays inside the dead task while Goby.run()
-#      blocks waiting on Main's channel: the application simply stops, with no error printed.
-#      A Julia task that goes quiet is worth suspecting for this.
+#      from a task instead raises an AssertionError naming the task, which stops the
+#      application.
 #
 # Julia fixes its thread count at startup, and Goby.run() needs one thread per task module plus
-# three (Main, the loop timer, and the C++ application). Two task modules therefore need five:
+# three (Main, the loop timer, and the C++ application). Two task modules therefore need five,
+# which goby_add_julia_app()'s THREADS gives the launcher:
 #
-#   JULIA_NUM_THREADS=5 build/bin/basic_julia_multithread basic_julia_multithread.pb.cfg
+#   build/bin/basic_julia_multithread basic_julia_multithread.pb.cfg
 
 include(joinpath(@__DIR__, "..", "goby_application_init.jl"))
 init_cxxwrap("basic_julia_multithread")

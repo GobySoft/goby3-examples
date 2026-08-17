@@ -6,6 +6,8 @@ add_goby_library(TARGET goby3_example_julia_multithread_config
 goby_add_julia_app(TARGET basic_julia_multithread
   INTERFACE_YML interface.yml
   MAIN multithread.jl
+  # one per task module plus three, for Main, the loop timer and the C++ application
+  THREADS 5
   INCLUDES messages/julia_nav.pb.h messages/groups.h
            julia_multithread_config/config.pb.h
            ${GOBY_INCLUDE_DIR}/goby/zeromq/application/single_thread.h
