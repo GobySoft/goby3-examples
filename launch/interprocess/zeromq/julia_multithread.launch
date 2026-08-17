@@ -1,0 +1,7 @@
+#! goby_launch -x
+gobyd
+# Julia fixes its thread count at startup, and this application needs one thread per task module
+# plus three: Main, the loop timer, and the C++ application.
+env JULIA_NUM_THREADS=5 basic_julia_multithread basic_julia_multithread.pb.cfg
+# the reports the Julia application forwards to interprocess, seen from outside it
+basic_julia_subscriber basic_julia_subscriber.pb.cfg

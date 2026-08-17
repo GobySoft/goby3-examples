@@ -1,0 +1,15 @@
+# Only the interprocess publication is declared. INTERTHREAD is implemented in Julia, using
+# channels between tasks, and never reaches the generated C++ -- so an interthread group is a
+# plain string chosen by the application rather than a C++ group named here.
+application:
+  name: BasicJuliaMultithread
+  cpp_type: goby.zeromq.SingleThreadApplication
+  config:
+    scheme: PROTOBUF
+    type: BasicJuliaMultithreadConfig
+
+interprocess:
+  publishes:
+    - group: groups::julia_nav
+      scheme: PROTOBUF
+      type: goby3_examples::protobuf::NavigationReport
