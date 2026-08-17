@@ -30,9 +30,6 @@ include_protos(@__MODULE__, "goby3_examples")
 const NAV_GROUP = "nav"
 const DEPTH_ALERT_GROUP = "depth_alert"
 
-# depth below which the subscriber task raises an alert, in meters
-const ALERT_DEPTH = 300.0
-
 # ---------------------------------------------------------------------------
 # Publisher task: runs on its own thread, publishing at the rate in goby_cfg.
 # ---------------------------------------------------------------------------
@@ -69,7 +66,7 @@ using Goby
 function incoming_nav(nav::Main.goby3_examples.protobuf.NavigationReport)
     println("[subscriber] Rx: z=$(round(nav.z, digits = 1))")
 
-    if -nav.z > Main.ALERT_DEPTH
+    if -nav.z > Main.alert_depth
         # an interthread message is any Julia value; this one never becomes protobuf
         Goby.publish(Main.app, Goby.INTERTHREAD, Main.DEPTH_ALERT_GROUP,
                      (depth = -nav.z, x = nav.x, y = nav.y))
@@ -106,5 +103,11 @@ goby_cfg = Dict(:cxx_channel_check_frequency => 10)
 
 config_str = Goby.read_cli_cfg()
 app = Goby.BasicJuliaMultithread(config_str)
+
+# the application's own configuration, decoded into the Julia bindings generated from
+# multithread_config.proto by goby_add_julia_protos()
+pb_cfg = Goby.cfg(app, goby3_examples.config.BasicJuliaMultithreadConfig)
+alert_depth = pb_cfg.alert_depth
+println("Alerting below $(alert_depth) m")
 
 Goby.run(app, Main, [PublisherTask, SubscriberTask])

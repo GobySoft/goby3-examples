@@ -2,7 +2,11 @@ syntax = "proto2";
 import "goby/middleware/protobuf/app_config.proto";
 import "goby/zeromq/protobuf/interprocess_config.proto";
 
-message BasicJuliaPublisherConfig
+// ProtoBuf.jl generates a Julia module per Protobuf package, so the configuration lives in one
+// alongside goby3_examples.protobuf rather than at the top level
+package goby3_examples.config;
+
+message BasicJuliaSubscriberConfig
 {
     // required parameters for ApplicationBase3 class
     optional goby.middleware.protobuf.AppConfig app = 1;

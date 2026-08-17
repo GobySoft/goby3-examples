@@ -6,7 +6,7 @@ application:
   cpp_type: goby.zeromq.SingleThreadApplication
   config:
     scheme: PROTOBUF
-    type: BasicJuliaMultithreadConfig
+    type: goby3_examples.config.BasicJuliaMultithreadConfig
 
 interprocess:
   publishes:

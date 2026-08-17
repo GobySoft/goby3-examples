@@ -25,12 +25,19 @@ function loop()
     Goby.publish(Main.app, Goby.INTERPROCESS, "groups::julia_nav", nav)
 end
 
-# goby_cfg is inspected by Goby.run() to configure the loop frequency.
-goby_cfg = Dict(
-    :loop_frequency => 10,   # Hz
-    :loop_function  => loop,
-)
-
 config_str = Goby.read_cli_cfg()
 app = Goby.BasicJuliaPublisher(config_str)
+
+# the application's own configuration, decoded into the Julia bindings generated from
+# publisher_config.proto by goby_add_julia_protos()
+pb_cfg = Goby.cfg(app, goby3_examples.config.BasicJuliaPublisherConfig)
+println("Publishing at $(pb_cfg.loop_frequency) Hz")
+
+# goby_cfg is inspected by Goby.run() to configure the loop frequency.
+goby_cfg = Dict(
+    :loop_frequency => pb_cfg.loop_frequency,   # Hz
+    :loop_function  => loop,
+    :pb             => pb_cfg,
+)
+
 Goby.run(app)
