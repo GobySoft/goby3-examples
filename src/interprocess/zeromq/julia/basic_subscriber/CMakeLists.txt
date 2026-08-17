@@ -1,4 +1,4 @@
-add_goby_library(TARGET goby3_example_julia_subscriber_config
+goby_add_library(TARGET goby3_example_julia_subscriber_config
   PROTOS subscriber_config.proto
   PROTOC_OUT_DIR ${project_INC_DIR}/julia_subscriber_config
   LINK_LIBRARIES ${Protobuf_LIBRARIES} dccl)

@@ -1,4 +1,4 @@
-add_goby_executable(TARGET goby3_example_cobs
+goby_add_app(TARGET goby3_example_cobs
   SOURCES main.cpp
   PROTOS config.proto
   LINK_LIBRARIES goby_zeromq goby3_example_messages)

@@ -1,5 +1,5 @@
 # both applications share the configuration messages
-add_goby_library(TARGET goby3_example_python_config
+goby_add_library(TARGET goby3_example_python_config
   PROTOS config.proto
   PROTOC_OUT_DIR ${project_INC_DIR}/python_config
   LINK_LIBRARIES ${Protobuf_LIBRARIES} dccl)
