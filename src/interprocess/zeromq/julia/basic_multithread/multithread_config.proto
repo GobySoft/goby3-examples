@@ -2,10 +2,17 @@ syntax = "proto2";
 import "goby/middleware/protobuf/app_config.proto";
 import "goby/zeromq/protobuf/interprocess_config.proto";
 
-message BasicJuliaSubscriberConfig
+// ProtoBuf.jl generates a Julia module per Protobuf package, so the configuration lives in one
+// alongside goby3_examples.protobuf rather than at the top level
+package goby3_examples.config;
+
+message BasicJuliaMultithreadConfig
 {
     // required parameters for ApplicationBase3 class
     optional goby.middleware.protobuf.AppConfig app = 1;
     // required parameters for connecting to 'gobyd'
     optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
+
+    // depth (m) below which the subscriber task raises an alert
+    optional double alert_depth = 3 [default = 300];
 }

@@ -6,3 +6,4 @@ configure_file(goby_application_init.jl "${JULIA_OUT_DIR}/goby_application_init.
 
 add_subdirectory(basic_publisher)
 add_subdirectory(basic_subscriber)
+add_subdirectory(basic_multithread)

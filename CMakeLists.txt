@@ -43,14 +43,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${project_LIB_DIR} CACHE PATH
 
 include_directories(${project_INC_DIR})
 
-# Import directories passed to protoc for all Goby targets (via GobyApp.cmake)
+# Import directories passed to protoc for all Goby targets. goby_add_app() and
+# goby_add_library() come from Goby's GobyTarget.cmake, included by goby-config.cmake.
 set(GOBY_PROTOBUF_IMPORT_DIRS
   ${DCCL_INCLUDE_DIR}
   ${GOBY_INCLUDE_DIR}
   ${project_INC_DIR}
 )
-
-include(GobyTarget)
 
 ## examples written in Python, which need Goby built with -Dbuild_python=ON
 # (goby-config.cmake includes GobyPython.cmake, which provides goby_add_python_app and looks for

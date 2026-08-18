@@ -3,7 +3,7 @@ application:
   cpp_type: goby.zeromq.SingleThreadApplication
   config:
     scheme: PROTOBUF
-    type: BasicJuliaSubscriberConfig
+    type: goby3_examples.config.BasicJuliaSubscriberConfig
 
 interprocess:
   subscribes:
