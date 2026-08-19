@@ -108,13 +108,30 @@ goby_launch -x julia_publisher_subscriber.launch
 
 This launches `gobyd`, the Julia subscriber, and the Julia publisher, each in their own XTerm window. When finished, type CTRL-C into the original terminal (the one from which `goby_launch` was run).
 
-The publisher sends a `NavigationReport` at 10 Hz on the `groups::julia_nav` group, which the subscriber prints as it receives them. Note that the Julia code identifies a group by its string value: `GOBY_DEFINE_GROUP` in `src/messages/groups.h` sets that string to the fully-qualified C++ name, so the group named in `interface.yml` and the string passed to `Goby.publish()`/`Goby.subscribe()` are the same text.
+The publisher sends a `NavigationReport` at 10 Hz on the `groups::julia_nav` group, which the subscriber prints as it receives them. The group is named through the module `goby_add_julia_app()` generates from `interface.yml` beside each application (`basic_julia_publisher_goby.jl`), so `groups.julia_nav` and `interprocess()` stand in for the group string and the layer constant. The expression then lives in one place, and a mistyped group is an `UndefVarError` naming it rather than a `GOBY_JULIA_FAIL` that terminates the application once the publish is reached.
 
 Unlike the C++ applications, the Julia applications take the path to their configuration file as their only argument, so `basic_julia_publisher.pb.cfg` and `basic_julia_subscriber.pb.cfg` are provided alongside the launch file:
 
 ```
 basic_julia_publisher <config.pb.cfg>
 basic_julia_subscriber <config.pb.cfg>
+```
+
+### Multi-Threaded Publish/Subscribe in Julia (ZeroMQ)
+
+`src/interprocess/zeromq/julia/basic_multithread` is the Julia equivalent of the interthread publisher/subscriber, and shows the layers available to a Julia task.
+
+`Goby.run(app, Main, [PublisherTask, SubscriberTask])` runs each task module on its own Julia thread. The publisher task sends `NavigationReport`s over `INTERTHREAD`, which is implemented in Julia over `Channel`s rather than in the generated C++ -- so its groups are plain strings chosen by the application rather than groups declared in `interface.yml`, and its messages can be any Julia value (the depth alert `Main` receives is a `NamedTuple`).
+
+The subscriber task publishes the deep reports out to `INTERPROCESS` itself. Goby.jl hands those to the task that owns the C++ application, the way a C++ thread's `InterProcessForwarder` does, so no task needs a portal of its own and none has to route through `Main`. Subscribing works the same way: the publisher task subscribes to the same group and sees each report that goes out, alongside the separate `basic_julia_subscriber` process.
+
+Julia fixes its thread count at startup, so the application needs one thread per task module plus three, for `Main`, the loop timer and the C++ application. `goby_add_julia_app()`'s `THREADS` gives that to the generated launcher.
+
+To run:
+
+```
+cd launch/interprocess/zeromq
+goby_launch -x julia_multithread.launch
 ```
 
 ### GPS Driver
