@@ -10,6 +10,11 @@ include(joinpath(@__DIR__, "..", "goby_application_init.jl"))
 init_cxxwrap("basic_julia_subscriber")
 include_protos(@__MODULE__, "goby3_examples")
 
+# the groups and layer accessors generated from interface.yml, written beside this script by
+# goby_add_julia_app()
+include(joinpath(@__DIR__, "basic_julia_subscriber_goby.jl"))
+using .BasicJuliaSubscriberGoby: groups, interprocess
+
 # ---------------------------------------------------------------------------
 # Called by Goby for each NavigationReport received. The message type is
 # inferred by Goby.subscribe() from this argument type.
@@ -20,9 +25,7 @@ end
 
 # start() is called by Goby.run() before entering the event loop.
 function start()
-    # the group is given by its string value, which GOBY_DEFINE_GROUP sets to
-    # the fully-qualified C++ name (see src/messages/groups.h)
-    Goby.subscribe(Main.app, Goby.INTERPROCESS, "groups::julia_nav", receive_incoming_msg)
+    Goby.subscribe(Main.app, interprocess(), groups.julia_nav, receive_incoming_msg)
 end
 
 config_str = Goby.read_cli_cfg()

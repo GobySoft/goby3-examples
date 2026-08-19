@@ -9,6 +9,11 @@ include(joinpath(@__DIR__, "..", "goby_application_init.jl"))
 init_cxxwrap("basic_julia_publisher")
 include_protos(@__MODULE__, "goby3_examples")
 
+# the groups and layer accessors generated from interface.yml, written beside this script by
+# goby_add_julia_app()
+include(joinpath(@__DIR__, "basic_julia_publisher_goby.jl"))
+using .BasicJuliaPublisherGoby: groups, interprocess
+
 # ---------------------------------------------------------------------------
 # Publisher loop – called at the frequency specified in goby_cfg below.
 # ---------------------------------------------------------------------------
@@ -20,9 +25,7 @@ function loop()
     )
 
     println("Tx: x=$(nav.x) y=$(nav.y) z=$(nav.z)")
-    # the group is given by its string value, which GOBY_DEFINE_GROUP sets to
-    # the fully-qualified C++ name (see src/messages/groups.h)
-    Goby.publish(Main.app, Goby.INTERPROCESS, "groups::julia_nav", nav)
+    Goby.publish(Main.app, interprocess(), groups.julia_nav, nav)
 end
 
 config_str = Goby.read_cli_cfg()
