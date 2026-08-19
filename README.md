@@ -108,7 +108,7 @@ goby_launch -x julia_publisher_subscriber.launch
 
 This launches `gobyd`, the Julia subscriber, and the Julia publisher, each in their own XTerm window. When finished, type CTRL-C into the original terminal (the one from which `goby_launch` was run).
 
-The publisher sends a `NavigationReport` at 10 Hz on the `groups::julia_nav` group, which the subscriber prints as it receives them. The group is named through the module `goby_add_julia_app()` generates from `interface.yml` beside each application (`basic_julia_publisher_goby.jl`), so `groups.julia_nav` and `interprocess()` stand in for the group string and the layer constant, and a typo is a `julia` error rather than a message that goes nowhere.
+The publisher sends a `NavigationReport` at 10 Hz on the `groups::julia_nav` group, which the subscriber prints as it receives them. The group is named through the module `goby_add_julia_app()` generates from `interface.yml` beside each application (`basic_julia_publisher_goby.jl`), so `groups.julia_nav` and `interprocess()` stand in for the group string and the layer constant. The expression then lives in one place, and a mistyped group is an `UndefVarError` naming it rather than a `GOBY_JULIA_FAIL` that terminates the application once the publish is reached.
 
 Unlike the C++ applications, the Julia applications take the path to their configuration file as their only argument, so `basic_julia_publisher.pb.cfg` and `basic_julia_subscriber.pb.cfg` are provided alongside the launch file:
 
