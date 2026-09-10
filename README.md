@@ -81,6 +81,27 @@ goby_launch -x basic_publisher_subscriber.launch
 
 This will launch the publisher application and two copies of the subscriber application, each in their own XTerm windows. When finished, type CTRL-C into the original terminal.
 
+### Basic Multi-Process Single-Threaded Publish/Subscribe (Zenoh)
+
+This example is equivalent to the two above but uses the [Zenoh](https://zenoh.io) interprocess transport. Like UDP Multicast it needs no central broker (`gobyd`); unlike UDP Multicast, each subscription becomes a Zenoh key expression, so a peer that publishes something this process has not subscribed to does not send it here at all.
+
+Requires Goby built with `-Dbuild_zenoh=ON`, and thus `libzenohc-dev` and `libzenohcpp-dev` (`./DEPENDENCIES -z` in the Goby source tree installs them from Eclipse's Debian repository). The example is only built when that component is present.
+
+The code for this example is given in src/interprocess/zenoh/basic_publisher and src/interprocess/zenoh/basic_subscriber. To run:
+
+```
+cd launch/interprocess/zenoh
+goby_launch -x basic_publisher_subscriber.launch
+```
+
+This will launch the publisher application and two copies of the subscriber application, each in their own XTerm windows. When finished, type CTRL-C into the original terminal.
+
+Zenoh's default listen endpoint is `tcp/[::]:0`, so on a host without IPv6 (a container, typically) opening the session fails. Pass an IPv4 endpoint instead:
+
+```
+goby3_example_basic_zenoh_interprocess_publisher --interprocess 'listen_endpoint: "tcp/0.0.0.0:0"'
+```
+
 ### Basic Multi-Process Publish/Subscribe in Julia (ZeroMQ)
 
 This example is the Julia equivalent of the basic ZeroMQ publisher/subscriber above: the application logic is written in Julia (using the `Goby` Julia module installed with Goby), while the Goby application itself is a C++ shared library generated from an `interface.yml` describing what the application publishes and subscribes.
