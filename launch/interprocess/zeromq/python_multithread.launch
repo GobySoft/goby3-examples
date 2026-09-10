@@ -1,0 +1,5 @@
+#!goby_launch -x
+gobyd
+goby3_example_python_multithread --alert_depth 300
+# the reports the watcher thread forwards to interprocess, seen from outside the application
+goby3_example_basic_interprocess_subscriber

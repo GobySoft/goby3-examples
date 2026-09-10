@@ -68,6 +68,50 @@ class BasicPublisher(SingleThreadApplication):
 
 Command line and configuration file handling are the same as for a C++ application, so `goby3_example_python_basic_publisher --help`, `--example_config` and `--my_value 10` all work as expected.
 
+### Multi-Threaded Publish/Subscribe in Python (INTERTHREAD)
+
+The Python equivalent of the interthread example above: a publisher thread produces
+`NavigationReport`s, a watcher thread consumes them and forwards each one to the interprocess
+layer, and the application prints an alert when the vehicle is deep. The code is in
+`src/interprocess/zeromq/python/basic_multithread`.
+
+```
+cd launch/interprocess/zeromq
+goby_launch -x python_multithread.launch
+```
+
+Threads are written in Python and launched by the application, mirroring how a C++ application
+launches `SimpleThread`s. The thread is constructed on the thread it runs on, so it subscribes in
+its constructor as a C++ thread does:
+
+```python
+class DepthWatcher(Thread):
+    def __init__(self):
+        super().__init__()
+        self.interthread().subscribe(NAV_GROUP, self.incoming_nav)
+
+class BasicMultithread(SingleThreadApplication):
+    def __init__(self):
+        super().__init__()
+        self.launch_thread(DepthWatcher)
+```
+
+The interthread layer is implemented in Python rather than through the C++
+`InterThreadTransporter`, which has three consequences the example is built to show:
+
+- The application is a `SingleThreadApplication`: the C++ side never sees these threads, so
+  `MultiThreadApplication` is not needed.
+- Interthread groups are not declared in `interface.yml` -- any string will do -- because nothing
+  is generated for the layer.
+- An interthread message is any Python object, not only a protobuf message. The depth alert here
+  is a `dataclass` and never becomes protobuf.
+
+The interprocess layer still belongs to the application's thread, but a thread publishes to it
+directly anyway: the publication is handed to the application behind the scenes, the way a C++
+thread's `InterProcessForwarder` hands its traffic to the portal. The application picks that up in
+its loop, so launching a thread raises the rate it is serviced at (10 Hz by default,
+`interthread_poll_frequency_hertz` to change it).
+
 ### Basic Multi-Process Single-Threaded Publish/Subscribe (UDP Multicast)
 
 This example is equivalent to the ZeroMQ example above but uses the UDP Multicast (udpm) interprocess transport instead. No central broker (`gobyd`) is required.
