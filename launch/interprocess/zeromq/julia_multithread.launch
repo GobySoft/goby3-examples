@@ -2,5 +2,5 @@
 gobyd
 # the launcher starts julia with the thread count declared by THREADS in CMakeLists.txt
 basic_julia_multithread basic_julia_multithread.pb.cfg
-# the reports the Julia application forwards to interprocess, seen from outside it
+# the deep reports the Julia application's subscriber task publishes, seen from outside it
 basic_julia_subscriber basic_julia_subscriber.pb.cfg
