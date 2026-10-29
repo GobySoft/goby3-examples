@@ -1,13 +1,21 @@
 name: Build
 
+# pull_request covers branches in this repository, so push only runs for main and tags
 on:
   push:
+    branches: [main]
+    tags: ['*']
   pull_request:
   schedule:
     - cron: "0 7 * * *"
 
 permissions:
   contents: read
+
+# a newer push to the same branch or PR supersedes the run in progress
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
