@@ -1,0 +1,51 @@
+# Harness for launch/interprocess/zeromq/basic_publisher_subscriber.launch
+#
+#   goby test run test/interprocess/zeromq/basic_publisher_subscriber.test.yml   (from the repository root, with the examples built and on the PATH)
+
+endpoint:
+  - name: default
+    zeromq: { platform: default_goby_platform }
+
+fixture:
+  - name: example
+    command: goby_launch -r basic_publisher_subscriber.launch
+    cwd: ../../../launch/interprocess/zeromq
+    ready: { output_regex: "All processes running", timeout: 30 }
+
+test:
+  name: basic interprocess publisher/subscriber
+  default_timeout: 5
+
+  require_app:
+    - name:
+        - gobyd
+        - goby3_example_basic_interprocess_publisher
+        - goby3_example_basic_interprocess_subscriber
+      timeout: 20
+
+  run:
+    # publisher runs at 10 Hz, so a few seconds is plenty for 10 reports
+    - name: publisher emits nav at ~10 Hz
+      expect:
+        - group: "groups::nav(;.*)?"
+          type: protobuf.NavigationReport
+          min_count: 10
+          timeout: 3
+          condition:
+            - { field: x, op: GE, value: 95 }
+            - { field: x, op: LT, value: 115 }
+            - { field: y, op: GE, value: 195 }
+            - { field: z, op: LT, value: 0 }
+
+    # the subscriber accepts any NavigationReport on this group; make sure a
+    # hand-published one is visible to everyone on the layer as well
+    - name: external nav is accepted on the same group
+      publish:
+        - group: "groups::nav;0"
+          type: protobuf.NavigationReport
+          value: "x: 1 y: 2 z: -3 veh_class: USV battery_ok: false"
+      expect:
+        - group: "groups::nav(;.*)?"
+          type: protobuf.NavigationReport
+          min_count: 1
+          match: "veh_class: USV battery_ok: false"
