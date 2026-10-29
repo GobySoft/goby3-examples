@@ -15,7 +15,7 @@ add_test(NAME goby3_example_test_json
   COMMAND ${run} ${tests}/interprocess/zeromq/json.test.yml
                  ${launch}/interprocess/zeromq/json.launch)
 add_test(NAME goby3_example_test_basic_udpm
-  COMMAND ${run} -t udpm ${tests}/interprocess/udpm/basic_publisher_subscriber.test.yml
+  COMMAND ${run} ${tests}/interprocess/udpm/basic_publisher_subscriber.test.yml
                  ${launch}/interprocess/udpm/basic_publisher_subscriber.launch)
 add_test(NAME goby3_example_test_basic_intervehicle
   COMMAND ${run} ${tests}/intervehicle/basic.test.yml

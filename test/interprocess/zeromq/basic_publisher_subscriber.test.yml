@@ -5,8 +5,7 @@
 
 endpoint:
   - name: default
-    layer: LAYER_INTERPROCESS
-    interprocess: { platform: default_goby_platform }
+    zeromq: { platform: default_goby_platform }
 
 test:
   name: basic interprocess publisher/subscriber
@@ -19,7 +18,7 @@ test:
         - goby3_example_basic_interprocess_subscriber
       timeout: 20
 
-  block:
+  run:
     # publisher runs at 10 Hz, so a few seconds is plenty for 10 reports
     - name: publisher emits nav at ~10 Hz
       expect:

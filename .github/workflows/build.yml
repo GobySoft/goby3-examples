@@ -57,8 +57,8 @@ jobs:
       - name: Add continuous build package sources.list
         run: echo "deb [signed-by=/usr/share/keyrings/gobysoft-archive-keyring.gpg] http://packages.gobysoft.org/ubuntu/continuous/ ${DISTRO_RELEASE_CODENAME}/" >> /etc/apt/sources.list.d/gobysoft_continuous.list
 
-      - name: Update apt packages and install goby3 headers
-        run: apt-get update && apt-get -y remove libdccl3-dev libdccl3 && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev clang
+      - name: Update apt packages and install goby3 headers and applications
+        run: apt-get update && apt-get -y remove libdccl3-dev libdccl3 && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev goby3-apps clang
 
       # The Python examples need the goby Python package (for the goby module and the
       # goby_gen_cpp generator) and pybind11 to compile the generated extension module.
@@ -84,7 +84,7 @@ jobs:
       - name: Configure examples
         # Both are requested explicitly rather than left to autodetection, so that a missing
         # dependency fails the build instead of quietly dropping the examples from it
-        run: mkdir -p build && cd build && cmake .. -Dbuild_python=ON -Denable_julia_examples=ON
+        run: mkdir -p build && cd build && cmake .. -Dbuild_python=ON -Denable_julia_examples=ON -Denable_tests=ON
 
       # GobyJulia.cmake warns and turns enable_julia_examples back OFF when a piece is missing,
       # which would otherwise leave this job passing without having built anything Julia
@@ -100,3 +100,7 @@ jobs:
 
       - name: Build examples
         run: cd build && cmake --build . -- -j4
+
+      # the harnesses in test/ launch each example and check its publications with 'goby test'
+      - name: Run example tests
+        run: cd build && ctest --output-on-failure

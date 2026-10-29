@@ -10,11 +10,9 @@
 
 endpoint:
   - name: veh1
-    layer: LAYER_INTERPROCESS
-    interprocess: { platform: vehicle1 }
+    zeromq: { platform: vehicle1 }
   - name: veh2
-    layer: LAYER_INTERPROCESS
-    interprocess: { platform: vehicle2 }
+    zeromq: { platform: vehicle2 }
 
 test:
   name: basic intervehicle
@@ -28,7 +26,7 @@ test:
       name: [gobyd, goby3_example_basic_intervehicle_subscriber]
       timeout: 20
 
-  block:
+  run:
     # publisher runs at 0.1 Hz on a 1 s slot MAC, so allow a generous window
     - name: nav crosses the link
       expect:

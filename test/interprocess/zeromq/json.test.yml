@@ -5,8 +5,7 @@
 
 endpoint:
   - name: default
-    layer: LAYER_INTERPROCESS
-    interprocess: { platform: default_goby_platform }
+    zeromq: { platform: default_goby_platform }
 
 test:
   name: json publisher/subscriber
@@ -16,7 +15,7 @@ test:
     - name: [gobyd, goby3_example_json_publisher, goby3_example_json_subscriber]
       timeout: 20
 
-  block:
+  run:
     - name: typed and untyped JSON both flow
       mode: PARALLEL
       step:

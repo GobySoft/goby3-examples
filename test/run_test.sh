@@ -1,19 +1,17 @@
 #!/bin/bash
 # Launch one or more example .launch files, run a goby pub/sub test against them, then shut everything down.
 #
-# Usage: run_test.sh [-t zeromq|udpm] [-w seconds] <test.yml> <file.launch> [<file.launch> ...]
+# Usage: run_test.sh [-w seconds] <test.yml> <file.launch> [<file.launch> ...]
 #
-# Exit code is that of 'goby <transport> test' (0 pass, 1 expectation failed, 2 setup error).
+# Exit code is that of 'goby test' (0 pass, 1 expectation failed, 2 setup error).
 # The example binaries and libgoby3_example_messages.so must be built (see ../README.md);
 # GOBY3_EXAMPLES_BUILD overrides the default build directory.
 
 set -u
 
-transport=zeromq
 startup_wait=0
-while getopts "t:w:h" opt; do
+while getopts "w:h" opt; do
     case $opt in
-        t) transport=$OPTARG ;;
         w) startup_wait=$OPTARG ;;
         h|*) sed -n 2,9p "$0"; exit 2 ;;
     esac
@@ -42,4 +40,4 @@ cleanup() {
 trap cleanup EXIT
 
 sleep "$startup_wait"
-goby "$transport" test "$test_file" ${TEST_ARGS[@]+"${TEST_ARGS[@]}"}
+goby test "$test_file" ${TEST_ARGS[@]+"${TEST_ARGS[@]}"}

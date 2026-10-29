@@ -1,7 +1,7 @@
 # Example test harnesses
 
-Each `*.test.yml` file here is a test definition for `goby zeromq test` or
-`goby udpm test` (see `goby zeromq help test` and the goby3 command line tool documentation). It names the applications that must be alive, then publishes
+Each `*.test.yml` file here is a test definition for `goby test` (see `goby help test`
+and the goby3 command line tool documentation). It names the applications that must be alive, then publishes
 messages into the running example and checks what comes back, on which group,
 with which contents, and how quickly.
 
@@ -14,7 +14,7 @@ test/run_test.sh test/interprocess/zeromq/basic_publisher_subscriber.test.yml \
     launch/interprocess/zeromq/basic_publisher_subscriber.launch
 ```
 
-Pass `-t udpm` for the UDP multicast examples. The exit code is 0 when every
+The exit code is 0 when every
 expectation passed, 1 when one failed, and 2 when the test could not be set up
 (for example a required application never answered the health request).
 

@@ -1,6 +1,6 @@
 # Harness for launch/interprocess/udpm/basic_publisher_subscriber.launch
 #
-#   test/run_test.sh -t udpm test/interprocess/udpm/basic_publisher_subscriber.test.yml \
+#   test/run_test.sh test/interprocess/udpm/basic_publisher_subscriber.test.yml \
 #       launch/interprocess/udpm/basic_publisher_subscriber.launch
 #
 # UDPM has no broker, so there is no gobyd to wait for; the endpoint joins the
@@ -8,8 +8,7 @@
 
 endpoint:
   - name: default
-    layer: LAYER_INTERPROCESS
-    interprocess: { platform: default_goby_platform }
+    udpm: { platform: default_goby_platform }
 
 test:
   name: basic udpm publisher/subscriber
@@ -21,7 +20,7 @@ test:
         - goby3_example_basic_udpm_interprocess_subscriber
       timeout: 20
 
-  block:
+  run:
     - name: publisher emits nav at ~10 Hz
       expect:
         - group: groups::nav

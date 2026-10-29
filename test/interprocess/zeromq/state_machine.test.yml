@@ -6,8 +6,7 @@
 
 endpoint:
   - name: sm
-    layer: LAYER_INTERPROCESS
-    interprocess: { platform: state_machine }
+    zeromq: { platform: state_machine }
 
 test:
   name: state machine round trip
@@ -18,7 +17,7 @@ test:
       name: [gobyd, goby3_example_state_machine_subscriber]
       timeout: 20
 
-  block:
+  run:
     - name: initial state is OFF
       expect:
         - endpoint: sm
