@@ -18,14 +18,7 @@ test:
       timeout: 20
 
   run:
-    - name: initial state is OFF
-      expect:
-        - endpoint: sm
-          group: groups::state_report
-          type: protobuf.StateReport
-          min_count: 1
-          match: "current_state: OFF"
-
+    # the machine starts OFF and reports that before this test subscribes, so begin with a transition
     - name: turn on
       publish:
         - endpoint: sm

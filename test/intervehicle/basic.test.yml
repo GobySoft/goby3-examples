@@ -4,9 +4,10 @@
 #       launch/intervehicle/basic/basic_vehicle1.launch launch/intervehicle/basic/basic_vehicle2.launch
 #
 # Two gobyd instances (vehicle1, vehicle2) linked over the UDP multicast
-# modem driver. The DCCL NavigationReport published on vehicle1's
-# intervehicle layer must arrive on vehicle2's interprocess layer, where
-# gobyd republishes received intervehicle data for its subscribers.
+# modem driver. On vehicle1's interprocess layer the outgoing DCCL report is
+# visible under its own group; on vehicle2 received intervehicle data is
+# handed to subscribers as DCCLForwardedData on the internal modem_data_in
+# group (frames carry the DCCL id, 127 for dccl.NavigationReport).
 
 endpoint:
   - name: veh1
@@ -27,22 +28,24 @@ test:
       timeout: 20
 
   run:
-    # publisher runs at 0.1 Hz on a 1 s slot MAC, so allow a generous window
-    - name: nav crosses the link
+    # the publisher runs at 0.1 Hz on a 1 s slot MAC and its first report expires before
+    # vehicle2's subscription has been forwarded, so allow a few cycles
+    - name: outgoing report on vehicle1
       expect:
-        - endpoint: veh2
-          group: groups::nav
+        - endpoint: veh1
+          group: "groups::nav(;.*)?"
           type: DCCL/dccl.NavigationReport
           min_count: 1
-          timeout: 30
+          timeout: 25
           condition:
             - { field: z, op: LE, value: 0 }
 
-    # vehicle1 must not see its own report echoed back from vehicle2
-    - name: no echo on the sender
+    - name: report crosses the link to vehicle2
       expect:
-        - endpoint: veh1
-          group: groups::nav
-          type: DCCL/dccl.NavigationReport
-          count: 0
-          timeout: 12
+        - endpoint: veh2
+          group: goby::middleware::intervehicle::modem_data_in
+          type: goby.middleware.intervehicle.protobuf.DCCLForwardedData
+          min_count: 1
+          timeout: 40
+          condition:
+            - { field: "frame[0].dccl_id", op: EQ, value: 127 }

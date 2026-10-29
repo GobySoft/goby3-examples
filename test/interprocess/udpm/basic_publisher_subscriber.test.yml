@@ -23,7 +23,7 @@ test:
   run:
     - name: publisher emits nav at ~10 Hz
       expect:
-        - group: groups::nav
+        - group: "groups::nav(;.*)?"
           type: protobuf.NavigationReport
           min_count: 10
           timeout: 3
@@ -32,11 +32,11 @@ test:
 
     - name: external nav is accepted on the same group
       publish:
-        - group: groups::nav
+        - group: "groups::nav;0"
           type: protobuf.NavigationReport
           value: "x: 1 y: 2 z: -3 veh_class: SHIP"
       expect:
-        - group: groups::nav
+        - group: "groups::nav(;.*)?"
           type: protobuf.NavigationReport
           min_count: 1
           match: "veh_class: SHIP"

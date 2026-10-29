@@ -21,7 +21,7 @@ test:
       step:
         - name: typed NavigationReport
           expect:
-            - group: groups::nav
+            - group: "groups::nav(;.*)?"
               type: JSON/NavigationReport
               min_count: 5
               condition:
@@ -29,18 +29,18 @@ test:
                 - { field: z, op: LT, value: 0 }
         - name: untyped object
           expect:
-            - group: groups::nav
+            - group: "groups::nav(;.*)?"
               type: JSON/nlohmann::json
               min_count: 5
               match: '{"x2": 10, "y2": 20}'
 
     - name: hand-published JSON is visible
       publish:
-        - group: groups::nav
+        - group: "groups::nav;0"
           type: JSON/NavigationReport
           value: '{"x": 1, "y": 2, "z": -3}'
       expect:
-        - group: groups::nav
+        - group: "groups::nav(;.*)?"
           type: JSON/NavigationReport
           min_count: 1
           match: '{"x": 1}'

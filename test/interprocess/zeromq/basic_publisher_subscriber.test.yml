@@ -22,7 +22,7 @@ test:
     # publisher runs at 10 Hz, so a few seconds is plenty for 10 reports
     - name: publisher emits nav at ~10 Hz
       expect:
-        - group: groups::nav
+        - group: "groups::nav(;.*)?"
           type: protobuf.NavigationReport
           min_count: 10
           timeout: 3
@@ -36,11 +36,11 @@ test:
     # hand-published one is visible to everyone on the layer as well
     - name: external nav is accepted on the same group
       publish:
-        - group: groups::nav
+        - group: "groups::nav;0"
           type: protobuf.NavigationReport
           value: "x: 1 y: 2 z: -3 veh_class: USV battery_ok: false"
       expect:
-        - group: groups::nav
+        - group: "groups::nav(;.*)?"
           type: protobuf.NavigationReport
           min_count: 1
           match: "veh_class: USV battery_ok: false"

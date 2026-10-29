@@ -38,3 +38,7 @@ cd build && ctest --output-on-failure
 | `interprocess/zeromq/json` | JSON marshalling | typed and untyped JSON messages flow in parallel; hand-published JSON is visible |
 | `interprocess/udpm/basic_publisher_subscriber` | basic UDPM pub/sub | as the ZeroMQ basic test, without a broker |
 | `intervehicle/basic` | two vehicles over UDP multicast modem | DCCL report from vehicle1 reaches vehicle2's interprocess layer; nothing echoes back to vehicle1 |
+
+Groups defined with `GOBY_DEFINE_INTERVEHICLE_GROUP` (such as `groups::nav`) appear on the
+interprocess layer with a numeric suffix, e.g. `groups::nav;0`, so expectations match them with
+a regex such as `"groups::nav(;.*)?"` and publications name the suffixed group.

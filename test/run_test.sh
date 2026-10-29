@@ -26,6 +26,7 @@ build_dir=${GOBY3_EXAMPLES_BUILD:-$script_dir/../build}
 export PATH=$build_dir/bin:$PATH
 export GOBY_TOOL_LOAD_SHARED_LIBRARY=$build_dir/lib/libgoby3_example_messages.so
 
+command -v goby_launch > /dev/null || { echo "goby_launch is not on the PATH" >&2; exit 2; }
 # an unknown action makes 'goby' print its help and exit 0, which would pass every test
 if ! goby help 2>&1 | grep -q "test.*Run a publish/subscribe test"; then
     echo "the installed goby has no 'test' action (goby3 >= 3.7 is required)" >&2
