@@ -23,6 +23,9 @@ health request). Add `--output_format JSON` for a machine-readable report.
 `goby test validate <file>` checks a file without running anything, and
 `goby test visualize <file> | dot -Tpng -o plan.png` draws its plan.
 
+Configuring with `-Dbuild_test_figures=ON` (requires Graphviz) renders each file's plan to
+`build/test_figures/<name>.svg` as part of the build.
+
 The same tests are registered with ctest when the examples are configured with
 `-Denable_tests=ON` (which requires a goby with `goby test validate`); each file
 gets a `validate` test and a `test` that runs it:

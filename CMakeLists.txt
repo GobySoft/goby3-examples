@@ -108,8 +108,11 @@ endif()
 add_subdirectory(src)
 
 option(enable_tests "Register the goby pub/sub test harnesses in test/ with ctest" OFF)
+option(build_test_figures "Render each test harness's plan to SVG with 'goby test visualize' and Graphviz dot (requires graphviz)" OFF)
 if(enable_tests)
   enable_testing()
+endif()
+if(enable_tests OR build_test_figures)
   add_subdirectory(test)
 endif()
 
