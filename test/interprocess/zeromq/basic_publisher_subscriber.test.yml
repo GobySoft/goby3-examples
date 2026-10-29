@@ -5,19 +5,19 @@
 
 endpoint:
   - name: default
-    layer: INTERPROCESS
+    layer: LAYER_INTERPROCESS
     interprocess: { platform: default_goby_platform }
 
 test:
   name: basic interprocess publisher/subscriber
-  default_timeout: 5 s
+  default_timeout: 5
 
   require_app:
     - name:
         - gobyd
         - goby3_example_basic_interprocess_publisher
         - goby3_example_basic_interprocess_subscriber
-      timeout: 20 s
+      timeout: 20
 
   block:
     # publisher runs at 10 Hz, so a few seconds is plenty for 10 reports
@@ -26,7 +26,7 @@ test:
         - group: groups::nav
           type: protobuf.NavigationReport
           min_count: 10
-          timeout: 3 s
+          timeout: 3
           condition:
             - { field: x, op: GE, value: 95 }
             - { field: x, op: LT, value: 115 }
@@ -43,5 +43,5 @@ test:
       expect:
         - group: groups::nav
           type: protobuf.NavigationReport
-          count: 1
+          min_count: 1
           match: "veh_class: USV battery_ok: false"

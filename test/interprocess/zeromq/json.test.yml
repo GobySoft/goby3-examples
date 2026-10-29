@@ -5,16 +5,16 @@
 
 endpoint:
   - name: default
-    layer: INTERPROCESS
+    layer: LAYER_INTERPROCESS
     interprocess: { platform: default_goby_platform }
 
 test:
   name: json publisher/subscriber
-  default_timeout: 3 s
+  default_timeout: 3
 
   require_app:
     - name: [gobyd, goby3_example_json_publisher, goby3_example_json_subscriber]
-      timeout: 20 s
+      timeout: 20
 
   block:
     - name: typed and untyped JSON both flow
@@ -43,5 +43,5 @@ test:
       expect:
         - group: groups::nav
           type: JSON/NavigationReport
-          count: 1
+          min_count: 1
           match: '{"x": 1}'

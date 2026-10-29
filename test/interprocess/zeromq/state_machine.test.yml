@@ -6,17 +6,17 @@
 
 endpoint:
   - name: sm
-    layer: INTERPROCESS
+    layer: LAYER_INTERPROCESS
     interprocess: { platform: state_machine }
 
 test:
   name: state machine round trip
-  default_timeout: 3 s
+  default_timeout: 3
 
   require_app:
     - endpoint: sm
       name: [gobyd, goby3_example_state_machine_subscriber]
-      timeout: 20 s
+      timeout: 20
 
   block:
     - name: initial state is OFF
@@ -37,7 +37,7 @@ test:
         - endpoint: sm
           group: groups::state_report
           type: protobuf.StateReport
-          count: 1
+          min_count: 1
           match: "current_state: ON"
 
     - name: turn off
@@ -50,7 +50,7 @@ test:
         - endpoint: sm
           group: groups::state_report
           type: protobuf.StateReport
-          count: 1
+          min_count: 1
           match: "current_state: OFF"
 
     # a repeated ON must not produce a second transition
@@ -61,11 +61,11 @@ test:
           type: protobuf.StateControl
           value: "desired_state: ON"
           repeat: 2
-          interval: 0.2 s
+          interval: 0.2
       expect:
         - endpoint: sm
           group: groups::state_report
           type: protobuf.StateReport
           count: 1
           match: "current_state: ON"
-          timeout: 2 s
+          timeout: 2

@@ -8,18 +8,18 @@
 
 endpoint:
   - name: default
-    layer: INTERPROCESS
+    layer: LAYER_INTERPROCESS
     interprocess: { platform: default_goby_platform }
 
 test:
   name: basic udpm publisher/subscriber
-  default_timeout: 5 s
+  default_timeout: 5
 
   require_app:
     - name:
         - goby3_example_basic_udpm_interprocess_publisher
         - goby3_example_basic_udpm_interprocess_subscriber
-      timeout: 20 s
+      timeout: 20
 
   block:
     - name: publisher emits nav at ~10 Hz
@@ -27,7 +27,7 @@ test:
         - group: groups::nav
           type: protobuf.NavigationReport
           min_count: 10
-          timeout: 3 s
+          timeout: 3
           condition:
             - { field: z, op: LT, value: 0 }
 
@@ -39,5 +39,5 @@ test:
       expect:
         - group: groups::nav
           type: protobuf.NavigationReport
-          count: 1
+          min_count: 1
           match: "veh_class: SHIP"

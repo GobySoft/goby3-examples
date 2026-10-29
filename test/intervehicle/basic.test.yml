@@ -10,23 +10,23 @@
 
 endpoint:
   - name: veh1
-    layer: INTERPROCESS
+    layer: LAYER_INTERPROCESS
     interprocess: { platform: vehicle1 }
   - name: veh2
-    layer: INTERPROCESS
+    layer: LAYER_INTERPROCESS
     interprocess: { platform: vehicle2 }
 
 test:
   name: basic intervehicle
-  default_timeout: 10 s
+  default_timeout: 10
 
   require_app:
     - endpoint: veh1
       name: [gobyd, goby3_example_basic_intervehicle_publisher]
-      timeout: 20 s
+      timeout: 20
     - endpoint: veh2
       name: [gobyd, goby3_example_basic_intervehicle_subscriber]
-      timeout: 20 s
+      timeout: 20
 
   block:
     # publisher runs at 0.1 Hz on a 1 s slot MAC, so allow a generous window
@@ -36,7 +36,7 @@ test:
           group: groups::nav
           type: DCCL/dccl.NavigationReport
           min_count: 1
-          timeout: 30 s
+          timeout: 30
           condition:
             - { field: z, op: LE, value: 0 }
 
@@ -47,4 +47,4 @@ test:
           group: groups::nav
           type: DCCL/dccl.NavigationReport
           count: 0
-          timeout: 12 s
+          timeout: 12
