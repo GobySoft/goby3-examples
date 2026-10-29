@@ -19,7 +19,7 @@ test:
   block:
     - name: typed and untyped JSON both flow
       mode: PARALLEL
-      block:
+      step:
         - name: typed NavigationReport
           expect:
             - group: groups::nav

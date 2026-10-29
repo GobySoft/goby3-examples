@@ -1,7 +1,7 @@
 # Example test harnesses
 
 Each `*.test.yml` file here is a test definition for `goby zeromq test` or
-`goby udpm test`. It names the applications that must be alive, then publishes
+`goby udpm test` (see `goby zeromq help test` and the goby3 command line tool documentation). It names the applications that must be alive, then publishes
 messages into the running example and checks what comes back, on which group,
 with which contents, and how quickly.
 
