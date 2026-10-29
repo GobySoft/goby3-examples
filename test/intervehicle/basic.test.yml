@@ -1,19 +1,28 @@
-# Harness for launch/intervehicle/basic/basic_vehicle1.launch + basic_vehicle2.launch
-#
-#   test/run_test.sh test/intervehicle/basic.test.yml \
-#       launch/intervehicle/basic/basic_vehicle1.launch launch/intervehicle/basic/basic_vehicle2.launch
+# Harness for launch/intervehicle/basic: basic_vehicle1.launch + basic_vehicle2.launch
 #
 # Two gobyd instances (vehicle1, vehicle2) linked over the UDP multicast
 # modem driver. On vehicle1's interprocess layer the outgoing DCCL report is
 # visible under its own group; on vehicle2 received intervehicle data is
 # handed to subscribers as DCCLForwardedData on the internal modem_data_in
 # group (frames carry the DCCL id, 127 for dccl.NavigationReport).
+#
+#   goby test run test/intervehicle/basic.test.yml   (from the repository root, with the examples built and on the PATH)
 
 endpoint:
   - name: veh1
     zeromq: { platform: vehicle1 }
   - name: veh2
     zeromq: { platform: vehicle2 }
+
+fixture:
+  - name: vehicle1
+    command: goby_launch -r basic_vehicle1.launch
+    cwd: ../../launch/intervehicle/basic
+    ready: { output_regex: "All processes running", timeout: 30 }
+  - name: vehicle2
+    command: goby_launch -r basic_vehicle2.launch
+    cwd: ../../launch/intervehicle/basic
+    ready: { output_regex: "All processes running", timeout: 30 }
 
 test:
   name: basic intervehicle

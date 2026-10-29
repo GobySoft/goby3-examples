@@ -1,12 +1,20 @@
-# Harness for launch/interprocess/zeromq/state_machine.launch
+# Harness for the state machine example
 #
 # The example's own controller toggles the state every second, so this test
-# launches only gobyd and the state machine app (see state_machine_app_only.launch)
+# launches only gobyd and the state machine app (state_machine_app_only.launch)
 # and drives it from here, checking the round trip StateControl -> StateReport.
+#
+#   goby test run test/interprocess/zeromq/state_machine.test.yml   (from the repository root, with the examples built and on the PATH)
 
 endpoint:
   - name: sm
     zeromq: { platform: state_machine }
+
+fixture:
+  - name: example
+    command: goby_launch -r state_machine_app_only.launch
+    cwd: ../../../launch/interprocess/zeromq
+    ready: { output_regex: "All processes running", timeout: 30 }
 
 test:
   name: state machine round trip

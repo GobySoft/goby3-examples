@@ -1,32 +1,33 @@
-# ctest wrappers around the goby pub/sub test harnesses in this directory.
-# Each test launches the example, runs 'goby <transport> test', and shuts the example down.
+# Each harness launches its example as a fixture, so ctest runs 'goby test' directly.
+# The examples must be on the PATH for goby_launch, along with their message library.
 
-set(run ${CMAKE_CURRENT_SOURCE_DIR}/run_test.sh)
-set(launch ${CMAKE_SOURCE_DIR}/launch)
-set(tests ${CMAKE_CURRENT_SOURCE_DIR})
+execute_process(COMMAND goby test help OUTPUT_VARIABLE goby_test_help ERROR_VARIABLE goby_test_help
+  RESULT_VARIABLE goby_test_result)
+if(NOT goby_test_help MATCHES "validate")
+  message(FATAL_ERROR "enable_tests requires a goby that provides 'goby test run' and 'goby test validate'")
+endif()
 
-add_test(NAME goby3_example_test_basic_interprocess
-  COMMAND ${run} ${tests}/interprocess/zeromq/basic_publisher_subscriber.test.yml
-                 ${launch}/interprocess/zeromq/basic_publisher_subscriber.launch)
-add_test(NAME goby3_example_test_state_machine
-  COMMAND ${run} ${tests}/interprocess/zeromq/state_machine.test.yml
-                 ${launch}/interprocess/zeromq/state_machine_app_only.launch)
-add_test(NAME goby3_example_test_json
-  COMMAND ${run} ${tests}/interprocess/zeromq/json.test.yml
-                 ${launch}/interprocess/zeromq/json.launch)
-add_test(NAME goby3_example_test_basic_udpm
-  COMMAND ${run} ${tests}/interprocess/udpm/basic_publisher_subscriber.test.yml
-                 ${launch}/interprocess/udpm/basic_publisher_subscriber.launch)
-add_test(NAME goby3_example_test_basic_intervehicle
-  COMMAND ${run} ${tests}/intervehicle/basic.test.yml
-                 ${launch}/intervehicle/basic/basic_vehicle1.launch
-                 ${launch}/intervehicle/basic/basic_vehicle2.launch)
+set(test_env
+  "PATH=${project_BIN_DIR}:$ENV{PATH}"
+  "GOBY_TOOL_LOAD_SHARED_LIBRARY=${project_LIB_DIR}/libgoby3_example_messages.so")
 
-set_tests_properties(goby3_example_test_basic_intervehicle PROPERTIES TIMEOUT 120)
-foreach(t basic_interprocess state_machine json basic_udpm)
-  set_tests_properties(goby3_example_test_${t} PROPERTIES TIMEOUT 60)
+set(harnesses
+  basic_interprocess:interprocess/zeromq/basic_publisher_subscriber.test.yml
+  state_machine:interprocess/zeromq/state_machine.test.yml
+  json:interprocess/zeromq/json.test.yml
+  basic_udpm:interprocess/udpm/basic_publisher_subscriber.test.yml
+  basic_intervehicle:intervehicle/basic.test.yml)
+
+foreach(harness ${harnesses})
+  string(REPLACE ":" ";" parts ${harness})
+  list(GET parts 0 name)
+  list(GET parts 1 file)
+  set(path ${CMAKE_CURRENT_SOURCE_DIR}/${file})
+
+  add_test(NAME goby3_example_validate_${name} COMMAND goby test validate ${path})
+  add_test(NAME goby3_example_test_${name} COMMAND goby test run ${path})
+  set_tests_properties(goby3_example_validate_${name} goby3_example_test_${name}
+    PROPERTIES ENVIRONMENT "${test_env}")
+  # the harnesses share platforms and multicast groups, so never run them concurrently
+  set_tests_properties(goby3_example_test_${name} PROPERTIES RUN_SERIAL TRUE TIMEOUT 120)
 endforeach()
-# the harnesses share platforms and multicast groups, so never run them concurrently
-set_tests_properties(goby3_example_test_basic_interprocess goby3_example_test_state_machine
-  goby3_example_test_json goby3_example_test_basic_udpm goby3_example_test_basic_intervehicle
-  PROPERTIES RUN_SERIAL TRUE)

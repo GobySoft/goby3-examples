@@ -2,10 +2,18 @@
 #
 # The publisher sends two JSON messages per loop on groups::nav: a typed
 # NavigationReport (goby_json_type) and an untyped nlohmann::json object.
+#
+#   goby test run test/interprocess/zeromq/json.test.yml   (from the repository root, with the examples built and on the PATH)
 
 endpoint:
   - name: default
     zeromq: { platform: default_goby_platform }
+
+fixture:
+  - name: example
+    command: goby_launch -r json.launch
+    cwd: ../../../launch/interprocess/zeromq
+    ready: { output_regex: "All processes running", timeout: 30 }
 
 test:
   name: json publisher/subscriber
