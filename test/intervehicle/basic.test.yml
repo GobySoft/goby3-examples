@@ -1,0 +1,50 @@
+# Harness for launch/intervehicle/basic/basic_vehicle1.launch + basic_vehicle2.launch
+#
+#   test/run_test.sh test/intervehicle/basic.test.yml \
+#       launch/intervehicle/basic/basic_vehicle1.launch launch/intervehicle/basic/basic_vehicle2.launch
+#
+# Two gobyd instances (vehicle1, vehicle2) linked over the UDP multicast
+# modem driver. The DCCL NavigationReport published on vehicle1's
+# intervehicle layer must arrive on vehicle2's interprocess layer, where
+# gobyd republishes received intervehicle data for its subscribers.
+
+endpoint:
+  - name: veh1
+    layer: INTERPROCESS
+    interprocess: { platform: vehicle1 }
+  - name: veh2
+    layer: INTERPROCESS
+    interprocess: { platform: vehicle2 }
+
+test:
+  name: basic intervehicle
+  default_timeout: 10 s
+
+  require_app:
+    - endpoint: veh1
+      name: [gobyd, goby3_example_basic_intervehicle_publisher]
+      timeout: 20 s
+    - endpoint: veh2
+      name: [gobyd, goby3_example_basic_intervehicle_subscriber]
+      timeout: 20 s
+
+  block:
+    # publisher runs at 0.1 Hz on a 1 s slot MAC, so allow a generous window
+    - name: nav crosses the link
+      expect:
+        - endpoint: veh2
+          group: groups::nav
+          type: DCCL/dccl.NavigationReport
+          min_count: 1
+          timeout: 30 s
+          condition:
+            - { field: z, op: LE, value: 0 }
+
+    # vehicle1 must not see its own report echoed back from vehicle2
+    - name: no echo on the sender
+      expect:
+        - endpoint: veh1
+          group: groups::nav
+          type: DCCL/dccl.NavigationReport
+          count: 0
+          timeout: 12 s

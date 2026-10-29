@@ -1,0 +1,47 @@
+# Harness for launch/interprocess/zeromq/json.launch
+#
+# The publisher sends two JSON messages per loop on groups::nav: a typed
+# NavigationReport (goby_json_type) and an untyped nlohmann::json object.
+
+endpoint:
+  - name: default
+    layer: INTERPROCESS
+    interprocess: { platform: default_goby_platform }
+
+test:
+  name: json publisher/subscriber
+  default_timeout: 3 s
+
+  require_app:
+    - name: [gobyd, goby3_example_json_publisher, goby3_example_json_subscriber]
+      timeout: 20 s
+
+  block:
+    - name: typed and untyped JSON both flow
+      mode: PARALLEL
+      block:
+        - name: typed NavigationReport
+          expect:
+            - group: groups::nav
+              type: JSON/NavigationReport
+              min_count: 5
+              condition:
+                - { field: x, op: GE, value: 95 }
+                - { field: z, op: LT, value: 0 }
+        - name: untyped object
+          expect:
+            - group: groups::nav
+              type: JSON/nlohmann::json
+              min_count: 5
+              match: '{"x2": 10, "y2": 20}'
+
+    - name: hand-published JSON is visible
+      publish:
+        - group: groups::nav
+          type: JSON/NavigationReport
+          value: '{"x": 1, "y": 2, "z": -3}'
+      expect:
+        - group: groups::nav
+          type: JSON/NavigationReport
+          count: 1
+          match: '{"x": 1}'

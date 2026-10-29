@@ -1,0 +1,43 @@
+# Harness for launch/interprocess/udpm/basic_publisher_subscriber.launch
+#
+#   test/run_test.sh -t udpm test/interprocess/udpm/basic_publisher_subscriber.test.yml \
+#       launch/interprocess/udpm/basic_publisher_subscriber.launch
+#
+# UDPM has no broker, so there is no gobyd to wait for; the endpoint joins the
+# example's default multicast group directly.
+
+endpoint:
+  - name: default
+    layer: INTERPROCESS
+    interprocess: { platform: default_goby_platform }
+
+test:
+  name: basic udpm publisher/subscriber
+  default_timeout: 5 s
+
+  require_app:
+    - name:
+        - goby3_example_basic_udpm_interprocess_publisher
+        - goby3_example_basic_udpm_interprocess_subscriber
+      timeout: 20 s
+
+  block:
+    - name: publisher emits nav at ~10 Hz
+      expect:
+        - group: groups::nav
+          type: protobuf.NavigationReport
+          min_count: 10
+          timeout: 3 s
+          condition:
+            - { field: z, op: LT, value: 0 }
+
+    - name: external nav is accepted on the same group
+      publish:
+        - group: groups::nav
+          type: protobuf.NavigationReport
+          value: "x: 1 y: 2 z: -3 veh_class: SHIP"
+      expect:
+        - group: groups::nav
+          type: protobuf.NavigationReport
+          count: 1
+          match: "veh_class: SHIP"
