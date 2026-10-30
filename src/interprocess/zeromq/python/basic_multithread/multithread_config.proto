@@ -1,0 +1,16 @@
+syntax = "proto2";
+import "goby/middleware/protobuf/app_config.proto";
+import "goby/zeromq/protobuf/interprocess_config.proto";
+
+package goby3_example.protobuf;
+
+message BasicPythonMultithreadConfig
+{
+    // required parameters for ApplicationBase3 class
+    optional goby.middleware.protobuf.AppConfig app = 1;
+    // required parameters for connecting to 'gobyd'
+    optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
+
+    // depth (m) below which the watcher thread raises an alert
+    optional double alert_depth = 3 [default = 300];
+}

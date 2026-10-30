@@ -1,0 +1,15 @@
+# Only the interprocess publication is declared. INTERTHREAD is implemented in Python and never
+# reaches the generated C++, so an interthread group is a plain string chosen by the application
+# rather than a C++ group named here -- and the application needs no MultiThreadApplication.
+application:
+  name: BasicPythonMultithread
+  cpp_type: goby::zeromq::SingleThreadApplication
+  config:
+    scheme: PROTOBUF
+    type: goby3_example.protobuf.BasicPythonMultithreadConfig
+
+interprocess:
+  publishes:
+    - group: groups::nav
+      scheme: PROTOBUF
+      type: protobuf.NavigationReport

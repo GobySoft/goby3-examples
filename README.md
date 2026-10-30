@@ -68,6 +68,50 @@ class BasicPublisher(SingleThreadApplication):
 
 Command line and configuration file handling are the same as for a C++ application, so `goby3_example_python_basic_publisher --help`, `--example_config` and `--my_value 10` all work as expected.
 
+### Multi-Threaded Publish/Subscribe in Python (INTERTHREAD)
+
+The Python equivalent of the interthread example above: a publisher thread produces
+`NavigationReport`s, a watcher thread consumes them and forwards each one to the interprocess
+layer, and the application prints an alert when the vehicle is deep. The code is in
+`src/interprocess/zeromq/python/basic_multithread`.
+
+```
+cd launch/interprocess/zeromq
+goby_launch -x python_multithread.launch
+```
+
+Threads are written in Python and launched by the application, mirroring how a C++ application
+launches `SimpleThread`s. The thread is constructed on the thread it runs on, so it subscribes in
+its constructor as a C++ thread does:
+
+```python
+class DepthWatcher(Thread):
+    def __init__(self):
+        super().__init__()
+        self.interthread().subscribe(NAV_GROUP, self.incoming_nav)
+
+class BasicMultithread(SingleThreadApplication):
+    def __init__(self):
+        super().__init__()
+        self.launch_thread(DepthWatcher)
+```
+
+The interthread layer is implemented in Python rather than through the C++
+`InterThreadTransporter`, which has three consequences the example is built to show:
+
+- The application is a `SingleThreadApplication`: the C++ side never sees these threads, so
+  `MultiThreadApplication` is not needed.
+- Interthread groups are not declared in `interface.yml` -- any string will do -- because nothing
+  is generated for the layer.
+- An interthread message is any Python object, not only a protobuf message. The depth alert here
+  is a `dataclass` and never becomes protobuf.
+
+The interprocess layer still belongs to the application's thread, but a thread publishes to it
+directly anyway: the publication is handed to the application behind the scenes, the way a C++
+thread's `InterProcessForwarder` hands its traffic to the portal. The application picks that up in
+its loop, so launching a thread raises the rate it is serviced at (10 Hz by default,
+`interthread_poll_frequency_hertz` to change it).
+
 ### Basic Multi-Process Single-Threaded Publish/Subscribe (UDP Multicast)
 
 This example is equivalent to the ZeroMQ example above but uses the UDP Multicast (udpm) interprocess transport instead. No central broker (`gobyd`) is required.
@@ -129,13 +173,30 @@ goby_launch -x julia_publisher_subscriber.launch
 
 This launches `gobyd`, the Julia subscriber, and the Julia publisher, each in their own XTerm window. When finished, type CTRL-C into the original terminal (the one from which `goby_launch` was run).
 
-The publisher sends a `NavigationReport` at 10 Hz on the `groups::julia_nav` group, which the subscriber prints as it receives them. Note that the Julia code identifies a group by its string value: `GOBY_DEFINE_GROUP` in `src/messages/groups.h` sets that string to the fully-qualified C++ name, so the group named in `interface.yml` and the string passed to `Goby.publish()`/`Goby.subscribe()` are the same text.
+The publisher sends a `NavigationReport` at 10 Hz on the `groups::julia_nav` group, which the subscriber prints as it receives them. The group is named through the module `goby_add_julia_app()` generates from `interface.yml` beside each application (`basic_julia_publisher_goby.jl`), so `groups.julia_nav` and `interprocess()` stand in for the group string and the layer constant. The expression then lives in one place, and a mistyped group is an `UndefVarError` naming it rather than a `GOBY_JULIA_FAIL` that terminates the application once the publish is reached.
 
 Unlike the C++ applications, the Julia applications take the path to their configuration file as their only argument, so `basic_julia_publisher.pb.cfg` and `basic_julia_subscriber.pb.cfg` are provided alongside the launch file:
 
 ```
 basic_julia_publisher <config.pb.cfg>
 basic_julia_subscriber <config.pb.cfg>
+```
+
+### Multi-Threaded Publish/Subscribe in Julia (ZeroMQ)
+
+`src/interprocess/zeromq/julia/basic_multithread` is the Julia equivalent of the interthread publisher/subscriber, and shows the layers available to a Julia task.
+
+`Goby.run(app, Main, [PublisherTask, SubscriberTask])` runs each task module on its own Julia thread. The publisher task sends `NavigationReport`s over `INTERTHREAD`, which is implemented in Julia over `Channel`s rather than in the generated C++ -- so its groups are plain strings chosen by the application rather than groups declared in `interface.yml`, and its messages can be any Julia value (the depth alert `Main` receives is a `NamedTuple`).
+
+The subscriber task publishes the deep reports out to `INTERPROCESS` itself. Goby.jl hands those to the task that owns the C++ application, the way a C++ thread's `InterProcessForwarder` does, so no task needs a portal of its own and none has to route through `Main`. Subscribing works the same way: the publisher task subscribes to the same group and sees each report that goes out, alongside the separate `basic_julia_subscriber` process.
+
+Julia fixes its thread count at startup, so the application needs one thread per task module plus three, for `Main`, the loop timer and the C++ application. `goby_add_julia_app()`'s `THREADS` gives that to the generated launcher.
+
+To run:
+
+```
+cd launch/interprocess/zeromq
+goby_launch -x julia_multithread.launch
 ```
 
 ### GPS Driver
