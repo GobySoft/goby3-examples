@@ -19,10 +19,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Goby.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <chrono>
 #include <fstream>
 
-#include <boost/asio/deadline_timer.hpp> // for deadline_timer
-#include <boost/asio/io_service.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/steady_timer.hpp>
 
 #include <goby/util/debug_logger.h>
 
@@ -105,10 +106,10 @@ int main(int argc, char* argv[])
         const int CLOSE_TIME = 60;
         goby::glog << warn << "closing in " << CLOSE_TIME << " seconds!" << std::endl;
 
-        // `sleep` is not thread safe, so we use a boost::asio::deadline_timer
-        boost::asio::io_service io_service;
-        boost::asio::deadline_timer timer(io_service);
-        timer.expires_from_now(boost::posix_time::seconds(CLOSE_TIME));
+        // `sleep` is not thread safe, so we use a boost::asio::steady_timer
+        boost::asio::io_context io_context;
+        boost::asio::steady_timer timer(io_context);
+        timer.expires_after(std::chrono::seconds(CLOSE_TIME));
         timer.wait();
     }
     else
