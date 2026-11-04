@@ -44,9 +44,9 @@ goby3_examples::apps::MavlinkExample::MavlinkExample()
 
     interprocess()
         .subscribe<goby::middleware::io::groups::mavlink_raw_in,
-                   std::tuple<int, int, mavlink::common::msg::HEARTBEAT>,
+                   std::tuple<int, int, mavlink::minimal::msg::HEARTBEAT>,
                    goby::middleware::MarshallingScheme::MAVLINK>(
-            [](const std::tuple<int, int, mavlink::common::msg::HEARTBEAT>& hb_with_metadata) {
+            [](const std::tuple<int, int, mavlink::minimal::msg::HEARTBEAT>& hb_with_metadata) {
                 auto [sysid, compid, hb] = hb_with_metadata;
                 goby::glog.is_verbose() &&
                     goby::glog << group("in") << "Received heartbeat [sysid: " << sysid
@@ -54,8 +54,8 @@ goby3_examples::apps::MavlinkExample::MavlinkExample()
             });
 
     interprocess()
-        .subscribe<goby::middleware::io::groups::mavlink_raw_in, mavlink::common::msg::HEARTBEAT>(
-            [](const mavlink::common::msg::HEARTBEAT& hb) {
+        .subscribe<goby::middleware::io::groups::mavlink_raw_in, mavlink::minimal::msg::HEARTBEAT>(
+            [](const mavlink::minimal::msg::HEARTBEAT& hb) {
                 goby::glog.is_verbose() && goby::glog << "Received heartbeat (w/o metadata): "
                                                       << hb.to_yaml() << std::endl;
             });
