@@ -72,6 +72,15 @@ jobs:
 
       # The Python examples need the goby Python package (for the goby module and the
       # goby_gen_cpp generator) and pybind11 to compile the generated extension module.
+      # libgoby3-zenoh-dev depends on libzenohc-dev and libzenohcpp-dev, which Eclipse publishes
+      # rather than the distributions or packages.gobysoft.org
+      - name: Install Zenoh example dependencies
+        run: |
+          install -d -m 0755 /etc/apt/keyrings
+          wget -qO- https://download.eclipse.org/zenoh/debian-repo/zenoh-public-key | gpg --dearmor -o /etc/apt/keyrings/zenoh.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/zenoh.gpg] https://download.eclipse.org/zenoh/debian-repo/ /" > /etc/apt/sources.list.d/eclipse_zenoh.list
+          apt-get update && apt-get -y install libgoby3-zenoh-dev
+
       - name: Install Python example dependencies
         run: apt-get -y install python3-goby3 pybind11-dev python3-dev
 
@@ -110,3 +119,13 @@ jobs:
 
       - name: Build examples
         run: cd build && cmake --build . -- -j4
+
+      # Zenoh is an optional Goby component, so its example is dropped silently if it isn't found
+      - name: Check that the Zenoh example was built
+        run: |
+          for _app in goby3_example_basic_zenoh_interprocess_publisher goby3_example_basic_zenoh_interprocess_subscriber; do
+            if [ ! -x "build/bin/${_app}" ]; then
+              echo "::error::${_app} was not built"
+              exit 1
+            fi
+          done
