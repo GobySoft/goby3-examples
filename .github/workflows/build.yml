@@ -28,7 +28,7 @@ jobs:
             distro_release_codename: jammy
             distro_release_version: ubuntu22.04
           - name: amd64-noble-build
-            image: gobysoft/goby3-ubuntu-build-base:24.04.1
+            image: gobysoft/goby3-ubuntu-build-base:24.04.2
             distro_release_codename: noble
             distro_release_version: ubuntu24.04
           - name: amd64-resolute-build
