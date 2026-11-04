@@ -1,7 +1,9 @@
 name: Build
 
 on:
+  # PR branches are built by pull_request; also building them on push would run every job twice
   push:
+    branches: [main]
   pull_request:
   schedule:
     - cron: "0 7 * * *"
