@@ -15,7 +15,7 @@ fixture:
 test:
   name: multivehicle_trail
   require_app:
-    - { endpoint: topside, name: [gobyd, goby3_example_trail_topside_manager], timeout: 30 }
+    - { endpoint: topside, name: [gobyd, goby_liaison, goby3_example_trail_topside_manager], timeout: 30 }
   run:
     - name: ${VEHICLE} reaches topside
       for_each:
