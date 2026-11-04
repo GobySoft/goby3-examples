@@ -1,4 +1,5 @@
 #include <mavlink/v2.0/common/common.hpp>
+#include <mavlink/v2.0/minimal/mavlink_msg_heartbeat.hpp>
 
 #include <goby/middleware/marshalling/mavlink.h>
 #include <goby/middleware/marshalling/protobuf.h>
