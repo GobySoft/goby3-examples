@@ -19,6 +19,10 @@ jobs:
             image: gobysoft/goby3-debian-build-base:12.1
             distro_release_codename: bookworm
             distro_release_version: debian12
+          - name: amd64-trixie-build
+            image: gobysoft/goby3-debian-build-base:13.1
+            distro_release_codename: trixie
+            distro_release_version: debian13
           - name: amd64-jammy-build
             image: gobysoft/goby3-ubuntu-build-base:22.04.1
             distro_release_codename: jammy
@@ -27,6 +31,10 @@ jobs:
             image: gobysoft/goby3-ubuntu-build-base:24.04.1
             distro_release_codename: noble
             distro_release_version: ubuntu24.04
+          - name: amd64-resolute-build
+            image: gobysoft/goby3-ubuntu-build-base:26.04.1
+            distro_release_codename: resolute
+            distro_release_version: ubuntu26.04
 
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
