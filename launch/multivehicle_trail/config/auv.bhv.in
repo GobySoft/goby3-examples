@@ -18,7 +18,7 @@ Behavior = BHV_Trail
   radius           = 5
   trail_angle      = $trail_angle
   trail_angle_type = relative
-  trail_range      = 50
+  trail_range      = 150
 }
 
 Behavior = BHV_ConstantDepth
