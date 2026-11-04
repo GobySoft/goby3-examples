@@ -1,0 +1,11 @@
+#!/usr/bin/env goby_launch
+
+[kill=SIGTERM] goby_basic_frontseat_simulator $(config/trail.pb.cfg.py usv simulator_port)
+
+gobyd <(config/trail.pb.cfg.py usv gobyd)
+goby_frontseat_interface_basic_simulator <(config/trail.pb.cfg.py usv goby_frontseat_interface)
+goby3_example_trail_usv_manager <(config/trail.pb.cfg.py usv goby3_example_trail_usv_manager)
+
+[kill=SIGTERM] config/moos_gen.sh usv
+[kill=SIGTERM] MOOSDB /tmp/multivehicle_trail/usv.moos
+[kill=SIGTERM] pHelmIvP /tmp/multivehicle_trail/usv.moos

@@ -1,0 +1,3 @@
+goby_add_library(TARGET goby3_example_trail_moos_plugin
+  SOURCES trail_moos_plugin.cpp
+  LINK_LIBRARIES goby goby_zeromq goby_moos goby3_example_trail_messages)

@@ -1,0 +1,5 @@
+#!/usr/bin/env goby_launch
+
+gobyd <(config/trail.pb.cfg.py topside gobyd)
+goby3_example_trail_topside_manager <(config/trail.pb.cfg.py topside goby3_example_trail_topside_manager)
+goby_liaison <(config/trail.pb.cfg.py topside goby_liaison)
