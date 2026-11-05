@@ -1,4 +1,4 @@
-# goby test run multivehicle_trail_test.yml
+# goby test run trail_test.yml
 # Launches the whole mission and checks that every vehicle's position reaches the topside, where
 # goby_liaison's Map tab reads it.
 
@@ -13,7 +13,7 @@ fixture:
     stop: { signal: SIGTERM, grace: 45 }
 
 test:
-  name: multivehicle_trail
+  name: intervehicle trail
   require_app:
     - { endpoint: topside, name: [gobyd, goby_liaison, goby3_example_trail_topside_manager], timeout: 30 }
   run:

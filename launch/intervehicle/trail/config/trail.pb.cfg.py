@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
 
-# Prints the configuration for one application of the multivehicle_trail mission.
+# Prints the configuration for one application of the intervehicle trail mission.
 # Usage: trail.pb.cfg.py {topside|usv|auv} app_name
-# Environment: trail_n_auvs (usv, auv), trail_auv_index (auv only), trail_map_tiles (topside)
+# Environment: trail_n_auvs (usv, auv), trail_auv_index (auv only), trail_map_tiles (topside),
+# trail_multicast_port (all)
 
 import os
+import socket
 import sys
+import zlib
 from string import Template
 
 def fail(message):
-    sys.exit('multivehicle_trail configuration: ' + message)
+    sys.exit('trail configuration: ' + message)
 
 if len(sys.argv) != 3:
     fail('usage: trail.pb.cfg.py {topside|usv|auv} app_name')
 role, app = sys.argv[1:]
 
 config_dir = os.path.dirname(os.path.realpath(__file__))
-examples_lib_dir = os.path.normpath(config_dir + '/../../../build/lib')
+examples_lib_dir = os.path.normpath(config_dir + '/../../../../build/lib')
 
 # Buzzard's Bay, where the OpenSeaMap overlay has plenty of buoys and lights to show
 lat_origin, lon_origin = 41.592344, -70.711260
@@ -36,6 +39,12 @@ auv_index = env_int('trail_auv_index') if role == 'auv' else None
 usv_id = 1
 vehicle_id = {'topside': 0, 'usv': usv_id, 'auv': 2 + (auv_index or 0)}[role]
 platform = 'auv{}'.format(auv_index) if role == 'auv' else role
+
+# Multicast crosses the local network, so copies of this example on two machines would hear each
+# other's vehicles. The ports come from the host name instead: the same for every vehicle here,
+# different on the next machine. The acoustic link uses the port after the satellite one.
+multicast_port = int(os.environ.get('trail_multicast_port',
+                                    54500 + 2 * (zlib.crc32(socket.gethostname().encode()) % 500)))
 
 def satellite_modem_id(vid): return vid + 1
 def acomms_modem_id(vid): return 0x100 + vid + 1
@@ -69,14 +78,14 @@ def link(modem_id, port, slots):
 def satellite_link():
     slots = ' '.join('slot {{ src: {} slot_seconds: 1 max_frame_bytes: 128 }}'.format(
         satellite_modem_id(v)) for v in (0, usv_id))
-    return link(satellite_modem_id(vehicle_id), 54500, slots)
+    return link(satellite_modem_id(vehicle_id), multicast_port, slots)
 
 def acomms_link():
     # the USV gets a slot before each AUV's so it is heard as often as all the AUVs together
     slots = ' '.join('slot {{ src: {} slot_seconds: 10 max_frame_bytes: 128 }} '
                      'slot {{ src: {} slot_seconds: 10 max_frame_bytes: 128 }}'.format(
                          acomms_modem_id(usv_id), auv) for auv in auv_modem_ids)
-    return link(acomms_modem_id(vehicle_id), 54501, slots)
+    return link(acomms_modem_id(vehicle_id), multicast_port + 1, slots)
 
 def gobyd():
     links = {'topside': [satellite_link()],
@@ -116,32 +125,14 @@ def frontseat():
 ''').substitute(type=role.upper(), sim_port=simulator_port(), moos_port=moos_port(),
                 lat=lat_origin, lon=lon_origin)
 
-# trail_map_tiles picks the Map tab's background; unset uses Liaison's default of OpenStreetMap
-# with the OpenSeaMap seamarks
-openseamap = """  tile_layer {
-    url_template: "https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png"
-    attribution: "&copy; <a href=\\"https://www.openseamap.org\\">OpenSeaMap</a> contributors"
-    max_zoom: 18
-    overlay: true
-  }
-"""
-map_tiles = {
-    '': '',
-    # Esri's Ocean basemap: shaded bathymetry from GEBCO and NOAA, under the seamarks
-    'bathymetry': """  tile_layer {
-    url_template: "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}"
-    attribution: "Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri"
-    max_zoom: 16
-  }
-""" + openseamap,
-    # no tiles at all, as on a vessel with no internet connection
-    'none': '  blank_background: true\n',
-}
+# trail_map_tiles=none draws no map tiles, as on a vessel with no internet connection; unset uses
+# Liaison's layers (GEBCO and OpenStreetMap bases, NOAA chart and OpenSeaMap seamark overlays)
+map_tiles = {'': '', 'none': '  blank_background: true\n'}
 
 def liaison():
     tiles = os.environ.get('trail_map_tiles', '')
     if tiles not in map_tiles:
-        fail('trail_map_tiles must be one of: bathymetry, none')
+        fail('trail_map_tiles, when set, must be none')
     return app_block + Template('''http_address: "0.0.0.0"
 http_port: 50000
 load_shared_library: "$lib"
@@ -166,7 +157,7 @@ def moos_gateway():
 def moos():
     return Template(open(config_dir + '/vehicle.moos.in').read()).substitute(
         moos_port=moos_port(), community=platform, warp=warp, lat=lat_origin, lon=lon_origin,
-        bhv_file='/tmp/multivehicle_trail/{}.bhv'.format(platform),
+        bhv_file='/tmp/goby3_example_trail/{}.bhv'.format(platform),
         speed_max=4 if role == 'auv' else 2)
 
 def bhv():

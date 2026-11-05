@@ -9,7 +9,7 @@
 #include <goby/time/system_clock.h>
 #include <goby/util/geodesy.h>
 
-#include "multivehicle_trail/nav.pb.h"
+#include "trail/nav.pb.h"
 
 namespace trail
 {

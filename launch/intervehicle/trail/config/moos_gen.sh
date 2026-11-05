@@ -6,7 +6,7 @@ role=$1
 platform=$role
 [[ "$role" == "auv" ]] && platform=auv${trail_auv_index}
 
-dir=/tmp/multivehicle_trail
+dir=/tmp/goby3_example_trail
 mkdir -p $dir
 config=$(dirname $0)/trail.pb.cfg.py
 $config $role moos > $dir/$platform.moos

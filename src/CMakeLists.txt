@@ -12,5 +12,4 @@ add_subdirectory(interprocess)
 add_subdirectory(intervehicle)
 
 add_subdirectory(components)
-add_subdirectory(multivehicle_trail)
 
