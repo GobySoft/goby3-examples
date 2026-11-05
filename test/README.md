@@ -42,6 +42,23 @@ cd build && ctest --output-on-failure
 | `interprocess/udpm/basic_publisher_subscriber` | basic UDPM pub/sub | as the ZeroMQ basic test, without a broker |
 | `intervehicle/basic` | two vehicles over UDP multicast modem | DCCL report is visible on vehicle1 and arrives on vehicle2, received on the intervehicle layer as the subscriber does |
 
+## Deployment checks
+
+The subscriptions these examples cannot work without are marked `Necessity::REQUIRED` in their
+code (the subscribers' `groups::nav`, and both directions of the state machine). With
+`-Dexport_goby_interfaces=ON` as well as `-Denable_tests=ON`, and a goby that provides
+`goby_validate_interfaces()`, each harnessed example's deployment file in `launch/` is also
+registered as a `goby3_example_interfaces_<name>` test that runs `goby interface validate --strict`:
+it fails if a required subscription has no publisher in the deployment, before anything is launched.
+
+```bash
+goby interface validate launch/interprocess/zeromq/state_machine_deployment.yml -I build/share/interfaces
+goby interface explain launch/interprocess/zeromq/json_deployment.yml nav -I build/share/interfaces
+```
+
+`json_deployment.yml` also shows a deployment setting a subscription's necessity: its subscriber's
+type-regex subscription is marked `recommended` there rather than in the code.
+
 Groups defined with `GOBY_DEFINE_INTERVEHICLE_GROUP` (such as `groups::nav`) appear on the
 interprocess layer with a numeric suffix, e.g. `groups::nav;0`, so expectations match them with
 a regex such as `"groups::nav(;.*)?"` and publications name the suffixed group.

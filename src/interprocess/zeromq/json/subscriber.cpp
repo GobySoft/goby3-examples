@@ -16,7 +16,7 @@ class JsonSubscriber : public Base
     {
         auto nav_callback = [this](const NavigationReport& nav) { this->incoming_nav(nav); };
         // subscribe directly to this type (using JSON since goby_json_type is defined in the struct)
-        interprocess().subscribe<groups::nav>(nav_callback);
+        interprocess().subscribe<groups::nav, goby::middleware::Necessity::REQUIRED>(nav_callback);
 
         // subscribe with regex to all json messages on this group
         interprocess().subscribe_type_regex<groups::nav, nlohmann::json>(

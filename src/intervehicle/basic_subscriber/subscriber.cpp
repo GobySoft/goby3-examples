@@ -46,7 +46,10 @@ class BasicSubscriber : public Base
         goby::middleware::Subscriber<NavigationReport> nav_subscriber(
             cfg().nav_subscriber_cfg(), on_nav_subscribed, on_nav_subscribe_expired, on_nav_header);
 
-        intervehicle().subscribe<groups::nav, NavigationReport>(on_nav, nav_subscriber);
+        // the scheme is spelled out only because the necessity is the template parameter after it
+        intervehicle()
+            .subscribe<groups::nav, NavigationReport, goby::middleware::MarshallingScheme::DCCL,
+                       goby::middleware::Necessity::REQUIRED>(on_nav, nav_subscriber);
     }
 };
 

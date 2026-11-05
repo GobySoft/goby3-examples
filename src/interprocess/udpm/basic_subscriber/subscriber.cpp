@@ -21,7 +21,9 @@ class BasicSubscriber : public Base
         auto nav_callback = [this](const NavigationReport& nav) { this->incoming_nav(nav); };
         // subscribe to a group for a given variable type (that matches the callback argument)
         // and when we receive messages, call the nav_callback function
-        interprocess().subscribe<groups::nav>(nav_callback);
+        // required: without navigation this application does nothing, so 'goby interface validate'
+        // fails a deployment that has no publisher for it
+        interprocess().subscribe<groups::nav, goby::middleware::Necessity::REQUIRED>(nav_callback);
     }
 
     // called each time a NavigationReport on the Group "navigation" is received
