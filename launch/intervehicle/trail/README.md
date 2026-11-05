@@ -25,7 +25,7 @@ cd launch/intervehicle/trail
 
 Then open <http://localhost:50000/map>. The AUVs report every few seconds and the USV more often. `CTRL+C` stops everything.
 
-- The layer control at the map's top right picks the background: GEBCO bathymetry or OpenStreetMap, with NOAA's chart (US waters only) and OpenSeaMap's seamarks as overlays. Add ENC uploads an S-57 cell (`.000`, or NOAA's `.zip`), such as [US5MA1FJ](https://www.charts.noaa.gov/ENCs/US5MA1FJ.zip) for this area, which is kept in `~/.goby/liaison/enc` and drawn as another overlay. Converting it needs GDAL (`apt install gdal-bin`).
+- The layer control at the map's top right picks the background: GEBCO bathymetry or OpenStreetMap, with NOAA's depths and chart (US waters only) and OpenSeaMap's seamarks as overlays. Add ENC uploads an S-57 cell (`.000`, or NOAA's `.zip`), such as [US5MA1FJ](https://www.charts.noaa.gov/ENCs/US5MA1FJ.zip) for this area, which is kept in `~/.goby/liaison/enc` and drawn as another overlay. Converting it needs GDAL (`apt install gdal-bin`).
 - Show depth adds a gauge beside each AUV, from the surface at the top to 5000 m at the bottom on a log scale.
 - `trail_map_tiles=none ./all.launch` uses no tiles at all, as on a vessel with no internet connection.
 - To add an AUV, raise `trail_n_auvs` on every line of `all.launch` and add another `auv.launch` line. The AUVs fan out from abeam to astern of the USV, 150 m off, each 10 m deeper than the last.
@@ -62,7 +62,7 @@ Run with the mission up and a browser on the Map tab. Selectors are the style cl
 | Trail | Set the Trail slider to 30 s, then to All; stop auv0's manager with Trail at 30 s. | Each track shows only its last 30 s, then everything kept; auv0's trail empties 30 s after its last position. |
 | Layers | Open the layer control; pick OpenStreetMap and switch on the seamarks; reload. | Starts on GEBCO with the NOAA chart; tiles come from the chosen servers; the choice is kept after the reload. |
 | Show depth | Check Show depth. | Each AUV has a gauge whose fill matches its depth on the log scale; the USV has none. |
-| Add ENC | Upload `US5MA1FJ.zip`. | The status reads Added US5MA1FJ; `~/.goby/liaison/enc/US5MA1FJ/geojson` holds its layers; the overlay ENC US5MA1FJ draws depth areas, contours and aids, and soundings from zoom 15; it is there after a reload. |
+| Add ENC | Upload `US5MA1FJ.zip`. | The status reads Added US5MA1FJ; `~/.goby/liaison/enc/US5MA1FJ/geojson` holds its layers; the overlay ENC US5MA1FJ draws depth areas, contours and aids, and ENC soundings its soundings from zoom 15; each switches off without the other, and both are there after a reload. |
 | Tab switching | Open Scope for 15 s, return to Map. | Tracks include the points received while away; no console errors. |
 | Stale | Stop `goby3_example_trail_auv_manager` for auv0; wait 30 s. | auv0's marker and row are `.stale` with a growing age; the others are not; Fit all leaves auv0 out. |
 | Second session | Open the page in a second browser profile, then close it. | The first page keeps updating. |
