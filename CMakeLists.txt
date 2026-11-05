@@ -18,7 +18,7 @@ get_target_property(DCCL_INCLUDE_DIR dccl INTERFACE_INCLUDE_DIRECTORIES)
 message("Using DCCL in ${DCCL_INCLUDE_DIR}")
 include_directories("${DCCL_INCLUDE_DIR}")
 
-find_package(GOBY 3.0 REQUIRED zeromq)
+find_package(GOBY 3.0 REQUIRED zeromq OPTIONAL_COMPONENTS zenoh)
 
 include_directories("${GOBY_INCLUDE_DIR}")
 
