@@ -1,0 +1,32 @@
+initialize DEPLOY = true
+initialize MOOS_MANUAL_OVERRIDE = false
+
+// the USV's position arrives as a NODE_REPORT from the goby_moos_gateway plugin
+Behavior = BHV_Trail
+{
+  name      = trail_usv
+  pwt       = 100
+  condition = DEPLOY = true
+
+  contact          = usv
+  decay            = 150,300
+  extrapolate      = true
+  on_no_contact_ok = false
+  time_on_leg      = 60
+
+  nm_radius        = 20
+  radius           = 5
+  trail_angle      = $trail_angle
+  trail_angle_type = relative
+  trail_range      = 150
+}
+
+Behavior = BHV_ConstantDepth
+{
+  name      = deploy_depth
+  pwt       = 100
+  condition = DEPLOY = true
+  duration  = no-time-limit
+
+  depth     = $deploy_depth
+}

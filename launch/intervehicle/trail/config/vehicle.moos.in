@@ -1,0 +1,19 @@
+ServerHost   = localhost
+ServerPort   = $moos_port
+Community    = $community
+MOOSTimeWarp = $warp // must match app { simulation { time { warp_factor } } }
+
+// must match app { geodesy { } }
+LatOrigin  = $lat
+LongOrigin = $lon
+
+ProcessConfig = pHelmIvP
+{
+  AppTick    = 1
+  CommsTick  = 4
+
+  behaviors  = $bhv_file
+  domain     = course:0:359:360
+  domain     = speed:0:$speed_max:41
+  domain     = depth:0:200:201:optional
+}

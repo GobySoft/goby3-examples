@@ -1,0 +1,15 @@
+syntax = "proto2";
+import "goby/middleware/protobuf/app_config.proto";
+import "goby/zeromq/protobuf/interprocess_config.proto";
+
+package goby3_examples.trail;
+
+message USVManagerConfig
+{
+    optional goby.middleware.protobuf.AppConfig app = 1;
+    optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
+
+    required int32 vehicle_id = 10;
+    // acoustic modem ids of the AUVs, whose positions are relayed topside
+    repeated int32 auv_modem_id = 11;
+}

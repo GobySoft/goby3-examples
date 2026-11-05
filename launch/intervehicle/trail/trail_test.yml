@@ -1,0 +1,32 @@
+# goby test run trail_test.yml
+# Launches the whole mission and checks that every vehicle's position reaches the topside, where
+# goby_liaison's Map tab reads it.
+
+endpoint:
+  - { name: topside, zeromq: { platform: topside } }
+
+fixture:
+  - name: mission
+    command: ./all.launch
+    ready: { output_regex: "All processes running", timeout: 60 }
+    # goby_launch shuts its screens down in order on SIGTERM
+    stop: { signal: SIGTERM, grace: 45 }
+
+test:
+  name: intervehicle trail
+  require_app:
+    - { endpoint: topside, name: [gobyd, goby_liaison, goby3_example_trail_topside_manager], timeout: 30 }
+  run:
+    - name: ${VEHICLE} reaches topside
+      for_each:
+        - { VEHICLE: usv, MIN_DEPTH: -1 }
+        - { VEHICLE: auv0, MIN_DEPTH: 5 }
+        - { VEHICLE: auv1, MIN_DEPTH: 15 }
+      expect:
+        - endpoint: topside
+          group: goby::middleware::frontseat::node_status
+          type: goby.middleware.frontseat.protobuf.NodeStatus
+          match: 'name: "${VEHICLE}"'
+          # the AUVs are at their trail depths by the time they report over the acoustic link
+          condition: [{ field: global_fix.depth, op: GT, value: "${MIN_DEPTH}" }]
+          timeout: 90

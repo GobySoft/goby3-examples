@@ -251,3 +251,13 @@ In this example, the vehicle 2 subscribe subscribes to vehicle 1 over both links
 
 In general, it is a key responsibility of the intervehicle subscriber to be able to reject duplicated data. Duplicates could come from multiple transmissions with lost acknowledgments or from multiple links being successful (as is the case here).
 
+### Multi-Vehicle Trail
+
+A USV drives a survey line while AUVs trail it underwater. Each vehicle sends its position over simulated satellite and acoustic links (the intervehicle layer), and the topside republishes them for `goby_liaison`'s Map tab. It is a trimmed copy of the goby3-course `trail` mission, and requires MOOS-IvP and `-Dbuild_moos=ON`.
+
+```
+cd launch/intervehicle/trail
+./all.launch
+```
+
+Then open <http://localhost:50000/map>. See `launch/intervehicle/trail/README.md` for the layout, the map background options, a `goby test` smoke test, and a checklist for the Map tab.
