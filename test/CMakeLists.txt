@@ -12,6 +12,7 @@ set(harnesses
   basic_interprocess:interprocess/zeromq/basic_publisher_subscriber.test.yml
   state_machine:interprocess/zeromq/state_machine.test.yml
   json:interprocess/zeromq/json.test.yml
+  hold:interprocess/zeromq/hold.test.yml
   basic_udpm:interprocess/udpm/basic_publisher_subscriber.test.yml
   basic_intervehicle:intervehicle/basic.test.yml)
 
