@@ -56,7 +56,7 @@ Run with the mission up and a browser on the Map tab. Selectors are the style cl
 | Pause | Click Pause, wait 5 s, click Resume. | No marker moved while paused and the button read Resume; all moved after. |
 | Clear tracks | Click Clear tracks. | Tracks are empty; markers remain. |
 | Show age | Check Show age. | Every marker's label shows the time since its last position (stale ones always do). |
-| Trail | Drag the Trail slider to 10, then back to 500. | Each track shows its newest 10 points, then all of them again. |
+| Trail | Set the Trail slider to 30 s, then to All; stop auv0's manager with Trail at 30 s. | Each track shows only its last 30 s, then everything kept; auv0's trail empties 30 s after its last position. |
 | Tab switching | Open Scope for 15 s, return to Map. | Tracks include the points received while away; no console errors. |
 | Stale | Stop `goby3_example_trail_auv_manager` for auv0; wait 30 s. | auv0's marker and row are `.stale` with a growing age; the others are not; Fit all leaves auv0 out. |
 | Second session | Open the page in a second browser profile, then close it. | The first page keeps updating. |
