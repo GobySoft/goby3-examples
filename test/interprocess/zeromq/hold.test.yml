@@ -1,0 +1,60 @@
+# Harness for launch/interprocess/zeromq/hold.launch
+#
+# gobyd's hold keeps every client from publishing until its required clients (here the
+# publisher and the subscriber) have reported ready, so the initial state the publisher
+# publishes once, in its constructor, reaches a subscriber that starts later. The launch
+# file's three commands run as fixtures in order, so the subscriber starts only once the
+# publisher is up and holding, and counts as ready only once it has printed the initial
+# state. The runs then check that nothing else was published under the hold and that the
+# layer is live after it.
+#
+#   goby test run test/interprocess/zeromq/hold.test.yml   (from the repository root, with the examples built and on the PATH)
+
+endpoint:
+  - name: default
+    zeromq: { platform: default_goby_platform }
+
+fixture:
+  - name: gobyd
+    command: >-
+      gobyd -v --hold 'required_client: "goby3_example_hold_interprocess_publisher"
+      required_client: "goby3_example_hold_interprocess_subscriber"'
+    ready: { output_regex: "gobyd is ready", timeout: 30 }
+  - name: publisher
+    command: goby3_example_hold_interprocess_publisher
+    ready: { output_regex: "Hold is on", timeout: 30 }
+  - name: subscriber
+    command: goby3_example_hold_interprocess_subscriber
+    ready: { output_regex: "Received initial state: state: ON", timeout: 30 }
+
+test:
+  name: hold
+  default_timeout: 5
+
+  require_app:
+    - name:
+        - gobyd
+        - goby3_example_hold_interprocess_publisher
+        - goby3_example_hold_interprocess_subscriber
+      timeout: 20
+
+  run:
+    # the publisher published its initial state exactly once, under the hold
+    - name: no further initial state after the hold
+      expect:
+        - group: groups::init
+          type: protobuf.Initial
+          count: 0
+          timeout: 2
+
+    # the layer carries traffic normally once the hold is released
+    - name: initial state published after the hold is delivered
+      publish:
+        - group: groups::init
+          type: protobuf.Initial
+          value: "state: OFF"
+      expect:
+        - group: groups::init
+          type: protobuf.Initial
+          min_count: 1
+          match: "state: OFF"
