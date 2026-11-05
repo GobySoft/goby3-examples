@@ -1,0 +1,60 @@
+# Harness for launch/intervehicle/basic: basic_vehicle1.launch + basic_vehicle2.launch
+#
+# Two gobyd instances (vehicle1, vehicle2) linked over the UDP multicast
+# modem driver. On vehicle1's interprocess layer the outgoing DCCL report is
+# visible under its own group; on vehicle2 received intervehicle data is
+# handed to subscribers as DCCLForwardedData on the internal modem_data_in
+# group (frames carry the DCCL id, 127 for dccl.NavigationReport).
+#
+#   goby test run test/intervehicle/basic.test.yml   (from the repository root, with the examples built and on the PATH)
+
+endpoint:
+  - name: veh1
+    zeromq: { platform: vehicle1 }
+  - name: veh2
+    zeromq: { platform: vehicle2 }
+
+fixture:
+  - name: vehicle1
+    command: goby_launch -r basic_vehicle1.launch
+    cwd: ../../launch/intervehicle/basic
+    ready: { output_regex: "All processes running", timeout: 30 }
+  - name: vehicle2
+    command: goby_launch -r basic_vehicle2.launch
+    cwd: ../../launch/intervehicle/basic
+    ready: { output_regex: "All processes running", timeout: 30 }
+
+test:
+  name: basic intervehicle
+  default_timeout: 10
+
+  require_app:
+    - endpoint: veh1
+      name: [gobyd, goby3_example_basic_intervehicle_publisher]
+      timeout: 20
+    - endpoint: veh2
+      name: [gobyd, goby3_example_basic_intervehicle_subscriber]
+      timeout: 20
+
+  run:
+    # the publisher runs at 0.1 Hz on a 1 s slot MAC and its first report expires before
+    # vehicle2's subscription has been forwarded, so allow a few cycles
+    - name: outgoing report on vehicle1
+      expect:
+        - endpoint: veh1
+          group: "groups::nav(;.*)?"
+          type: DCCL/dccl.NavigationReport
+          min_count: 1
+          timeout: 25
+          condition:
+            - { field: z, op: LE, value: 0 }
+
+    - name: report crosses the link to vehicle2
+      expect:
+        - endpoint: veh2
+          group: goby::middleware::intervehicle::modem_data_in
+          type: goby.middleware.intervehicle.protobuf.DCCLForwardedData
+          min_count: 1
+          timeout: 40
+          condition:
+            - { field: "frame[0].dccl_id", op: EQ, value: 127 }

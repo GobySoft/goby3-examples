@@ -1,0 +1,71 @@
+# Harness for the state machine example
+#
+# The example's own controller toggles the state every second, so this test
+# launches only gobyd and the state machine app (state_machine_app_only.launch)
+# and drives it from here, checking the round trip StateControl -> StateReport.
+#
+#   goby test run test/interprocess/zeromq/state_machine.test.yml   (from the repository root, with the examples built and on the PATH)
+
+endpoint:
+  - name: sm
+    zeromq: { platform: state_machine }
+
+fixture:
+  - name: example
+    command: goby_launch -r state_machine_app_only.launch
+    cwd: ../../../launch/interprocess/zeromq
+    ready: { output_regex: "All processes running", timeout: 30 }
+
+test:
+  name: state machine round trip
+  default_timeout: 3
+
+  require_app:
+    - endpoint: sm
+      name: [gobyd, goby3_example_state_machine_subscriber]
+      timeout: 20
+
+  run:
+    # the machine starts OFF and reports that before this test subscribes, so begin with a transition
+    - name: turn on
+      publish:
+        - endpoint: sm
+          group: groups::state_control
+          type: protobuf.StateControl
+          value: "desired_state: ON"
+      expect:
+        - endpoint: sm
+          group: groups::state_report
+          type: protobuf.StateReport
+          min_count: 1
+          match: "current_state: ON"
+
+    - name: turn off
+      publish:
+        - endpoint: sm
+          group: groups::state_control
+          type: protobuf.StateControl
+          value: "desired_state: OFF"
+      expect:
+        - endpoint: sm
+          group: groups::state_report
+          type: protobuf.StateReport
+          min_count: 1
+          match: "current_state: OFF"
+
+    # a repeated ON must not produce a second transition
+    - name: redundant command is ignored
+      publish:
+        - endpoint: sm
+          group: groups::state_control
+          type: protobuf.StateControl
+          value: "desired_state: ON"
+          repeat: 2
+          interval: 0.2
+      expect:
+        - endpoint: sm
+          group: groups::state_report
+          type: protobuf.StateReport
+          count: 1
+          match: "current_state: ON"
+          timeout: 2

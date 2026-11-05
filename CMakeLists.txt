@@ -107,6 +107,15 @@ endif()
 
 add_subdirectory(src)
 
+option(enable_tests "Register the goby pub/sub test harnesses in test/ with ctest" OFF)
+option(build_test_figures "Render each test harness's plan to SVG with 'goby test visualize' and Graphviz dot (requires graphviz)" OFF)
+if(enable_tests)
+  enable_testing()
+endif()
+if(enable_tests OR build_test_figures)
+  add_subdirectory(test)
+endif()
+
 if(export_goby_interfaces)
   generate_interfaces_figure(INTERFACE_YML launch/interprocess/zeromq/gps_driver_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE gps_driver_interfaces.pdf)  
   generate_interfaces_figure(INTERFACE_YML launch/interprocess/zeromq/basic_publisher_subscriber_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE basic_interprocess_interfaces.pdf)
