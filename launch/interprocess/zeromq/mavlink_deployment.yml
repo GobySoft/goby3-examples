@@ -1,6 +1,8 @@
 deployment: mavlink_deployment
 platforms:
   - name: auv0
-    interfaces:
-     - goby3_example_mavlink_interface.yml
-     - @GOBY_INTERFACES_DIR@/goby_mavlink_gateway_interface.yml
+    run:
+      - gobyd
+      # goby_mavlink_gateway's interface file comes with Goby
+      - { application: goby_mavlink_gateway, args: "--connection_type CONNECTION_UDP --udp 'bind_port: 14550 remote_address: \"127.0.0.1\" remote_port: 14551' -vvv -n" }
+      - { application: goby3_example_mavlink, args: -v -n }

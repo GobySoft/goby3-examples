@@ -38,61 +38,6 @@ function(GOBY_EXPORT_INTERFACE)
   set(${args_YML} ${${args_YML}} PARENT_SCOPE)
 endfunction()
 
-# usage: goby_visualize_interfaces(TARGET_OUT <out_var> YML_DIR <yml_dir> DEPLOYMENT_YAML <yaml> IMAGE_OUT <image> [PARAMETERS <params>] [DEPENDENCIES <dep1> <dep2> ...])
-# generates PDF graphviz graph from deployment yaml file
-# TARGET_OUT: variable name to store output target name
-# YML_DIR: directory to YML interface files
-# DEPLOYMENT_YAML: deployment file
-# IMAGE_OUT: output image path
-# PARAMETERS: extra parameters for goby_clang_tool (optional)
-# DEPENDENCIES: YML dependencies (list of targets from GOBY_EXPORT_INTERFACE())
-function(GOBY_VISUALIZE_INTERFACES)
-  cmake_parse_arguments(args "" "TARGET_OUT;YML_DIR;DEPLOYMENT_YAML;IMAGE_OUT;PARAMETERS" "DEPENDENCIES" ${ARGN})
-
-  get_filename_component(ABS_IMAGE_OUT ${args_IMAGE_OUT} ABSOLUTE)
-  get_filename_component(OUT_DIR ${ABS_IMAGE_OUT} DIRECTORY)
-  get_filename_component(IMAGE_EXT ${ABS_IMAGE_OUT} EXT)
-
-  # .pdf -> pdf
-  string(SUBSTRING ${IMAGE_EXT} 1 -1 IMAGE_TYPE)
-  
-  get_filename_component(ABS_DEPLOYMENT_YAML ${args_DEPLOYMENT_YAML} ABSOLUTE)
-
-  set(PARAMETERS_SUFFIX)
-  if(args_PARAMETERS)
-    string(REGEX REPLACE "[ -]" "_" PARAMETERS_SUFFIX ${args_PARAMETERS})
-  endif()
-  
-  file(MAKE_DIRECTORY ${OUT_DIR})
-  get_filename_component(DEPLOYMENT_NAME_FROM_FILENAME ${ABS_DEPLOYMENT_YAML} NAME_WE)
-  set(DOT_OUT_FILE "${DEPLOYMENT_NAME_FROM_FILENAME}${PARAMETERS_SUFFIX}_${IMAGE_TYPE}.dot")
-  set(ABS_DOT_OUT "${OUT_DIR}/${DOT_OUT_FILE}")
-  
-  add_custom_command(
-    OUTPUT ${ABS_DOT_OUT}
-    COMMAND goby_clang_tool
-    ARGS -viz -outdir ${OUT_DIR} -o ${DOT_OUT_FILE} -p ${CMAKE_BINARY_DIR} ${ABS_DEPLOYMENT_YAML} ${args_PARAMETERS}
-    DEPENDS ${args_DEPENDENCIES} ${ABS_DEPLOYMENT_YAML}
-    WORKING_DIRECTORY ${args_YML_DIR}
-    )
-
-  set_source_files_properties(${ABS_DOT_OUT} PROPERTIES GENERATED TRUE)
-  
-  add_custom_command(
-    OUTPUT ${ABS_IMAGE_OUT}
-    COMMAND dot
-    ARGS -T${IMAGE_TYPE} -o ${ABS_IMAGE_OUT} ${ABS_DOT_OUT}  
-    DEPENDS ${ABS_DOT_OUT}
-    )
-
-  set_source_files_properties(${ABS_IMAGE_OUT} PROPERTIES GENERATED TRUE)
-
-  set(LOCAL_TARGET_OUT ${DEPLOYMENT_NAME_FROM_FILENAME}${PARAMETERS_SUFFIX}_interface_viz_${IMAGE_TYPE})
-  add_custom_target(${LOCAL_TARGET_OUT} ALL DEPENDS ${ABS_IMAGE_OUT})
-  set(${args_TARGET_OUT} ${LOCAL_TARGET_OUT} PARENT_SCOPE)
-endfunction()
-
-
 macro(generate_interfaces) 
   cmake_parse_arguments(gi_args "" "TARGET" "" ${ARGN})
   goby_export_interface(TARGET ${gi_args_TARGET} YML_OUT_DIR ${YML_OUT_DIR} YML ${gi_args_TARGET}_YML_OUT)
@@ -100,17 +45,47 @@ macro(generate_interfaces)
   set(project_goby_interfaces "${project_goby_interfaces};${gi_args_TARGET}_interface;${gi_args_TARGET}" CACHE INTERNAL "Goby Interface YMLS")
 endmacro()
     
-macro(generate_interfaces_figure) 
-  cmake_parse_arguments(gif_args "" "INTERFACE_YML;YML_OUT_DIR;OUTPUT_IMAGE;PARAMETERS" "" ${ARGN})
-  get_filename_component(INTERFACE_YML_NAME_WE ${gif_args_INTERFACE_YML} NAME_WE)
-  set(CONFIGURED_INTERFACE_YML ${gif_args_YML_OUT_DIR}/figures/${INTERFACE_YML_NAME_WE}.yml)
-  configure_file(${gif_args_INTERFACE_YML} ${CONFIGURED_INTERFACE_YML} @ONLY)
-  goby_visualize_interfaces(
-    TARGET_OUT TARGET_OUT
-    YML_DIR ${gif_args_YML_OUT_DIR}
-    DEPLOYMENT_YAML ${CONFIGURED_INTERFACE_YML}
-    IMAGE_OUT ${gif_args_YML_OUT_DIR}/figures/${gif_args_OUTPUT_IMAGE}
-    PARAMETERS "${gif_args_PARAMETERS}"
-    DEPENDENCIES ${project_goby_interfaces})
-  set(project_goby_interfaces_figures "${project_goby_interfaces_figures};${TARGET_OUT}" CACHE INTERNAL "Goby Interface Figures")
-endmacro()
+# usage: generate_interfaces_figure(DEPLOYMENT <deployment.yml> NAME <name>)
+# Draws the deployment with 'goby interface visualize' as YML_OUT_DIR/figures/<name>.pdf (Graphviz)
+# and, with build_interface_figures_d2, as <name>.d2 (rendered to <name>.svg when d2 is found).
+function(generate_interfaces_figure)
+  cmake_parse_arguments(gif_args "" "DEPLOYMENT;NAME" "" ${ARGN})
+  get_filename_component(deployment ${gif_args_DEPLOYMENT} ABSOLUTE)
+  set(figures_dir ${YML_OUT_DIR}/figures)
+  file(MAKE_DIRECTORY ${figures_dir})
+  set(visualize ${GOBY_EXECUTABLE} interface visualize ${deployment} -I ${YML_OUT_DIR})
+  set(base ${figures_dir}/${gif_args_NAME})
+
+  add_custom_command(
+    OUTPUT ${base}.dot
+    COMMAND ${visualize} --output_file ${base}.dot
+    DEPENDS ${project_goby_interfaces} ${deployment}
+    COMMENT "Drawing ${gif_args_NAME} (Graphviz)"
+    VERBATIM)
+  add_custom_command(
+    OUTPUT ${base}.pdf
+    COMMAND dot -Tpdf -o ${base}.pdf ${base}.dot
+    DEPENDS ${base}.dot
+    VERBATIM)
+  set(outputs ${base}.pdf)
+
+  if(build_interface_figures_d2)
+    add_custom_command(
+      OUTPUT ${base}.d2
+      COMMAND ${visualize} --format D2 --output_file ${base}.d2
+      DEPENDS ${project_goby_interfaces} ${deployment}
+      COMMENT "Drawing ${gif_args_NAME} (D2)"
+      VERBATIM)
+    list(APPEND outputs ${base}.d2)
+    if(D2_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${base}.svg
+        COMMAND ${D2_EXECUTABLE} ${base}.d2 ${base}.svg
+        DEPENDS ${base}.d2
+        VERBATIM)
+      list(APPEND outputs ${base}.svg)
+    endif()
+  endif()
+
+  add_custom_target(${gif_args_NAME}_interface_figure ALL DEPENDS ${outputs})
+endfunction()
