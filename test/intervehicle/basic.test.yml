@@ -2,9 +2,9 @@
 #
 # Two gobyd instances (vehicle1, vehicle2) linked over the UDP multicast
 # modem driver. On vehicle1's interprocess layer the outgoing DCCL report is
-# visible under its own group; on vehicle2 received intervehicle data is
-# handed to subscribers as DCCLForwardedData on the internal modem_data_in
-# group (frames carry the DCCL id, 127 for dccl.NavigationReport).
+# visible under its own group. vehicle2's endpoint is on the intervehicle
+# layer: like the example's subscriber, it subscribes to the report on the
+# broadcast group (0) from modem 1, and receives it across the link.
 #
 #   goby test run test/intervehicle/basic.test.yml   (from the repository root, with the examples built and on the PATH)
 
@@ -12,6 +12,7 @@ endpoint:
   - name: veh1
     zeromq: { platform: vehicle1 }
   - name: veh2
+    layer: LAYER_INTERVEHICLE
     zeromq: { platform: vehicle2 }
 
 fixture:
@@ -52,9 +53,10 @@ test:
     - name: report crosses the link to vehicle2
       expect:
         - endpoint: veh2
-          group: goby::middleware::intervehicle::modem_data_in
-          type: goby.middleware.intervehicle.protobuf.DCCLForwardedData
+          group: "0"
+          type: DCCL/dccl.NavigationReport
+          intervehicle: { publisher_id: [1] }
           min_count: 1
           timeout: 40
           condition:
-            - { field: "frame[0].dccl_id", op: EQ, value: 127 }
+            - { field: z, op: LE, value: 0 }

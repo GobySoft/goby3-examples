@@ -40,7 +40,7 @@ cd build && ctest --output-on-failure
 | `interprocess/zeromq/state_machine` | state machine | `StateControl` → `StateReport` round trip for ON/OFF; a redundant command causes no extra transition |
 | `interprocess/zeromq/json` | JSON marshalling | typed and untyped JSON messages flow in parallel; hand-published JSON is visible |
 | `interprocess/udpm/basic_publisher_subscriber` | basic UDPM pub/sub | as the ZeroMQ basic test, without a broker |
-| `intervehicle/basic` | two vehicles over UDP multicast modem | DCCL report is visible on vehicle1 and arrives on vehicle2 as `DCCLForwardedData` on `modem_data_in` |
+| `intervehicle/basic` | two vehicles over UDP multicast modem | DCCL report is visible on vehicle1 and arrives on vehicle2, received on the intervehicle layer as the subscriber does |
 
 Groups defined with `GOBY_DEFINE_INTERVEHICLE_GROUP` (such as `groups::nav`) appear on the
 interprocess layer with a numeric suffix, e.g. `groups::nav;0`, so expectations match them with
