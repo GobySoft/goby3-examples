@@ -1,9 +1,10 @@
 deployment: basic_interprocess
 platforms:
   - name: vehicle1
-    interfaces:
-     - goby3_example_json_publisher_interface.yml
-     - goby3_example_json_subscriber_interface.yml
+    run:
+      - gobyd
+      - goby3_example_json_publisher
+      - goby3_example_json_subscriber
 # The subscriber's typed subscription to groups::nav is required in its code. Its type-regex
 # subscription to the same group, which prints every JSON type, is only recommended, and set here.
 necessity:

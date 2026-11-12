@@ -47,9 +47,12 @@ cd build && ctest --output-on-failure
 The subscriptions these examples cannot work without are marked `Necessity::REQUIRED` in their
 code (the subscribers' `groups::nav`, and both directions of the state machine). With
 `-Dexport_goby_interfaces=ON` as well as `-Denable_tests=ON`, and a goby that provides
-`goby_validate_interfaces()`, each harnessed example's deployment file in `launch/` is also
+`goby_validate_interfaces()`, each deployment file in `launch/` listed in `CMakeLists.txt` is also
 registered as a `goby3_example_interfaces_<name>` test that runs `goby interface validate --strict`:
 it fails if a required subscription has no publisher in the deployment, before anything is launched.
+Each of its launch files gets a `goby3_example_launch_<name>_<platform>` test that runs
+`goby interface launch_check`, which fails if the launch file and the deployment's `run:` list
+disagree on what is launched.
 
 ```bash
 goby interface validate launch/interprocess/zeromq/state_machine_deployment.yml -I build/share/interfaces

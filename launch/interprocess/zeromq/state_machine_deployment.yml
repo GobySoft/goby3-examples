@@ -1,6 +1,9 @@
 deployment: state_machine
 platforms:
   - name: example
-    interfaces:
-     - goby3_example_state_machine_subscriber_interface.yml
-     - goby3_example_state_machine_publisher_interface.yml
+    launch:
+      defaults: { args: "--interprocess 'platform: \"state_machine\"'" }
+    run:
+      - gobyd
+      - goby3_example_state_machine_subscriber
+      - goby3_example_state_machine_publisher

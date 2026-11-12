@@ -1,7 +1,8 @@
 deployment: gps_deployment
 platforms:
   - name: auv0
-    interfaces:
-     - goby3_example_gps_controller_interface.yml
-     - goby3_example_gps_driver_interface.yml
-     
+    run:
+      - gobyd
+      - { application: goby3_example_gps_driver, args: "--serial 'port: \"/dev/ttyUSB0\"' -vvv" }
+      # started by hand once the driver is running (see README.md)
+      - { application: goby3_example_gps_controller, enabled: false }

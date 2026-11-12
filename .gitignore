@@ -1,3 +1,5 @@
 build/*
 *~
 CMakeFiles/
+# written by goby launch <deployment>.yml
+.*.launch

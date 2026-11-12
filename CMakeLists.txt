@@ -116,42 +116,74 @@ if(enable_tests OR build_test_figures)
   add_subdirectory(test)
 endif()
 
-if(export_goby_interfaces)
-  generate_interfaces_figure(INTERFACE_YML launch/interprocess/zeromq/gps_driver_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE gps_driver_interfaces.pdf)  
-  generate_interfaces_figure(INTERFACE_YML launch/interprocess/zeromq/basic_publisher_subscriber_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE basic_interprocess_interfaces.pdf)
-  generate_interfaces_figure(INTERFACE_YML launch/interprocess/zeromq/state_machine_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE state_machine_interfaces.pdf)
-  generate_interfaces_figure(INTERFACE_YML launch/interprocess/zeromq/hold_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE hold_interfaces.pdf)
-  generate_interfaces_figure(INTERFACE_YML launch/interprocess/zeromq/json_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE json_interfaces.pdf)
-  generate_interfaces_figure(INTERFACE_YML launch/interthread/basic_interthread_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE basic_interthread_interfaces.pdf)
-  generate_interfaces_figure(INTERFACE_YML launch/intervehicle/basic/basic_intervehicle_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE basic_intervehicle_interfaces.pdf)
-  generate_interfaces_figure(INTERFACE_YML launch/interprocess/zeromq/mavlink_deployment.yml YML_OUT_DIR ${YML_OUT_DIR} OUTPUT_IMAGE mavlink_interfaces.pdf)
-  
+# 'goby interface' (visualize, validate, launch_check) comes with newer versions of goby, along
+# with goby_validate_interfaces()
+if(export_goby_interfaces AND COMMAND goby_validate_interfaces AND GOBY_EXECUTABLE)
+  # the deployments' run: entries use launch keys (args, config, hold, enabled), which 'goby
+  # interface' reads only from the version that added 'goby interface launch'
+  set(probe ${CMAKE_CURRENT_BINARY_DIR}/goby_interface_launch_keys_probe.yml)
+  file(WRITE ${probe} "deployment: probe\nplatforms:\n  - name: probe\n    run:\n      - { process: probe, exec: \"true\", args: -v, enabled: false }\n")
+  execute_process(COMMAND ${GOBY_EXECUTABLE} interface validate ${probe}
+    RESULT_VARIABLE probe_result OUTPUT_QUIET ERROR_QUIET)
+  if(probe_result EQUAL 0)
+    set(goby_interface_tool_found ON)
+  else()
+    message(STATUS "This goby's 'goby interface' does not read launch keys in run: entries (it predates 'goby interface launch'): deployment figures and checks are skipped")
+  endif()
+elseif(export_goby_interfaces)
+  message(STATUS "This goby has no 'goby interface' tool: deployment figures and checks are skipped")
 endif()
 
-# 'goby interface validate' on the deployments the test harnesses run: each fails if a required
-# subscription has no publisher. goby_validate_interfaces() comes with goby versions that have it.
-if(export_goby_interfaces AND enable_tests)
-  if(COMMAND goby_validate_interfaces)
-    set(validated_deployments
-      basic_interprocess:launch/interprocess/zeromq/basic_publisher_subscriber_deployment.yml
-      state_machine:launch/interprocess/zeromq/state_machine_deployment.yml
-      json:launch/interprocess/zeromq/json_deployment.yml
-      basic_udpm:launch/interprocess/udpm/basic_publisher_subscriber_deployment.yml
-      basic_intervehicle:launch/intervehicle/basic/basic_intervehicle_deployment.yml)
-    foreach(deployment ${validated_deployments})
-      string(REPLACE ":" ";" parts ${deployment})
-      list(GET parts 0 name)
-      list(GET parts 1 file)
-      goby_validate_interfaces(NAME goby3_example_interfaces_${name}
-        DEPLOYMENT_YAML ${CMAKE_CURRENT_SOURCE_DIR}/${file}
-        INTERFACE_DIRS ${YML_OUT_DIR})
-    endforeach()
-  else()
-    message(STATUS "This goby has no goby_validate_interfaces(); deployment files are not checked")
+option(build_interface_figures_d2 "With export_goby_interfaces, also draw each deployment as a D2 diagram (rendered to SVG when d2 is found)" OFF)
+if(goby_interface_tool_found AND build_interface_figures_d2)
+  find_program(D2_EXECUTABLE d2)
+  if(NOT D2_EXECUTABLE)
+    message(STATUS "d2 (https://d2lang.com) was not found: the D2 figures are written but not rendered")
   endif()
 endif()
 
+# deployment name, file, and (for the launch_check tests) launch files as <platform>=<file>
+set(deployments
+  "basic_interprocess launch/interprocess/zeromq/basic_publisher_subscriber_deployment.yml vehicle1=basic_publisher_subscriber.launch"
+  "gps_driver launch/interprocess/zeromq/gps_driver_deployment.yml auv0=gps_driver.launch"
+  "hold launch/interprocess/zeromq/hold_deployment.yml vehicle1=hold.launch"
+  "json launch/interprocess/zeromq/json_deployment.yml vehicle1=json.launch"
+  "state_machine launch/interprocess/zeromq/state_machine_deployment.yml example=state_machine.launch"
+  "mavlink launch/interprocess/zeromq/mavlink_deployment.yml auv0=mavlink.launch"
+  "basic_udpm launch/interprocess/udpm/basic_publisher_subscriber_deployment.yml vehicle1=basic_publisher_subscriber.launch"
+  "basic_interthread launch/interthread/basic_interthread_deployment.yml vehicle1=basic_interthread.launch"
+  "basic_intervehicle launch/intervehicle/basic/basic_intervehicle_deployment.yml vehicle1=basic_vehicle1.launch vehicle2=basic_vehicle2.launch")
+if(TARGET goby3_example_basic_zenoh_interprocess_publisher)
+  list(APPEND deployments
+    "basic_zenoh launch/interprocess/zenoh/basic_publisher_subscriber_deployment.yml vehicle1=basic_publisher_subscriber.launch")
+endif()
 
+if(goby_interface_tool_found)
+  foreach(entry ${deployments})
+    string(REPLACE " " ";" parts "${entry}")
+    list(GET parts 0 name)
+    list(GET parts 1 file)
+    list(REMOVE_AT parts 0 1)
+    generate_interfaces_figure(DEPLOYMENT ${file} NAME ${name}_interfaces)
+
+    if(enable_tests)
+      # 'goby interface validate --strict': a required subscription with no publisher fails
+      goby_validate_interfaces(NAME goby3_example_interfaces_${name}
+        DEPLOYMENT_YAML ${CMAKE_CURRENT_SOURCE_DIR}/${file}
+        INTERFACE_DIRS ${YML_OUT_DIR})
+      # 'goby interface launch_check': the launch file runs what the deployment lists
+      get_filename_component(launch_dir ${CMAKE_CURRENT_SOURCE_DIR}/${file} DIRECTORY)
+      foreach(launch ${parts})
+        string(REPLACE "=" ";" launch_parts ${launch})
+        list(GET launch_parts 0 platform)
+        list(GET launch_parts 1 launch_file)
+        add_test(NAME goby3_example_launch_${name}_${platform}
+          COMMAND ${GOBY_EXECUTABLE} interface launch_check ${CMAKE_CURRENT_SOURCE_DIR}/${file}
+                  ${launch_dir}/${launch_file} --platform ${platform} -I ${YML_OUT_DIR})
+      endforeach()
+    endif()
+  endforeach()
+endif()
 
 ## configure to build/include
 file(GLOB_RECURSE INCLUDE_FILES RELATIVE ${project_SRC_DIR} 
