@@ -52,12 +52,12 @@ function(generate_interfaces_figure)
   cmake_parse_arguments(gif_args "" "DEPLOYMENT;NAME" "" ${ARGN})
   get_filename_component(deployment ${gif_args_DEPLOYMENT} ABSOLUTE)
   set(figures_dir ${YML_OUT_DIR}/figures)
-  file(MAKE_DIRECTORY ${figures_dir})
   set(visualize ${GOBY_EXECUTABLE} interface visualize ${deployment} -I ${YML_OUT_DIR})
   set(base ${figures_dir}/${gif_args_NAME})
 
   add_custom_command(
     OUTPUT ${base}.dot
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${figures_dir}
     COMMAND ${visualize} --output_file ${base}.dot
     DEPENDS ${project_goby_interfaces} ${deployment}
     COMMENT "Drawing ${gif_args_NAME} (Graphviz)"
@@ -72,6 +72,7 @@ function(generate_interfaces_figure)
   if(build_interface_figures_d2)
     add_custom_command(
       OUTPUT ${base}.d2
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${figures_dir}
       COMMAND ${visualize} --format D2 --output_file ${base}.d2
       DEPENDS ${project_goby_interfaces} ${deployment}
       COMMENT "Drawing ${gif_args_NAME} (D2)"
