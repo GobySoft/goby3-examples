@@ -14,7 +14,7 @@ class StateMachineApp : public goby::zeromq::SingleThreadApplication<StateMachin
   public:
     StateMachineApp()
     {
-        interprocess().subscribe<groups::state_control>(
+        interprocess().subscribe<groups::state_control, goby::middleware::Necessity::REQUIRED>(
             [this](const protobuf::StateControl& ctrl) {
                 std::cout << "Received message: " << ctrl.ShortDebugString() << std::endl;
                 switch (ctrl.desired_state())

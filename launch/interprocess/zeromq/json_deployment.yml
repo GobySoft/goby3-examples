@@ -4,3 +4,7 @@ platforms:
     interfaces:
      - goby3_example_json_publisher_interface.yml
      - goby3_example_json_subscriber_interface.yml
+# The subscriber's typed subscription to groups::nav is required in its code. Its type-regex
+# subscription to the same group, which prints every JSON type, is only recommended, and set here.
+necessity:
+  - { application: goby3_example_json_subscriber, type: "nlohmann::.*", set: recommended }

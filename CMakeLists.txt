@@ -128,6 +128,29 @@ if(export_goby_interfaces)
   
 endif()
 
+# 'goby interface validate' on the deployments the test harnesses run: each fails if a required
+# subscription has no publisher. goby_validate_interfaces() comes with goby versions that have it.
+if(export_goby_interfaces AND enable_tests)
+  if(COMMAND goby_validate_interfaces)
+    set(validated_deployments
+      basic_interprocess:launch/interprocess/zeromq/basic_publisher_subscriber_deployment.yml
+      state_machine:launch/interprocess/zeromq/state_machine_deployment.yml
+      json:launch/interprocess/zeromq/json_deployment.yml
+      basic_udpm:launch/interprocess/udpm/basic_publisher_subscriber_deployment.yml
+      basic_intervehicle:launch/intervehicle/basic/basic_intervehicle_deployment.yml)
+    foreach(deployment ${validated_deployments})
+      string(REPLACE ":" ";" parts ${deployment})
+      list(GET parts 0 name)
+      list(GET parts 1 file)
+      goby_validate_interfaces(NAME goby3_example_interfaces_${name}
+        DEPLOYMENT_YAML ${CMAKE_CURRENT_SOURCE_DIR}/${file}
+        INTERFACE_DIRS ${YML_OUT_DIR})
+    endforeach()
+  else()
+    message(STATUS "This goby has no goby_validate_interfaces(); deployment files are not checked")
+  endif()
+endif()
+
 
 
 ## configure to build/include
