@@ -98,7 +98,7 @@ if(enable_julia_examples)
   goby_julia_proto_include_dirs("${DCCL_INCLUDE_DIR}" "${GOBY_INCLUDE_DIR}" "${project_INC_DIR}")
 endif()
 
-option(export_goby_interfaces OFF "Build Goby Publish/Subscribe interface files (YML) from code")
+option(export_goby_interfaces "Build Goby Publish/Subscribe interface files (YML) from code" OFF)
 
 if(export_goby_interfaces)
   include(GobyClangTool)
