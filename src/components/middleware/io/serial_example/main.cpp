@@ -20,7 +20,7 @@ GOBY_DEFINE_GROUP(groups, serial_in)
 GOBY_DEFINE_GROUP(groups, serial_out)
 
 using AppBase = goby::zeromq::MultiThreadApplication<SerialExampleConfig>;
-using ThreadBase = goby::middleware::SimpleThread<SerialExampleConfig>;
+using ThreadBase = goby::zeromq::SimpleThread<SerialExampleConfig>;
 
 class SerialDataHandleThread : public ThreadBase
 {

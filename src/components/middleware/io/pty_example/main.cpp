@@ -20,7 +20,7 @@ GOBY_DEFINE_GROUP(groups, pty_in)
 GOBY_DEFINE_GROUP(groups, pty_out)
 
 using AppBase = goby::zeromq::MultiThreadApplication<PTYExampleConfig>;
-using ThreadBase = goby::middleware::SimpleThread<PTYExampleConfig>;
+using ThreadBase = goby::zeromq::SimpleThread<PTYExampleConfig>;
 
 class PTYDataHandleThread : public ThreadBase
 {

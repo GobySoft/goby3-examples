@@ -9,7 +9,7 @@
 #include "messages/nav.pb.h"
 #include "config.pb.h"
 
-using ThreadBase = goby::middleware::SimpleThread<BasicMultithreadPubSubConfig>;
+using ThreadBase = goby::middleware::StandaloneThread<BasicMultithreadPubSubConfig>;
 
 class BasicSubscriber : public ThreadBase
 {
