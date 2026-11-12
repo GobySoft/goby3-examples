@@ -60,6 +60,7 @@ jobs:
       # Julia is installed from the official generic Linux tarball rather than a distribution
       # package, which is how upstream expects it to be deployed. Bump here to update.
       JULIA_VERSION: "1.12.2"
+      D2_VERSION: "0.7.0"
 
     steps:
       - name: Checkout
@@ -75,6 +76,19 @@ jobs:
 
       - name: Update apt packages and install goby3 headers and applications
         run: apt-get update && apt-get -y remove libdccl3-dev libdccl3 && apt-get -y dist-upgrade && apt-get -y install libgoby3-dev goby3-apps clang
+
+      # libgoby3-dev only recommends these, and the image may not install recommends
+      - name: Install MOOS, interface tool and figure dependencies
+        run: apt-get -y install libgoby3-moos-dev libmavlink-dev goby3-clang-tool goby3-interfaces graphviz
+
+      - name: Install D2
+        run: |
+          wget -qO /tmp/d2.tar.gz \
+            "https://github.com/terrastruct/d2/releases/download/v${D2_VERSION}/d2-v${D2_VERSION}-linux-amd64.tar.gz"
+          mkdir -p /opt/d2
+          tar xzf /tmp/d2.tar.gz -C /opt/d2 --strip-components=1
+          ln -sf /opt/d2/bin/d2 /usr/local/bin/d2
+          d2 --version
 
       # The Python examples need the goby Python package (for the goby module and the
       # goby_gen_cpp generator) and pybind11 to compile the generated extension module.
@@ -109,7 +123,11 @@ jobs:
       - name: Configure examples
         # Both are requested explicitly rather than left to autodetection, so that a missing
         # dependency fails the build instead of quietly dropping the examples from it
-        run: mkdir -p build && cd build && cmake .. -Dbuild_python=ON -Denable_julia_examples=ON -Denable_tests=ON
+        run: >
+          mkdir -p build && cd build && cmake ..
+          -Dbuild_python=ON -Denable_julia_examples=ON -Dbuild_moos=ON
+          -Dexport_goby_interfaces=ON -Dbuild_interface_figures_d2=ON
+          -Denable_tests=ON -Dbuild_test_figures=ON
 
       # GobyJulia.cmake warns and turns enable_julia_examples back OFF when a piece is missing,
       # which would otherwise leave this job passing without having built anything Julia
@@ -126,15 +144,40 @@ jobs:
       - name: Build examples
         run: cd build && cmake --build . -- -j4
 
-      # Zenoh is an optional Goby component, so its example is dropped silently if it isn't found
-      - name: Check that the Zenoh example was built
+      # these are dropped with only a warning or status message when a dependency isn't found
+      - name: Check that the optional examples, figures and checks were built
         run: |
-          for _app in goby3_example_basic_zenoh_interprocess_publisher goby3_example_basic_zenoh_interprocess_subscriber; do
-            if [ ! -x "build/bin/${_app}" ]; then
-              echo "::error::${_app} was not built"
-              exit 1
+          _missing=0
+          for _file in \
+              bin/goby3_example_basic_zenoh_interprocess_publisher \
+              bin/goby3_example_basic_zenoh_interprocess_subscriber \
+              bin/goby3_example_mavlink \
+              bin/goby3_example_chat \
+              lib/libgoby3_example_gps_moos_plugin.so \
+              lib/libgoby3_example_trail_moos_plugin.so; do
+            if [ ! -e "build/${_file}" ]; then
+              echo "::error::${_file} was not built"
+              _missing=1
             fi
           done
+          _figures=$(ls build/share/interfaces/figures/*.pdf 2>/dev/null | wc -l)
+          if [ "${_figures}" -eq 0 ]; then
+            echo "::error::no deployment figures were drawn"
+            _missing=1
+          fi
+          for _pdf in build/share/interfaces/figures/*.pdf; do
+            if [ ! -e "${_pdf%.pdf}.svg" ]; then
+              echo "::error::$(basename ${_pdf%.pdf}).svg (D2) was not rendered"
+              _missing=1
+            fi
+          done
+          for _test in goby3_example_interfaces_ goby3_example_launch_; do
+            if ! (cd build && ctest -N | grep -q "${_test}"); then
+              echo "::error::no ${_test}* tests are registered"
+              _missing=1
+            fi
+          done
+          exit ${_missing}
 
       # the harnesses in test/ launch each example and check its publications with 'goby test'
       - name: Run example tests
