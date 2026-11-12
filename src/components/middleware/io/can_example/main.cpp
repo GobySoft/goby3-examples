@@ -25,7 +25,7 @@ GOBY_DEFINE_GROUP(groups, can_in)
 GOBY_DEFINE_GROUP(groups, can_out)
 
 using AppBase = goby::zeromq::MultiThreadApplication<CanExampleConfig>;
-using ThreadBase = goby::middleware::SimpleThread<CanExampleConfig>;
+using ThreadBase = goby::zeromq::SimpleThread<CanExampleConfig>;
 
 class CanDataHandleThread : public ThreadBase
 {

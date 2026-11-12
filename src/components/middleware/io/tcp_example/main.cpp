@@ -66,7 +66,7 @@ class TCPConfigurator : public goby::middleware::ProtobufConfigurator<TCPExample
 };
 
 using AppBase = goby::zeromq::MultiThreadApplication<TCPExampleConfig>;
-using ThreadBase = goby::middleware::SimpleThread<TCPExampleConfig>;
+using ThreadBase = goby::zeromq::SimpleThread<TCPExampleConfig>;
 
 class TCPExample : public AppBase
 {

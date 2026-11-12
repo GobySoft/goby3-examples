@@ -4,16 +4,17 @@
 #include <goby/middleware/marshalling/protobuf.h>
 
 #include <goby/middleware/application/multi_thread.h>
+#include <goby/zeromq/application/simple_thread.h>
 
 #include "config.pb.h"
 #include "messages/groups.h"
 #include "messages/nav.pb.h"
 
-class BasicPublisher : public goby::middleware::SimpleThread<BasicMultithreadPubSubConfig>
+class BasicPublisher : public goby::zeromq::SimpleThread<BasicMultithreadPubSubConfig>
 {
   public:
     BasicPublisher(const BasicMultithreadPubSubConfig& config)
-        : goby::middleware::SimpleThread<BasicMultithreadPubSubConfig>(config, 1 /*hertz*/)
+        : goby::zeromq::SimpleThread<BasicMultithreadPubSubConfig>(config, 1 /*hertz*/)
     {
         // goby::glog is thread safe in goby::zeromq::MultiThreadApplication, std::cout is not
         goby::glog.is_verbose() && goby::glog << "My configuration int is: " << cfg().my_value()

@@ -19,7 +19,7 @@ using protobuf::GPSCommand;
 using protobuf::GPSPosition;
 
 using AppBase = goby::zeromq::MultiThreadApplication<GPSDriverConfig>;
-using ThreadBase = goby::middleware::SimpleThread<GPSDriverConfig>;
+using ThreadBase = goby::zeromq::SimpleThread<GPSDriverConfig>;
 namespace si = boost::units::si;
 
 using goby::glog;

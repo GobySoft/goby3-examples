@@ -68,7 +68,7 @@ class UDPConfigurator : public goby::middleware::ProtobufConfigurator<UDPExample
 };
 
 using AppBase = goby::zeromq::MultiThreadApplication<UDPExampleConfig>;
-using ThreadBase = goby::middleware::SimpleThread<UDPExampleConfig>;
+using ThreadBase = goby::zeromq::SimpleThread<UDPExampleConfig>;
 
 class UDPExample : public AppBase
 {
