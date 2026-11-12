@@ -4,13 +4,12 @@
 #include <goby/middleware/marshalling/protobuf.h>
 
 #include <goby/middleware/application/multi_thread.h>
-#include <goby/zeromq/application/simple_thread.h>
 
 #include "messages/groups.h"
 #include "messages/nav.pb.h"
 #include "config.pb.h"
 
-using ThreadBase = goby::zeromq::SimpleThread<BasicMultithreadPubSubConfig>;
+using ThreadBase = goby::middleware::StandaloneThread<BasicMultithreadPubSubConfig>;
 
 class BasicSubscriber : public ThreadBase
 {
