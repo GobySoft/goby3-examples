@@ -14,7 +14,7 @@ export PATH=$PATH:/path/to/goby3-examples/build/bin
 
 With `-Dexport_goby_interfaces=ON`, the build runs `goby_clang_tool` on each example to write its publish/subscribe interface file (`build/share/interfaces`), then draws each `launch/**/*_deployment.yml` with `goby interface visualize` into `build/share/interfaces/figures/<example>_interfaces.pdf`. Add `-Dbuild_interface_figures_d2=ON` to also write each as a [D2](https://d2lang.com) diagram (`.d2`), rendered to `.svg` when `d2` is installed.
 
-With `-Denable_tests=ON` as well, `ctest` runs `goby interface validate --strict` on each deployment (a required subscription with no publisher fails) and `goby interface launch_check` on its launch files (each line has a `run:` entry in the deployment and each entry a line). These need a goby that has `goby interface`.
+With `-Denable_tests=ON` as well, `ctest` runs `goby interface validate --strict` on each deployment (a required subscription with no publisher fails) and `goby interface launch_check` on its launch files (each line has a `run:` entry in the deployment and each entry a line). The figures and checks need a goby whose `goby interface` includes `launch` (the deployment files carry its launch keys); with an older one they are skipped with a status message.
 
 The deployment files can also be explored, or launched (`goby launch` writes a `.<deployment>.launch` file from the `run:` list and passes it, with any `goby_launch` options such as `-x`, to `goby_launch`):
 

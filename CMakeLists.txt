@@ -119,7 +119,17 @@ endif()
 # 'goby interface' (visualize, validate, launch_check) comes with newer versions of goby, along
 # with goby_validate_interfaces()
 if(export_goby_interfaces AND COMMAND goby_validate_interfaces AND GOBY_EXECUTABLE)
-  set(goby_interface_tool_found ON)
+  # the deployments' run: entries use launch keys (args, config, hold, enabled), which 'goby
+  # interface' reads only from the version that added 'goby interface launch'
+  set(probe ${CMAKE_CURRENT_BINARY_DIR}/goby_interface_launch_keys_probe.yml)
+  file(WRITE ${probe} "deployment: probe\nplatforms:\n  - name: probe\n    run:\n      - { process: probe, exec: \"true\", args: -v, enabled: false }\n")
+  execute_process(COMMAND ${GOBY_EXECUTABLE} interface validate ${probe}
+    RESULT_VARIABLE probe_result OUTPUT_QUIET ERROR_QUIET)
+  if(probe_result EQUAL 0)
+    set(goby_interface_tool_found ON)
+  else()
+    message(STATUS "This goby's 'goby interface' does not read launch keys in run: entries (it predates 'goby interface launch'): deployment figures and checks are skipped")
+  endif()
 elseif(export_goby_interfaces)
   message(STATUS "This goby has no 'goby interface' tool: deployment figures and checks are skipped")
 endif()
