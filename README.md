@@ -87,7 +87,9 @@ Command line and configuration file handling are the same as for a C++ applicati
 The Python equivalent of the interthread example above: a publisher thread produces
 `NavigationReport`s, a watcher thread consumes them and forwards each one to the interprocess
 layer, and the application prints an alert when the vehicle is deep. The code is in
-`src/interprocess/zeromq/python/basic_multithread`.
+`src/interprocess/zeromq/python/basic_multithread`. Its `interface.yml` declares the interthread
+traffic between the threads, which the application is then held to and which `goby interface`
+draws; it needs Goby 3.8 or later and is skipped otherwise.
 
 ```
 cd launch/interprocess/zeromq
@@ -200,7 +202,9 @@ basic_julia_subscriber <config.pb.cfg>
 
 `src/interprocess/zeromq/julia/basic_multithread` is the Julia equivalent of the interthread publisher/subscriber, and shows the layers available to a Julia task.
 
-`Goby.run(app, Main, [PublisherTask, SubscriberTask])` runs each task module on its own Julia thread. The publisher task sends `NavigationReport`s over `INTERTHREAD`, which is implemented in Julia over `Channel`s rather than in the generated C++ -- so its groups are plain strings chosen by the application rather than groups declared in `interface.yml`, and its messages can be any Julia value (the depth alert `Main` receives is a `NamedTuple`).
+`Goby.run(app, Main, [PublisherTask, SubscriberTask])` runs each task module on its own Julia thread. The publisher task sends `NavigationReport`s over `INTERTHREAD`, which Goby.jl carries between tasks rather than the generated C++, so its messages can be any Julia value: the depth alert `Main` receives is a `DepthAlert` struct.
+
+The interthread traffic is declared in `interface.yml` all the same, with the task that publishes or subscribes each group, its type (`scheme: NATIVE` for a Julia type), and how the subscriber task's queue behaves (`capacity: 10`, `overflow: drop_oldest`). Goby.jl holds every `INTERTHREAD` call to that declaration, and the tasks appear in the `goby interface` diagram of `launch/interprocess/zeromq/julia_multithread_deployment.yml`.
 
 The subscriber task publishes the deep reports out to `INTERPROCESS` itself. Goby.jl hands those to the task that owns the C++ application, the way a C++ thread's `InterProcessForwarder` does, so no task needs a portal of its own and none has to route through `Main`. Subscribing works the same way: the publisher task subscribes to the same group and sees each report that goes out, alongside the separate `basic_julia_subscriber` process.
 
@@ -212,6 +216,23 @@ To run:
 cd launch/interprocess/zeromq
 goby_launch -x julia_multithread.launch
 ```
+
+### Slow Consumers in Julia (INTERTHREAD)
+
+`src/interprocess/zeromq/julia/slow_consumer` shows what a Julia `INTERTHREAD` publisher does when a subscriber cannot keep up. A producer task publishes work at 20 Hz to a consumer that takes 0.5 s an item, and a monitor task subscribes to the same group. Each subscription has a queue of its own, and `basic_julia_slow_consumer.pb.cfg` chooses the consumer's `capacity` and `overflow`:
+
+- `drop_oldest` (as configured): the producer keeps its rate and the consumer's oldest queued items are dropped.
+- `block`: the producer waits for room, so everything slows to the consumer's pace, the monitor included.
+- `drop_newest` or `error`: new items are dropped, or the publication throws.
+
+Once a second the application prints, and publishes on `groups::julia_queue_stats`, what each subscription has delivered and dropped (from `Goby.interthread_stats()`). The consumer is a task module of its own because a callback runs on its task's thread: a slow one delays everything else that task does.
+
+```
+cd launch/interprocess/zeromq
+goby_launch -x julia_slow_consumer.launch
+```
+
+These two examples need a Goby.jl with `INTERTHREAD` queues (Goby 3.8 or later), and are skipped otherwise.
 
 ### GPS Driver
 A working example using a standard NMEA-0183 GPS is given in `src/interprocess/zeromq/gps_driver`.

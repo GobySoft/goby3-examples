@@ -1,0 +1,4 @@
+#! goby_launch -x
+gobyd
+# the launcher starts julia with the thread count declared by THREADS in CMakeLists.txt
+basic_julia_slow_consumer basic_julia_slow_consumer.pb.cfg

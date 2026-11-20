@@ -1,0 +1,7 @@
+deployment: python_multithread
+platforms:
+  - name: vehicle1
+    run:
+      - gobyd
+      - { application: goby3_example_python_multithread, args: --alert_depth 300 }
+      - goby3_example_basic_interprocess_subscriber

@@ -1,0 +1,17 @@
+# Only the interprocess report is declared. The interthread work is left undeclared so that the
+# configuration can choose the slow consumer's capacity and overflow policy at launch, through
+# Goby.subscribe; a declared subscription takes both from here instead (see basic_multithread).
+application:
+  name: BasicJuliaSlowConsumer
+  cpp_type: goby.zeromq.SingleThreadApplication
+  config:
+    scheme: PROTOBUF
+    type: goby3_examples.config.BasicJuliaSlowConsumerConfig
+
+interprocess:
+  publishes:
+    # Main reports from its loop
+    - group: groups::julia_queue_stats
+      scheme: PROTOBUF
+      type: goby3_examples::protobuf::InterthreadQueueStats
+      thread: Main

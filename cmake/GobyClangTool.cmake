@@ -25,13 +25,23 @@ function(GOBY_EXPORT_INTERFACE)
     endif()
   endforeach()  
   
+  # a Julia or Python application's interthread never reaches its C++, so goby_add_julia_app()
+  # and goby_add_python_app() describe it in a manifest instead
+  get_target_property(interthread_manifest ${args_TARGET} GOBY_INTERTHREAD_MANIFEST)
+  set(interthread_manifest_args)
+  if(interthread_manifest)
+    set(interthread_manifest_args -interthread-manifest ${interthread_manifest})
+  else()
+    set(interthread_manifest)
+  endif()
+
   set(${args_YML} "${args_YML_OUT_DIR}/${args_TARGET}_interface.yml")
   add_custom_command(
     OUTPUT "${args_YML_OUT_DIR}/${args_TARGET}_interface.yml"
     COMMAND goby_clang_tool
-    ARGS -gen -target ${args_TARGET} -outdir ${args_YML_OUT_DIR} -p ${CMAKE_BINARY_DIR} ${ABS_TARGET_SOURCES}
+    ARGS -gen -target ${args_TARGET} -outdir ${args_YML_OUT_DIR} ${interthread_manifest_args} -p ${CMAKE_BINARY_DIR} ${ABS_TARGET_SOURCES}
     COMMENT "Running goby_clang_tool on ${args_TARGET}"
-    DEPENDS ${ABS_TARGET_SOURCES} ${args_TARGET}
+    DEPENDS ${ABS_TARGET_SOURCES} ${args_TARGET} ${interthread_manifest}
     VERBATIM)
 
   set_source_files_properties(${${args_YML}} PROPERTIES GENERATED TRUE)

@@ -1,0 +1,6 @@
+deployment: julia_slow_consumer
+platforms:
+  - name: vehicle1
+    run:
+      - gobyd
+      - { application: basic_julia_slow_consumer, args: basic_julia_slow_consumer.pb.cfg }

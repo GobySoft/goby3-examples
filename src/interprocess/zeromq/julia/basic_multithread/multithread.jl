@@ -8,11 +8,11 @@
 #
 # Four things this example exists to show:
 #
-#   1. INTERTHREAD is pure Julia. Goby.jl carries these messages between tasks over Channels,
-#      so they never enter the generated C++ and interthread groups are not declared in
-#      interface.yml -- any string will do.
-#   2. Because of that, an interthread message can be any Julia value, not only a protobuf
-#      message. The alert Main receives below is a NamedTuple.
+#   1. INTERTHREAD is pure Julia. Goby.jl carries these messages between tasks, so they never
+#      enter the generated C++. interface.yml declares them anyway: Goby.jl then holds every
+#      INTERTHREAD call to that declaration, and 'goby interface' draws the tasks.
+#   2. An interthread message can be any Julia value, not only a protobuf message. The alert
+#      Main receives below is a DepthAlert struct, declared in interface.yml as scheme NATIVE.
 #   3. INTERPROCESS works from any task. Goby.jl hands the message to the task that owns the C++
 #      application, the way a C++ thread's InterProcessForwarder does, so a task neither needs a
 #      portal of its own nor has to route through Main.
@@ -29,14 +29,18 @@ include(joinpath(@__DIR__, "..", "goby_application_init.jl"))
 init_cxxwrap("basic_julia_multithread")
 include_protos(@__MODULE__, "goby3_examples")
 
-# the groups and layer accessors generated from interface.yml, written beside this script by
-# goby_add_julia_app()
+# the groups, layer accessors and interthread contract generated from interface.yml, written
+# beside this script by goby_add_julia_app()
 include(joinpath(@__DIR__, "basic_julia_multithread_goby.jl"))
-using .BasicJuliaMultithreadGoby: groups, interprocess
+using .BasicJuliaMultithreadGoby: groups, interprocess, interthread
 
-# interthread groups are Julia-side only, so they are named here rather than in interface.yml
-const NAV_GROUP = "nav"
-const DEPTH_ALERT_GROUP = "depth_alert"
+# an interthread message that is not a protobuf message, and never becomes one; interface.yml
+# names it, and Goby.run() finds it here
+struct DepthAlert
+    depth::Float64
+    x::Float64
+    y::Float64
+end
 
 # ---------------------------------------------------------------------------
 # Publisher task: produces reports, and watches the ones that reach interprocess.
@@ -53,7 +57,7 @@ function loop()
     )
 
     println("[publisher] Tx: z=$(round(nav.z, digits = 1))")
-    Goby.publish(Main.app, Goby.INTERTHREAD, Main.NAV_GROUP, nav)
+    Goby.publish(Main.app, Main.interthread(), Main.groups.nav, nav)
 end
 
 function published_nav(nav::Main.goby3_examples.protobuf.NavigationReport)
@@ -87,14 +91,14 @@ function incoming_nav(nav::Main.goby3_examples.protobuf.NavigationReport)
         # straight out of this task: no portal here, and no hop through Main
         Goby.publish(Main.app, Main.interprocess(), Main.groups.julia_nav, nav)
 
-        # an interthread message is any Julia value; this one never becomes protobuf
-        Goby.publish(Main.app, Goby.INTERTHREAD, Main.DEPTH_ALERT_GROUP,
-                     (depth = -nav.z, x = nav.x, y = nav.y))
+        Goby.publish(Main.app, Main.interthread(), Main.groups.depth_alert,
+                     Main.DepthAlert(-nav.z, nav.x, nav.y))
     end
 end
 
+# capacity 10 and overflow drop_oldest come from interface.yml
 function start()
-    Goby.subscribe(Main.app, Goby.INTERTHREAD, Main.NAV_GROUP, incoming_nav)
+    Goby.subscribe(Main.app, Main.interthread(), Main.groups.nav, incoming_nav)
 end
 
 end # module SubscriberTask
@@ -103,13 +107,13 @@ end # module SubscriberTask
 # Main: reports the alerts the subscriber task raises.
 # ---------------------------------------------------------------------------
 
-function incoming_depth_alert(alert)
+function incoming_depth_alert(alert::DepthAlert)
     println("[main] alert: $(round(alert.depth, digits = 1)) m at " *
             "x=$(round(alert.x, digits = 1)) y=$(round(alert.y, digits = 1))")
 end
 
 function start()
-    Goby.subscribe(app, Goby.INTERTHREAD, DEPTH_ALERT_GROUP, incoming_depth_alert)
+    Goby.subscribe(app, interthread(), groups.depth_alert, incoming_depth_alert)
 end
 
 # how often the C++ application drains the channels the tasks publish to it through

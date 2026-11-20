@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+// What the Julia slow consumer example's interthread subscriptions have done so far, published
+// once a second so that it can be watched from outside the application.
+package goby3_examples.protobuf;
+
+message InterthreadQueueStats
+{
+    // work items the producer task has published
+    required int64 produced = 1;
+
+    // the slow consumer's subscription, which the configuration bounds
+    required int64 slow_delivered = 2;
+    required int64 slow_dropped = 3;
+    required int32 slow_queued = 4;
+
+    // the monitor's subscription to the same group, on a task of its own
+    required int64 monitor_delivered = 5;
+    // the longest a work item waited before the monitor saw it (s)
+    required double monitor_max_latency = 6;
+}
