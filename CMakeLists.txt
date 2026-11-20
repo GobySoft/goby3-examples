@@ -161,7 +161,7 @@ endif()
 if(TARGET basic_julia_multithread)
   list(APPEND deployments
     "julia_multithread launch/interprocess/zeromq/julia_multithread_deployment.yml vehicle1=julia_multithread.launch"
-    "julia_backpressure launch/interprocess/zeromq/julia_backpressure_deployment.yml vehicle1=julia_backpressure.launch")
+    "julia_slow_consumer launch/interprocess/zeromq/julia_slow_consumer_deployment.yml vehicle1=julia_slow_consumer.launch")
 endif()
 if(TARGET goby3_example_python_multithread)
   list(APPEND deployments

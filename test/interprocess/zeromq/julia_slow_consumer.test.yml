@@ -1,12 +1,12 @@
-# Harness for launch/interprocess/zeromq/julia_backpressure.launch
+# Harness for launch/interprocess/zeromq/julia_slow_consumer.launch
 #
 # The Julia application reports its INTERTHREAD subscriptions once a second on
-# groups::julia_backpressure. With the configured :drop_oldest policy and a consumer that takes
+# groups::julia_queue_stats. With the configured :drop_oldest policy and a consumer that takes
 # 0.5 s an item against a 20 Hz producer, the consumer's queue overflows and drops the oldest
 # items, while the producer keeps its rate and the monitor, subscribed to the same group on a
 # task of its own, keeps up with it.
 #
-#   goby test run test/interprocess/zeromq/julia_backpressure.test.yml   (from the repository root, with the examples built and on the PATH)
+#   goby test run test/interprocess/zeromq/julia_slow_consumer.test.yml   (from the repository root, with the examples built and on the PATH)
 
 endpoint:
   - name: default
@@ -14,24 +14,24 @@ endpoint:
 
 fixture:
   - name: example
-    command: goby_launch -r julia_backpressure.launch
+    command: goby_launch -r julia_slow_consumer.launch
     cwd: ../../../launch/interprocess/zeromq
     ready: { output_regex: "All processes running", timeout: 30 }
 
 test:
-  name: julia interthread backpressure
+  name: julia interthread slow consumer
   default_timeout: 5
 
   require_app:
     # Julia compiles on first use, so the application can take a while to answer
-    - name: [gobyd, basic_julia_backpressure]
+    - name: [gobyd, basic_julia_slow_consumer]
       timeout: 180
 
   run:
     - name: the slow consumer drops the oldest items while the producer and monitor keep up
       expect:
-        - group: groups::julia_backpressure
-          type: goby3_examples.protobuf.InterthreadBackpressure
+        - group: groups::julia_queue_stats
+          type: goby3_examples.protobuf.InterthreadQueueStats
           min_count: 1
           timeout: 30
           condition:

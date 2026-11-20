@@ -217,19 +217,19 @@ cd launch/interprocess/zeromq
 goby_launch -x julia_multithread.launch
 ```
 
-### Backpressure in Julia (INTERTHREAD)
+### Slow Consumers in Julia (INTERTHREAD)
 
-`src/interprocess/zeromq/julia/backpressure` shows what a Julia `INTERTHREAD` publisher does when a subscriber cannot keep up. A producer task publishes work at 20 Hz to a consumer that takes 0.5 s an item, and a monitor task subscribes to the same group. Each subscription has a queue of its own, and `basic_julia_backpressure.pb.cfg` chooses the consumer's `capacity` and `overflow`:
+`src/interprocess/zeromq/julia/slow_consumer` shows what a Julia `INTERTHREAD` publisher does when a subscriber cannot keep up. A producer task publishes work at 20 Hz to a consumer that takes 0.5 s an item, and a monitor task subscribes to the same group. Each subscription has a queue of its own, and `basic_julia_slow_consumer.pb.cfg` chooses the consumer's `capacity` and `overflow`:
 
 - `drop_oldest` (as configured): the producer keeps its rate and the consumer's oldest queued items are dropped.
 - `block`: the producer waits for room, so everything slows to the consumer's pace, the monitor included.
 - `drop_newest` or `error`: new items are dropped, or the publication throws.
 
-Once a second the application prints, and publishes on `groups::julia_backpressure`, what each subscription has delivered and dropped (from `Goby.interthread_stats()`). The consumer is a task module of its own because a callback runs on its task's thread: a slow one delays everything else that task does.
+Once a second the application prints, and publishes on `groups::julia_queue_stats`, what each subscription has delivered and dropped (from `Goby.interthread_stats()`). The consumer is a task module of its own because a callback runs on its task's thread: a slow one delays everything else that task does.
 
 ```
 cd launch/interprocess/zeromq
-goby_launch -x julia_backpressure.launch
+goby_launch -x julia_slow_consumer.launch
 ```
 
 These two examples need a Goby.jl with `INTERTHREAD` queues (Goby 3.8 or later), and are skipped otherwise.

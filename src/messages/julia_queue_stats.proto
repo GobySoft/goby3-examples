@@ -1,10 +1,10 @@
 syntax = "proto2";
 
-// What the Julia backpressure example's interthread subscriptions have done so far, published
+// What the Julia slow consumer example's interthread subscriptions have done so far, published
 // once a second so that it can be watched from outside the application.
 package goby3_examples.protobuf;
 
-message InterthreadBackpressure
+message InterthreadQueueStats
 {
     // work items the producer task has published
     required int64 produced = 1;

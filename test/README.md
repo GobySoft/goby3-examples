@@ -41,7 +41,7 @@ cd build && ctest --output-on-failure
 | `interprocess/zeromq/json` | JSON marshalling | typed and untyped JSON messages flow in parallel; hand-published JSON is visible |
 | `interprocess/udpm/basic_publisher_subscriber` | basic UDPM pub/sub | as the ZeroMQ basic test, without a broker |
 | `intervehicle/basic` | two vehicles over UDP multicast modem | DCCL report is visible on vehicle1 and arrives on vehicle2, received on the intervehicle layer as the subscriber does |
-| `interprocess/zeromq/julia_backpressure` | Julia INTERTHREAD backpressure (when the Julia examples are built) | a full `drop_oldest` subscription drops items while the producer and a second subscriber keep their rate |
+| `interprocess/zeromq/julia_slow_consumer` | Julia INTERTHREAD slow consumer (when the Julia examples are built) | a full `drop_oldest` subscription drops items while the producer and a second subscriber keep their rate |
 
 ## Deployment checks
 

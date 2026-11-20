@@ -15,8 +15,8 @@ set(harnesses
   hold:interprocess/zeromq/hold.test.yml
   basic_udpm:interprocess/udpm/basic_publisher_subscriber.test.yml
   basic_intervehicle:intervehicle/basic.test.yml)
-if(TARGET basic_julia_backpressure)
-  list(APPEND harnesses julia_backpressure:interprocess/zeromq/julia_backpressure.test.yml)
+if(TARGET basic_julia_slow_consumer)
+  list(APPEND harnesses julia_slow_consumer:interprocess/zeromq/julia_slow_consumer.test.yml)
 endif()
 
 if(enable_tests)

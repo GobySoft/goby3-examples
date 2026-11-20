@@ -19,19 +19,19 @@
 # far behind the consumer falls. The consumer is a task module of its own for the same reason: a
 # callback runs on its task's thread, so a slow one delays everything else that task does.
 #
-#   build/bin/basic_julia_backpressure basic_julia_backpressure.pb.cfg
+#   build/bin/basic_julia_slow_consumer basic_julia_slow_consumer.pb.cfg
 
 include(joinpath(@__DIR__, "..", "goby_application_init.jl"))
-init_cxxwrap("basic_julia_backpressure")
+init_cxxwrap("basic_julia_slow_consumer")
 include_protos(@__MODULE__, "goby3_examples")
 
-include(joinpath(@__DIR__, "basic_julia_backpressure_goby.jl"))
-using .BasicJuliaBackpressureGoby: groups, interprocess
+include(joinpath(@__DIR__, "basic_julia_slow_consumer_goby.jl"))
+using .BasicJuliaSlowConsumerGoby: groups, interprocess
 
 # read first: the task modules below take their rates and queue settings from it
 config_str = Goby.read_cli_cfg()
-app = Goby.BasicJuliaBackpressure(config_str)
-pb_cfg = Goby.cfg(app, goby3_examples.config.BasicJuliaBackpressureConfig)
+app = Goby.BasicJuliaSlowConsumer(config_str)
+pb_cfg = Goby.cfg(app, goby3_examples.config.BasicJuliaSlowConsumerConfig)
 println("Producing at $(pb_cfg.producer_rate) Hz for a consumer taking $(pb_cfg.consumer_delay) s " *
         "an item, queueing $(pb_cfg.capacity) with overflow $(pb_cfg.overflow)")
 
@@ -98,7 +98,7 @@ function report()
     monitor = stats_for(stats, :MonitorTask)
     (slow === nothing || monitor === nothing) && return
 
-    msg = goby3_examples.protobuf.InterthreadBackpressure(
+    msg = goby3_examples.protobuf.InterthreadQueueStats(
         produced = ProducerTask.produced[],
         slow_delivered = slow.delivered,
         slow_dropped = slow.dropped,
@@ -109,7 +109,7 @@ function report()
     println("[main] produced $(msg.produced); consumer: $(msg.slow_delivered) handled, " *
             "$(msg.slow_dropped) dropped, $(msg.slow_queued) queued; monitor: " *
             "$(msg.monitor_delivered) handled, worst latency $(round(msg.monitor_max_latency, digits = 3)) s")
-    Goby.publish(app, interprocess(), groups.julia_backpressure, msg)
+    Goby.publish(app, interprocess(), groups.julia_queue_stats, msg)
 end
 
 goby_cfg = Dict(:loop_frequency => 1, :loop_function => report)

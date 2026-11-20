@@ -17,6 +17,6 @@ GOBY_DEFINE_GROUP(groups, string_msg)
 
 GOBY_DEFINE_GROUP(groups, init)
 GOBY_DEFINE_GROUP(groups, julia_nav)
-GOBY_DEFINE_GROUP(groups, julia_backpressure)
+GOBY_DEFINE_GROUP(groups, julia_queue_stats)
 
 #endif
