@@ -10,6 +10,8 @@ application:
 
 interprocess:
   publishes:
+    # Main reports from its loop
     - group: groups::julia_backpressure
       scheme: PROTOBUF
       type: goby3_examples::protobuf::InterthreadBackpressure
+      thread: Main

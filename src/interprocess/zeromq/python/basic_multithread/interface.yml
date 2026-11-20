@@ -11,9 +11,11 @@ application:
 
 interprocess:
   publishes:
+    # the watcher thread forwards each report; only it may publish here
     - group: groups::nav
       scheme: PROTOBUF
       type: protobuf.NavigationReport
+      thread: DepthWatcher
 
 interthread:
   publishes:
