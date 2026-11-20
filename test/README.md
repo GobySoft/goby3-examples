@@ -41,6 +41,7 @@ cd build && ctest --output-on-failure
 | `interprocess/zeromq/json` | JSON marshalling | typed and untyped JSON messages flow in parallel; hand-published JSON is visible |
 | `interprocess/udpm/basic_publisher_subscriber` | basic UDPM pub/sub | as the ZeroMQ basic test, without a broker |
 | `intervehicle/basic` | two vehicles over UDP multicast modem | DCCL report is visible on vehicle1 and arrives on vehicle2, received on the intervehicle layer as the subscriber does |
+| `interprocess/zeromq/julia_backpressure` | Julia INTERTHREAD backpressure (when the Julia examples are built) | a full `drop_oldest` subscription drops items while the producer and a second subscriber keep their rate |
 
 ## Deployment checks
 
@@ -58,6 +59,10 @@ disagree on what is launched.
 goby interface validate launch/interprocess/zeromq/state_machine_deployment.yml -I build/share/interfaces
 goby interface explain launch/interprocess/zeromq/json_deployment.yml nav -I build/share/interfaces
 ```
+
+The Julia and Python multithread deployments draw each Julia task or Python thread inside its
+application, from the interthread traffic their `interface.yml` declares, and validate its
+required subscriptions the same way.
 
 `json_deployment.yml` also shows a deployment setting a subscription's necessity: its subscriber's
 type-regex subscription is marked `recommended` there rather than in the code.

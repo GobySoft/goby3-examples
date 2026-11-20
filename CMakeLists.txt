@@ -157,6 +157,16 @@ if(TARGET goby3_example_basic_zenoh_interprocess_publisher)
   list(APPEND deployments
     "basic_zenoh launch/interprocess/zenoh/basic_publisher_subscriber_deployment.yml vehicle1=basic_publisher_subscriber.launch")
 endif()
+# the Julia and Python applications' interthread tasks and threads come from their interface.yml
+if(TARGET basic_julia_multithread)
+  list(APPEND deployments
+    "julia_multithread launch/interprocess/zeromq/julia_multithread_deployment.yml vehicle1=julia_multithread.launch"
+    "julia_backpressure launch/interprocess/zeromq/julia_backpressure_deployment.yml vehicle1=julia_backpressure.launch")
+endif()
+if(TARGET goby3_example_python_multithread)
+  list(APPEND deployments
+    "python_multithread launch/interprocess/zeromq/python_multithread_deployment.yml vehicle1=python_multithread.launch")
+endif()
 
 if(goby_interface_tool_found)
   foreach(entry ${deployments})

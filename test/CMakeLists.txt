@@ -15,6 +15,9 @@ set(harnesses
   hold:interprocess/zeromq/hold.test.yml
   basic_udpm:interprocess/udpm/basic_publisher_subscriber.test.yml
   basic_intervehicle:intervehicle/basic.test.yml)
+if(TARGET basic_julia_backpressure)
+  list(APPEND harnesses julia_backpressure:interprocess/zeromq/julia_backpressure.test.yml)
+endif()
 
 if(enable_tests)
   if(NOT goby_test_help MATCHES "validate")
@@ -39,6 +42,10 @@ if(enable_tests)
       PROPERTIES ENVIRONMENT "${test_env}")
     # the harnesses share platforms and multicast groups, so never run them concurrently
     set_tests_properties(goby3_example_test_${name} PROPERTIES RUN_SERIAL TRUE TIMEOUT 120)
+    # Julia compiles its dependencies on first use
+    if(name MATCHES "^julia_")
+      set_tests_properties(goby3_example_test_${name} PROPERTIES TIMEOUT 600)
+    endif()
   endforeach()
 endif()
 

@@ -1,0 +1,7 @@
+deployment: julia_multithread
+platforms:
+  - name: vehicle1
+    run:
+      - gobyd
+      - { application: basic_julia_multithread, args: basic_julia_multithread.pb.cfg }
+      - { application: basic_julia_subscriber, args: basic_julia_subscriber.pb.cfg }

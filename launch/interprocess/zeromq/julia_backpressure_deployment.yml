@@ -1,0 +1,6 @@
+deployment: julia_backpressure
+platforms:
+  - name: vehicle1
+    run:
+      - gobyd
+      - { application: basic_julia_backpressure, args: basic_julia_backpressure.pb.cfg }

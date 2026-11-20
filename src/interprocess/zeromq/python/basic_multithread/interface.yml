@@ -1,6 +1,7 @@
-# Only the interprocess publication is declared. INTERTHREAD is implemented in Python and never
-# reaches the generated C++, so an interthread group is a plain string chosen by the application
-# rather than a C++ group named here -- and the application needs no MultiThreadApplication.
+# The interprocess publication goes through the generated C++. The interthread traffic is carried
+# between the Python threads and never reaches C++: declaring it here makes it a contract the
+# application is held to, and puts the threads in the 'goby interface' diagrams. The application
+# is still a SingleThreadApplication: the C++ side has no idea these threads exist.
 application:
   name: BasicPythonMultithread
   cpp_type: goby::zeromq::SingleThreadApplication
@@ -13,3 +14,25 @@ interprocess:
     - group: groups::nav
       scheme: PROTOBUF
       type: protobuf.NavigationReport
+
+interthread:
+  publishes:
+    - group: raw_nav
+      scheme: PROTOBUF
+      type: protobuf.NavigationReport
+      thread: NavPublisher
+    # NATIVE: any Python class, here a dataclass defined in multithread.py
+    - group: depth_alert
+      scheme: NATIVE
+      type: DepthAlert
+      thread: DepthWatcher
+  subscribes:
+    - group: raw_nav
+      scheme: PROTOBUF
+      type: protobuf.NavigationReport
+      thread: DepthWatcher
+      necessity: required
+    - group: depth_alert
+      scheme: NATIVE
+      type: DepthAlert
+      thread: BasicMultithread

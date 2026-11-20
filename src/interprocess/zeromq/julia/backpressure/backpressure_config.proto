@@ -1,0 +1,21 @@
+syntax = "proto2";
+import "goby/middleware/protobuf/app_config.proto";
+import "goby/zeromq/protobuf/interprocess_config.proto";
+
+package goby3_examples.config;
+
+message BasicJuliaBackpressureConfig
+{
+    optional goby.middleware.protobuf.AppConfig app = 1;
+    optional goby.zeromq.protobuf.InterProcessPortalConfig interprocess = 2;
+
+    // how fast the producer task publishes work (Hz)
+    optional double producer_rate = 3 [default = 20];
+    // how long the slow consumer spends on each item (s)
+    optional double consumer_delay = 4 [default = 0.5];
+
+    // the slow consumer's subscription: how many items it queues, and what a publication does
+    // when the queue is full (block, drop_oldest, drop_newest or error)
+    optional int32 capacity = 5 [default = 10];
+    optional string overflow = 6 [default = "drop_oldest"];
+}

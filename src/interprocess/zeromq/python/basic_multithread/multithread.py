@@ -7,11 +7,11 @@ one to the rest of the Goby system, and the application prints an alert when the
 Three things this example exists to show:
 
   1. INTERTHREAD is pure Python. Goby carries these messages between threads without marshalling
-     them, so they never enter the generated C++ and interthread groups are not declared in
-     interface.yml -- any string will do. The application is a SingleThreadApplication: the C++
-     side has no idea these threads exist.
+     them, so they never enter the generated C++ and the application is a
+     SingleThreadApplication. interface.yml declares them anyway: each publication and
+     subscription is then held to that declaration, and 'goby interface' draws the threads.
   2. Because of that, an interthread message can be any Python object, not only a protobuf
-     message. The alert below is a dataclass.
+     message. The alert below is a dataclass, declared in interface.yml as scheme NATIVE.
   3. INTERPROCESS belongs to the application's thread, but a thread publishes to it directly
      anyway: the publication is handed to the application behind the scenes, as a C++ thread's
      InterProcessForwarder hands its traffic to the portal.
@@ -28,15 +28,11 @@ from dataclasses import dataclass
 import goby
 
 # generated from interface.yml by goby_add_python_app(); provides the application and thread base
-# classes, and the groups declared in the interface file
+# classes, the groups declared in the interface file, and the interthread contract
 from basic_python_multithread_goby import SingleThreadApplication, Thread, groups
 
 # protoc --python_out of src/messages/nav.proto
 from messages import nav_pb2
-
-# interthread groups are Python-side only, so they are named here rather than in interface.yml
-NAV_GROUP = "nav"
-DEPTH_ALERT_GROUP = "depth_alert"
 
 
 @dataclass
@@ -62,7 +58,7 @@ class NavPublisher(Thread):
         )
 
         print(f"[publisher] Tx: z={nav.z:.1f}")
-        self.interthread().publish(NAV_GROUP, nav)
+        self.interthread().publish(groups.raw_nav, nav)
 
 
 class DepthWatcher(Thread):
@@ -74,7 +70,7 @@ class DepthWatcher(Thread):
 
         # subscribing in the constructor is what a C++ SimpleThread does, and works for the same
         # reason: the thread is constructed on the thread it runs on, so the callback lands here
-        self.interthread().subscribe(NAV_GROUP, self.incoming_nav)
+        self.interthread().subscribe(groups.raw_nav, self.incoming_nav)
 
     def incoming_nav(self, nav: nav_pb2.NavigationReport):
         print(f"[watcher] Rx: z={nav.z:.1f}")
@@ -85,7 +81,7 @@ class DepthWatcher(Thread):
 
         if -nav.z > self.cfg.alert_depth:
             self.interthread().publish(
-                DEPTH_ALERT_GROUP, DepthAlert(depth=-nav.z, x=nav.x, y=nav.y)
+                groups.depth_alert, DepthAlert(depth=-nav.z, x=nav.x, y=nav.y)
             )
 
 
@@ -97,7 +93,7 @@ class BasicMultithread(SingleThreadApplication):
 
         print(f"Alerting below {self.cfg.alert_depth} m")
 
-        self.interthread().subscribe(DEPTH_ALERT_GROUP, self.incoming_depth_alert)
+        self.interthread().subscribe(groups.depth_alert, self.incoming_depth_alert)
 
         self.launch_thread(NavPublisher)
         self.launch_thread(DepthWatcher)
